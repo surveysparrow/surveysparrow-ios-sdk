@@ -10,6 +10,9 @@
 		547B0F202498707300898A47 /* SurveySparrowSdk.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 547B0F162498707300898A47 /* SurveySparrowSdk.framework */; };
 		547B0F252498707300898A47 /* SurveySparrowSdkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 547B0F242498707300898A47 /* SurveySparrowSdkTests.swift */; };
 		547B0F272498707300898A47 /* SurveySparrowSdk.h in Headers */ = {isa = PBXBuildFile; fileRef = 547B0F192498707300898A47 /* SurveySparrowSdk.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		547B0F312498707300898A47 /* SsSurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 547B0F302498707300898A47 /* SsSurveyViewController.swift */; };
+		547B0F332498707300898A47 /* SsSurveyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 547B0F322498707300898A47 /* SsSurveyView.swift */; };
+		547B0F352498707300898A47 /* SsSurveyDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 547B0F342498707300898A47 /* SsSurveyDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +32,9 @@
 		547B0F1F2498707300898A47 /* SurveySparrowSdkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SurveySparrowSdkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		547B0F242498707300898A47 /* SurveySparrowSdkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveySparrowSdkTests.swift; sourceTree = "<group>"; };
 		547B0F262498707300898A47 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		547B0F302498707300898A47 /* SsSurveyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsSurveyViewController.swift; sourceTree = "<group>"; };
+		547B0F322498707300898A47 /* SsSurveyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsSurveyView.swift; sourceTree = "<group>"; };
+		547B0F342498707300898A47 /* SsSurveyDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsSurveyDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +79,9 @@
 			children = (
 				547B0F192498707300898A47 /* SurveySparrowSdk.h */,
 				547B0F1A2498707300898A47 /* Info.plist */,
+				547B0F322498707300898A47 /* SsSurveyView.swift */,
+				547B0F302498707300898A47 /* SsSurveyViewController.swift */,
+				547B0F342498707300898A47 /* SsSurveyDelegate.swift */,
 			);
 			path = SurveySparrowSdk;
 			sourceTree = "<group>";
@@ -148,6 +157,7 @@
 				TargetAttributes = {
 					547B0F152498707300898A47 = {
 						CreatedOnToolsVersion = 11.3.1;
+						LastSwiftMigration = 1130;
 					};
 					547B0F1E2498707300898A47 = {
 						CreatedOnToolsVersion = 11.3.1;
@@ -195,6 +205,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				547B0F352498707300898A47 /* SsSurveyDelegate.swift in Sources */,
+				547B0F332498707300898A47 /* SsSurveyView.swift in Sources */,
+				547B0F312498707300898A47 /* SsSurveyViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -340,6 +353,7 @@
 		547B0F2B2498707300898A47 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = K82TH94VUY;
@@ -356,6 +370,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.surveysparrow.SurveySparrowSdk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -364,6 +379,7 @@
 		547B0F2C2498707300898A47 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = K82TH94VUY;
@@ -388,6 +404,7 @@
 		547B0F2E2498707300898A47 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = K82TH94VUY;
 				INFOPLIST_FILE = SurveySparrowSdkTests/Info.plist;
@@ -406,6 +423,7 @@
 		547B0F2F2498707300898A47 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = K82TH94VUY;
 				INFOPLIST_FILE = SurveySparrowSdkTests/Info.plist;
