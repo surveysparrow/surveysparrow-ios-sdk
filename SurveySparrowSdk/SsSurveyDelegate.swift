@@ -8,6 +8,6 @@
 
 import Foundation
 
-protocol SsSurveyDelegate {
+public protocol SsSurveyDelegate {
   func handleSurveyResponse(response: [String: Any])
 }

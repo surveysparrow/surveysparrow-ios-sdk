@@ -7,10 +7,9 @@
 //
 
 import UIKit
-import os.log
 
 @IBDesignable
-class SsSurveyViewController: UIViewController, SsSurveyDelegate {
+public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
   // MARK: Properties
   var surveyDelegate: SsSurveyDelegate!
   
@@ -21,7 +20,7 @@ class SsSurveyViewController: UIViewController, SsSurveyDelegate {
   @IBInspectable var thankyouTimeout: Double = 3.0
 
   // MARK: Initialize
-  override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
     
     view.backgroundColor = view.backgroundColor == nil ? .white : view.backgroundColor
@@ -36,12 +35,12 @@ class SsSurveyViewController: UIViewController, SsSurveyDelegate {
       ssSurveyView.loadSurvey(domain: domain, token: token)
       view.addSubview(ssSurveyView)
     } else {
-      os_log("Domain or Token is nil", type: .debug)
+      print("Error: Domain or token is nil")
     }
   }
   
   // MARK: Delegate
-  func handleSurveyResponse(response: [String : Any]) {
+  public func handleSurveyResponse(response: [String : Any]) {
     if surveyDelegate != nil {
       surveyDelegate.handleSurveyResponse(response: response)
     }

@@ -8,9 +8,8 @@
 
 import UIKit
 import WebKit
-import os.log
 
-@IBDesignable class SsSurveyView: UIView, WKScriptMessageHandler {
+@IBDesignable public class SsSurveyView: UIView, WKScriptMessageHandler {
   // MARK: Properties
   private var ssWebView: WKWebView?
   private let surveyResponseHandler = WKUserContentController()
@@ -47,7 +46,7 @@ import os.log
     addSubview(ssWebView!)
   }
   
-  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+  public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
     if surveyDelegate != nil {
       let response = message.body as! [String: Any]
       surveyDelegate.handleSurveyResponse(response: response)
@@ -55,12 +54,12 @@ import os.log
   }
   
   // MARK: Public method
-  func loadSurvey(domain: String? = nil, token: String? = nil) {
+  public func loadSurvey(domain: String? = nil, token: String? = nil) {
     self.domain = domain != nil ? domain! : self.domain
     self.token = token != nil ? token! : self.token
     if self.domain != nil && self.token != nil {
       var urlComponent = URLComponents()
-      urlComponent.scheme = "http"
+      urlComponent.scheme = "https"
       urlComponent.host = self.domain!.trimmingCharacters(in: CharacterSet.whitespaces)
       urlComponent.path = "/s/ios/\(self.token!.trimmingCharacters(in: CharacterSet.whitespaces))"
       urlComponent.queryItems = params.map {
@@ -72,7 +71,7 @@ import os.log
         ssWebView?.load(request)
       }
     } else {
-      os_log("Domain or token is nil", type: .debug)
+      print("Error: Domain or token is nil")
     }
   }
 }
