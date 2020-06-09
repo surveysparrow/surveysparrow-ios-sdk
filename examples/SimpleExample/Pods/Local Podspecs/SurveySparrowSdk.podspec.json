@@ -1,0 +1,20 @@
+{
+  "name": "SurveySparrowSdk",
+  "version": "0.0.3",
+  "summary": "SurveySparrow Feedback SDK for iOS",
+  "description": "SurveySparrow Feedback SDK for iOS",
+  "homepage": "https://surveysparrow.com",
+  "license": "MIT",
+  "authors": {
+    "Ajay Sivan": "ajaysivan@surveysparrow.com"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "source": {
+    "path": "."
+  },
+  "source_files": "SurveySparrowSdk/**/*.swift",
+  "swift_versions": "5.0",
+  "swift_version": "5.0"
+}

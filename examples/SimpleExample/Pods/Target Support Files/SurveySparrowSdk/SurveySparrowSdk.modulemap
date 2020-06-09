@@ -1,0 +1,6 @@
+framework module SurveySparrowSdk {
+  umbrella header "SurveySparrowSdk-umbrella.h"
+
+  export *
+  module * { export * }
+}
