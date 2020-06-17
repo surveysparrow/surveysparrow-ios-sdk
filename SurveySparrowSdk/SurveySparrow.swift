@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-public class SurveySparrow {
+public class SurveySparrow: SsSurveyDelegate {
   // MARK: Properties
   private var dataStore = NSUbiquitousKeyValueStore()
   private var domain: String
@@ -17,7 +17,7 @@ public class SurveySparrow {
   
   public var params: [String: String]?
   public var thankyouTimout: Double = 3.0
-  public var surveyDelgate: SsSurveyDelegate!
+  public var surveyDelegate: SsSurveyDelegate!
   public var alertTitle: String = "Rate us"
   public var alertMessage: String = "Share your feedback and let us know how we are doing"
   public var alertPositiveButton: String = "Rate Now"
@@ -64,14 +64,13 @@ public class SurveySparrow {
         ssSurveyViewController.domain = self.domain
         ssSurveyViewController.token = self.token
         ssSurveyViewController.thankyouTimeout = self.thankyouTimout
-        ssSurveyViewController.surveyDelegate = self.surveyDelgate
+        ssSurveyViewController.surveyDelegate = self
         parent.present(ssSurveyViewController, animated: true, completion: nil)
       }))
       alertDialog.addAction(UIAlertAction(title: alertNegativeButton, style: UIAlertAction.Style.cancel, handler: nil))
       parent.present(alertDialog, animated: true)
       
       UserDefaults.standard.set(incrementalRepeat ? incrementMultiplier * 2 : 1, forKey: self.incrementMultiplierKey)
-      UserDefaults.standard.set(true, forKey: isAlreadyTakenKey)
       let timeTillNext = Int64(repeatInterval * 24 * 60 * 60 * 1000 * incrementMultiplier)
       let nextPrompt = currentTime + timeTillNext
       UserDefaults.standard.set(nextPrompt, forKey: promptTimeKey)
@@ -82,5 +81,13 @@ public class SurveySparrow {
     UserDefaults.standard.removeObject(forKey: incrementMultiplierKey)
     UserDefaults.standard.removeObject(forKey: isAlreadyTakenKey)
     UserDefaults.standard.removeObject(forKey: promptTimeKey)
+  }
+  
+  // MARK: Delegate
+  public func handleSurveyResponse(response: [String : Any]) {
+    UserDefaults.standard.set(true, forKey: isAlreadyTakenKey)
+    if surveyDelegate != nil {
+      self.surveyDelegate.handleSurveyResponse(response: response)
+    }
   }
 }
