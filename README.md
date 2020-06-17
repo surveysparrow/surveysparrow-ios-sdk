@@ -25,6 +25,8 @@ Add `SurveySparrowSdk.framework` to your project
 ### Full-screen feedback
 Take feedback using our pre-build `SsSurveyViewController` and get the response after submission by implementing the `SsSurveyDelegate`'s `handleSurveyResponse` protocol.
 
+![picture](examples/screenshots/fullscreen.png)
+
 #### Import framework
 ```swift
 import SurveySparrowSdk
@@ -61,6 +63,8 @@ ssSurveyViewController.surveyDelegate = self
 ### Embed survey 
 Embed the feedback experience using the [`SsSurveyView`](#SsSurveyView).
 
+![picture](examples/screenshots/embedded.png)
+
 #### Add SsSurveyView
 Add a `UIView` to storyboard and change the Class to `SsSurveyView` under *Identity Inspector*, make survey that the Module is `SurveySparrowSdk`. Under Attribute inspector tab specify `domain` and `token`. 
 
@@ -77,6 +81,8 @@ Implement `SsSurveyDelegate` protocol to handle responses.
 
 ### Schedule Surveys
 Ask the user to take a feedback survey when they open your app after few days.
+
+![picture](examples/screenshots/schedule.png)
 
 Override viewDidAppear method and create a `SurveySparrow` object by passing domain and `token`. Then call `scheduleSurvey` method on the `SurveySparrow` object by passing the `ViewController` reference to schedule the survey.
 ```swift
