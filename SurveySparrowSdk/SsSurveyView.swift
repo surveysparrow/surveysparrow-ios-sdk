@@ -63,7 +63,7 @@ import WebKit
   
   public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
     if surveyDelegate != nil {
-      let response = message.body as! [String: Any]
+      let response = message.body as! [String: AnyObject]
       surveyDelegate.handleSurveyResponse(response: response)
     }
   }
