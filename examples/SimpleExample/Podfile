@@ -6,7 +6,6 @@ target 'SimpleExample' do
   use_frameworks!
 
   # Pods for SimpleExample
-  pod 'SurveySparrowSdk', :path => '/Users/ajaysivan/SurveySparrow/SDK/SurveySparrowSdk'
 
   target 'SimpleExampleTests' do
     inherit! :search_paths

@@ -1,16 +1,3 @@
-PODS:
-  - SurveySparrowSdk (0.0.3)
-
-DEPENDENCIES:
-  - SurveySparrowSdk (from `/Users/ajaysivan/SurveySparrow/SDK/SurveySparrowSdk`)
-
-EXTERNAL SOURCES:
-  SurveySparrowSdk:
-    :path: "/Users/ajaysivan/SurveySparrow/SDK/SurveySparrowSdk"
-
-SPEC CHECKSUMS:
-  SurveySparrowSdk: 28cd2cfde31a92549b0bbba632bae7f34814a4d0
-
-PODFILE CHECKSUM: e3073b1658c6b842b6adfacec7244db028cf4efa
+PODFILE CHECKSUM: 853a4c56d71c9ccb2a9b04c47b81ca4d88d34995
 
 COCOAPODS: 1.8.4
