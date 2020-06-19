@@ -23,8 +23,8 @@ public class SurveySparrow: SsSurveyDelegate {
   public var alertPositiveButton: String = "Rate Now"
   public var alertNegativeButton: String = "Later"
   public var isConnectedToNetwork: Bool = true
-  public var startAfter: Int = 3
-  public var repeatInterval: Int = 5
+  public var startAfter: Int64 = 259200000 // 3 days
+  public var repeatInterval: Int64 = 432000000 // 5 days
   public var incrementalRepeat: Bool = false
   public var repeatSurvey: Bool = false
   
@@ -51,7 +51,7 @@ public class SurveySparrow: SsSurveyDelegate {
     incrementMultiplier = incrementMultiplier == 0 ? 1 : incrementMultiplier
     
     if promptTime == 0 {
-      let nextPrompt = currentTime + Int64(startAfter * 24 * 60 * 60 * 1000)
+      let nextPrompt = currentTime + startAfter
       UserDefaults.standard.set(nextPrompt, forKey: promptTimeKey)
       dataStore.set(1, forKey: incrementMultiplierKey)
       return
@@ -71,7 +71,7 @@ public class SurveySparrow: SsSurveyDelegate {
       parent.present(alertDialog, animated: true)
       
       UserDefaults.standard.set(incrementalRepeat ? incrementMultiplier * 2 : 1, forKey: self.incrementMultiplierKey)
-      let timeTillNext = Int64(repeatInterval * 24 * 60 * 60 * 1000 * incrementMultiplier)
+      let timeTillNext = repeatInterval * Int64(incrementMultiplier)
       let nextPrompt = currentTime + timeTillNext
       UserDefaults.standard.set(nextPrompt, forKey: promptTimeKey)
     }

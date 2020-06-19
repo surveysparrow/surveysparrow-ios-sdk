@@ -1,6 +1,6 @@
 # Survey Sparrow iOS SDK
 
-SurveySparrow iOS SDK enables you to collect the feedback from your mobile app. Embed the Classic & Chat surveys in your iOS application seamlessly with few lines of code.
+SurveySparrow iOS SDK enables you to collect feedback from your mobile app. Embed the Classic & Chat surveys in your iOS application seamlessly with few lines of code.
 
 > Mobile SDK share channel is only available from SurveySparrow **Premium** plan onwards.
 
@@ -12,7 +12,7 @@ SurveySparrow iOS SDK enables you to collect the feedback from your mobile app. 
 ## SDK integration (Deployment Target 9+)
 
 ### Add SurveySparrowSdk Framework
-Add SurveySparrowSdk Framework to your project either by using CocoaPods or directly embed binary
+Add SurveySparrowSdk Framework to your project either by using CocoaPods or directly embedding binary
 #### Using CocoaPods
 Add the following line to your `Podfile` file under `target`
 ```swift
@@ -66,7 +66,7 @@ Embed the feedback experience using the [`SsSurveyView`](#SsSurveyView).
 ![](examples/screenshots/embedded.png =250x)
 
 #### Add SsSurveyView
-Add a `UIView` to storyboard and change the Class to `SsSurveyView` under *Identity Inspector*, make survey that the Module is `SurveySparrowSdk`. Under Attribute inspector tab specify `domain` and `token`. 
+Add a `UIView` to storyboard and change the Class to `SsSurveyView` under *Identity Inspector* and also make sure that the Module is `SurveySparrowSdk`. Under *Attribute inspector*  provide `domain` and `token`. 
 
 Now connect the `SsSurveyView` as an `IBOutlet`
 ```swift
@@ -80,11 +80,11 @@ ssSurveyView.loadSurvey()
 Implement `SsSurveyDelegate` protocol to handle responses.
 
 ### Schedule Surveys
-Ask the user to take a feedback survey when they open your app after few days.
+Ask the user to take a feedback survey when they open your app/ a screen after a period of time.
 
 ![](examples/screenshots/schedule.png =250x)
 
-Override viewDidAppear method and create a `SurveySparrow` object by passing domain and `token`. Then call `scheduleSurvey` method on the `SurveySparrow` object by passing the `ViewController` reference to schedule the survey.
+Override viewDidAppear method and create a `SurveySparrow` object by passing domain and `token`. Then call `scheduleSurvey` method on the `SurveySparrow` object by passing the parent `ViewController` reference to schedule the survey.
 ```swift
 override func viewDidAppear(_ animated: Bool) {
   super.viewDidAppear(animated)
@@ -98,8 +98,8 @@ Refer [SurveySparrow](#SurveySparrow) class for configuration options.
 #### Handle response
 Implement `SsSurveyDelegate` protocol to handle responses.
 
-#### Cancel a schedule
-You can cancel a schedule by calling the `surveySparrow.clearSchedule()` method.
+#### Clear a schedule
+You can clear a schedule by calling the `surveySparrow.clearSchedule()` method.
 
 #### How scheduling works
 We will show a customized alert to take a feedback survey whenever the `scheduleSurvey` method called after the `startAfter` days and if the user declines to take the survey we will show the prompt after the `repeatInterval`.
@@ -163,8 +163,8 @@ Class to handle survey scheduling
 |`alertPositiveButton: String`| Alert positive button text | Rate Now |
 |`alertNegativeButton: String`| Alert negative button text | Later |
 |`isConnectedToNetwork: Bool`| Network status | true |
-|`startAfter: Int`| Set the number of days to wait before showing the scheduled alert after launching the app for first time | 3 |
-|`repeatInterval: Int`| Set the number of days to wait to show the dialog once the user declined the dialog or accepted in the case of multiple feedback enabled | 5 |
+|`startAfter: Int64`| Set the number of days to wait before showing the scheduled alert after launching the app for first time | 259200000 *(3 days)* |
+|`repeatInterval: Int64`| Set the number of days to wait to show the dialog once the user declined the dialog or accepted in the case of multiple feedback enabled | 432000000 *(5 days)* |
 |`repeatSurvey: Bool`| Collect scheduled feedback multiple times. (Make sure that you have enabled 'Allow multiple submissions per user' for this survey) | false |
 |`incrementalRepeat: Bool`| Repeat survey with a incremental interval | false |
 
