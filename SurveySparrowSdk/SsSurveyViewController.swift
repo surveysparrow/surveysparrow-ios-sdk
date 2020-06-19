@@ -40,7 +40,7 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
   }
   
   // MARK: Delegate
-  public func handleSurveyResponse(response: [String : Any]) {
+  public func handleSurveyResponse(response: [String : AnyObject]) {
     if surveyDelegate != nil {
       surveyDelegate.handleSurveyResponse(response: response)
     }

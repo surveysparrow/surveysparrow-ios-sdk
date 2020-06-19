@@ -84,7 +84,7 @@ public class SurveySparrow: SsSurveyDelegate {
   }
   
   // MARK: Delegate
-  public func handleSurveyResponse(response: [String : Any]) {
+  public func handleSurveyResponse(response: [String : AnyObject]) {
     UserDefaults.standard.set(true, forKey: isAlreadyTakenKey)
     if surveyDelegate != nil {
       self.surveyDelegate.handleSurveyResponse(response: response)

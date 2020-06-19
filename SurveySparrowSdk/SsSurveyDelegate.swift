@@ -9,5 +9,5 @@
 import Foundation
 
 public protocol SsSurveyDelegate {
-  func handleSurveyResponse(response: [String: Any])
+  func handleSurveyResponse(response: [String: AnyObject])
 }
