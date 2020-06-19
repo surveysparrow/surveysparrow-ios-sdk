@@ -9,10 +9,11 @@
 import UIKit
 import WebKit
 
-@IBDesignable public class SsSurveyView: UIView, WKScriptMessageHandler {
+@IBDesignable public class SsSurveyView: UIView, WKScriptMessageHandler, WKNavigationDelegate {
   // MARK: Properties
-  private var ssWebView: WKWebView?
+  private var ssWebView: WKWebView = WKWebView()
   private let surveyResponseHandler = WKUserContentController()
+  private let loader: UIActivityIndicatorView = UIActivityIndicatorView()
   
   public var params: [String: String] = [:]
   
@@ -40,9 +41,24 @@ import WebKit
     ssWebView = WKWebView(frame: bounds, configuration: config)
     surveyResponseHandler.add(self, name: "surveyResponse")
     
-    ssWebView?.backgroundColor = .gray
-    ssWebView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    addSubview(ssWebView!)
+    ssWebView.backgroundColor = .gray
+    ssWebView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    addSubview(ssWebView)
+    
+    ssWebView.addSubview(loader)
+    ssWebView.navigationDelegate = self
+    loader.translatesAutoresizingMaskIntoConstraints = false
+    loader.centerXAnchor.constraint(equalTo: ssWebView.centerXAnchor).isActive = true
+    loader.centerYAnchor.constraint(equalTo: ssWebView.centerYAnchor).isActive = true
+    loader.hidesWhenStopped = true
+  }
+  
+  public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    loader.stopAnimating()
+  }
+  
+  public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    loader.stopAnimating()
   }
   
   public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -54,6 +70,7 @@ import WebKit
   
   // MARK: Public method
   public func loadSurvey(domain: String? = nil, token: String? = nil) {
+    loader.startAnimating()
     self.domain = domain != nil ? domain! : self.domain
     self.token = token != nil ? token! : self.token
     if self.domain != nil && self.token != nil {
@@ -67,7 +84,7 @@ import WebKit
       
       if let url = urlComponent.url {
         let request = URLRequest(url: url)
-        ssWebView?.load(request)
+        ssWebView.load(request)
       }
     } else {
       print("Error: Domain or token is nil")
