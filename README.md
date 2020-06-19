@@ -19,8 +19,8 @@ Add the following line to your `Podfile` file under `target`
 pod 'SurveySparrowSdk', :git => 'https://github.com/surveysparrow/surveysparrow-ios-sdk.git', :tag => '0.1.0'
 ```
 
-#### Embed SurveySparrowSdk Binary
-Add `SurveySparrowSdk.framework` to your project
+#### Not using CocoaPods! Directly import SurveySparrowSdk
+Add `SurveySparrowSdk.xcodeproj` or `SurveySparrowSdk.framework` to your project.
 
 ### Full-screen feedback
 Take feedback using our pre-build `SsSurveyViewController` and get the response after submission by implementing the `SsSurveyDelegate`'s `handleSurveyResponse` protocol.
