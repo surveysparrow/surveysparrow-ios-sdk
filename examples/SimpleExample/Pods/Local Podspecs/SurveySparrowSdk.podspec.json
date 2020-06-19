@@ -1,6 +1,6 @@
 {
   "name": "SurveySparrowSdk",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "summary": "SurveySparrow Feedback SDK for iOS",
   "description": "SurveySparrow Feedback SDK for iOS",
   "homepage": "https://surveysparrow.com",
@@ -12,7 +12,8 @@
     "ios": "9.0"
   },
   "source": {
-    "path": "."
+    "git": "https://github.com/surveysparrow/surveysparrow-ios-sdk",
+    "tag": "0.1.0"
   },
   "source_files": "SurveySparrowSdk/**/*.swift",
   "swift_versions": "5.0",

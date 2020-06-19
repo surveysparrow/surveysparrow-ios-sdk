@@ -4,7 +4,7 @@ Pod::Spec.new do |spec|
   spec.summary      = "SurveySparrow Feedback SDK for iOS"
   spec.description  = "SurveySparrow iOS SDK enables you to collect feedback from your mobile app. Embed the Classic & Chat surveys in your iOS application seamlessly with few lines of code."
   spec.homepage     = "https://surveysparrow.com"
-  spec.license = { :type => "MIT", :file => "./LICENSE" }
+  spec.license      = { :type => "MIT", :file => "LICENSE" }
   spec.author             = { "Ajay Sivan" => "ajaysivan@surveysparrow.com" }
   spec.platform     = :ios, "9.0"
 

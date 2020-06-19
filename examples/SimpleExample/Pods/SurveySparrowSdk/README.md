@@ -15,8 +15,8 @@ SurveySparrow iOS SDK enables you to collect feedback from your mobile app. Embe
 Add SurveySparrowSdk Framework to your project either by using CocoaPods or directly embedding binary
 #### Using CocoaPods
 Add the following line to your `Podfile` file under `target`
-```pod
-pod 'SurveySparrowSdk', :git => 'https://github.com/surveysparrow/surveysparrow-ios-sdk.git', :tag => '0.1.0'
+```swift
+pod 'SurveySparrowSdk', :git => 'URL', :tag => '0.1.0'
 ```
 
 #### Embed SurveySparrowSdk Binary
@@ -25,8 +25,7 @@ Add `SurveySparrowSdk.framework` to your project
 ### Full-screen feedback
 Take feedback using our pre-build `SsSurveyViewController` and get the response after submission by implementing the `SsSurveyDelegate`'s `handleSurveyResponse` protocol.
 
-<img width="340" alt="SurveySparrow Android SDK full-screen view" src="https://user-images.githubusercontent.com/61273614/85125035-89f2c680-b248-11ea-9a4f-fffa737e8572.png">
-
+![](examples/screenshots/fullscreen.png =250x)
 
 #### Import framework
 ```swift
@@ -49,7 +48,7 @@ Implement the `SsSurveyDelegate` protocol to handle survey responses.
 ```swift
 class ViewController: UIViewController, SsSurveyDelegate {
   //...
-  func handleSurveyResponse(response: [String : AnyObject]) {
+  func handleSurveyResponse(response: [String : Any]) {
     // Handle response here
     print(response)
   }
@@ -64,7 +63,7 @@ ssSurveyViewController.surveyDelegate = self
 ### Embed survey 
 Embed the feedback experience using the [`SsSurveyView`](#SsSurveyView).
 
-<img width="340" alt="SurveySparrow Android SDK embed view" src="https://user-images.githubusercontent.com/61273614/85125244-e48c2280-b248-11ea-86b1-eeb83230c1ee.png">
+![](examples/screenshots/embedded.png =250x)
 
 #### Add SsSurveyView
 Add a `UIView` to storyboard and change the Class to `SsSurveyView` under *Identity Inspector* and also make sure that the Module is `SurveySparrowSdk`. Under *Attribute inspector*  provide `domain` and `token`. 
@@ -83,8 +82,7 @@ Implement `SsSurveyDelegate` protocol to handle responses.
 ### Schedule Surveys
 Ask the user to take a feedback survey when they open your app/ a screen after a period of time.
 
-<img width="340" alt="SurveySparrow Android SDK scheduling" src="https://user-images.githubusercontent.com/61273614/85125416-3765da00-b249-11ea-846d-8c053cd83851.png">
-
+![](examples/screenshots/schedule.png =250x)
 
 Override viewDidAppear method and create a `SurveySparrow` object by passing domain and `token`. Then call `scheduleSurvey` method on the `SurveySparrow` object by passing the parent `ViewController` reference to schedule the survey.
 ```swift
@@ -146,7 +144,7 @@ ViewController to take full-screen feedback
 Protocol to get survey responses
 |Method|Description|
 |-----------|------|
-|`handleSurveyResponse(response: [String: AnyObject])`|Handle survey response|
+|`handleSurveyResponse(response: [String: Any])`|Handle survey response|
 
 ### SurveySparrow
 Class to handle survey scheduling
