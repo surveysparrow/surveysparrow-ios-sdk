@@ -25,7 +25,7 @@ Add `SurveySparrowSdk.framework` to your project
 ### Full-screen feedback
 Take feedback using our pre-build `SsSurveyViewController` and get the response after submission by implementing the `SsSurveyDelegate`'s `handleSurveyResponse` protocol.
 
-<img width="340" alt="SurveySparrow Android SDK full-screen view" src="https://user-images.githubusercontent.com/61273614/85125035-89f2c680-b248-11ea-9a4f-fffa737e8572.png">
+<img width="340" alt="SurveySparrow Android SDK full-screen view" src="https://user-images.githubusercontent.com/61273614/85126008-37b2a500-b24a-11ea-8b7d-1edd55ecc668.png">
 
 
 #### Import framework
@@ -64,7 +64,7 @@ ssSurveyViewController.surveyDelegate = self
 ### Embed survey 
 Embed the feedback experience using the [`SsSurveyView`](#SsSurveyView).
 
-<img width="340" alt="SurveySparrow Android SDK embed view" src="https://user-images.githubusercontent.com/61273614/85125244-e48c2280-b248-11ea-86b1-eeb83230c1ee.png">
+<img width="340" alt="SurveySparrow Android SDK embed view" src="https://user-images.githubusercontent.com/61273614/85125981-2e293d00-b24a-11ea-8468-d56f1035dccb.png">
 
 #### Add SsSurveyView
 Add a `UIView` to storyboard and change the Class to `SsSurveyView` under *Identity Inspector* and also make sure that the Module is `SurveySparrowSdk`. Under *Attribute inspector*  provide `domain` and `token`. 
@@ -83,7 +83,7 @@ Implement `SsSurveyDelegate` protocol to handle responses.
 ### Schedule Surveys
 Ask the user to take a feedback survey when they open your app/ a screen after a period of time.
 
-<img width="340" alt="SurveySparrow Android SDK scheduling" src="https://user-images.githubusercontent.com/61273614/85125416-3765da00-b249-11ea-846d-8c053cd83851.png">
+<img width="340" alt="SurveySparrow Android SDK scheduling" src="https://user-images.githubusercontent.com/61273614/85126016-3d0fef80-b24a-11ea-8760-89bf3cca8af4.png">
 
 
 Override viewDidAppear method and create a `SurveySparrow` object by passing domain and `token`. Then call `scheduleSurvey` method on the `SurveySparrow` object by passing the parent `ViewController` reference to schedule the survey.
