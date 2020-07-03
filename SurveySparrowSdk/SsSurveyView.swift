@@ -14,12 +14,12 @@ import WebKit
   private var ssWebView: WKWebView?
   private let surveyResponseHandler = WKUserContentController()
   
-  var params: [String: String] = [:]
+  public var params: [String: String] = [:]
   
-  @IBInspectable var domain: String?
-  @IBInspectable var token: String?
+  @IBInspectable public var domain: String?
+  @IBInspectable public var token: String?
   
-  var surveyDelegate: SsSurveyDelegate!
+  public var surveyDelegate: SsSurveyDelegate!
   
   // MARK: Initialization
   override init(frame: CGRect) {
@@ -33,15 +33,14 @@ import WebKit
   }
   
   // MARK: Private methods
-  private func addFeedbackView() {
-    backgroundColor = backgroundColor != nil ? backgroundColor : .gray;
-    
+  private func addFeedbackView() {    
     let config = WKWebViewConfiguration()
     config.userContentController = surveyResponseHandler
     
     ssWebView = WKWebView(frame: bounds, configuration: config)
     surveyResponseHandler.add(self, name: "surveyResponse")
     
+    ssWebView?.backgroundColor = .gray
     ssWebView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     addSubview(ssWebView!)
   }

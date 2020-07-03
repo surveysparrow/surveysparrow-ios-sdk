@@ -13,6 +13,7 @@
 		547B0F312498707300898A47 /* SsSurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 547B0F302498707300898A47 /* SsSurveyViewController.swift */; };
 		547B0F332498707300898A47 /* SsSurveyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 547B0F322498707300898A47 /* SsSurveyView.swift */; };
 		547B0F352498707300898A47 /* SsSurveyDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 547B0F342498707300898A47 /* SsSurveyDelegate.swift */; };
+		547B108A2498B26700898A47 /* SurveySparrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 547B10892498B26700898A47 /* SurveySparrow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +36,7 @@
 		547B0F302498707300898A47 /* SsSurveyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsSurveyViewController.swift; sourceTree = "<group>"; };
 		547B0F322498707300898A47 /* SsSurveyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsSurveyView.swift; sourceTree = "<group>"; };
 		547B0F342498707300898A47 /* SsSurveyDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsSurveyDelegate.swift; sourceTree = "<group>"; };
+		547B10892498B26700898A47 /* SurveySparrow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveySparrow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +81,7 @@
 			children = (
 				547B0F192498707300898A47 /* SurveySparrowSdk.h */,
 				547B0F1A2498707300898A47 /* Info.plist */,
+				547B10892498B26700898A47 /* SurveySparrow.swift */,
 				547B0F322498707300898A47 /* SsSurveyView.swift */,
 				547B0F302498707300898A47 /* SsSurveyViewController.swift */,
 				547B0F342498707300898A47 /* SsSurveyDelegate.swift */,
@@ -207,6 +210,7 @@
 			files = (
 				547B0F352498707300898A47 /* SsSurveyDelegate.swift in Sources */,
 				547B0F332498707300898A47 /* SsSurveyView.swift in Sources */,
+				547B108A2498B26700898A47 /* SurveySparrow.swift in Sources */,
 				547B0F312498707300898A47 /* SsSurveyViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

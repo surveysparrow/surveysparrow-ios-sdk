@@ -11,13 +11,13 @@ import UIKit
 @IBDesignable
 public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
   // MARK: Properties
-  var surveyDelegate: SsSurveyDelegate!
+  public var surveyDelegate: SsSurveyDelegate!
   
-  var params: [String: String] = [:]
+  public var params: [String: String] = [:]
   
-  @IBInspectable var domain: String?
-  @IBInspectable var token: String?
-  @IBInspectable var thankyouTimeout: Double = 3.0
+  @IBInspectable public var domain: String?
+  @IBInspectable public var token: String?
+  @IBInspectable public var thankyouTimeout: Double = 3.0
 
   // MARK: Initialize
   public override func viewDidLoad() {
