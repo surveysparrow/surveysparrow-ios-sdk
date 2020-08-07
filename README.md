@@ -1,6 +1,6 @@
 # Survey Sparrow iOS SDK
 
-SurveySparrow iOS SDK enables you to collect feedback from your mobile app. Embed the Classic & Chat surveys in your iOS application seamlessly with few lines of code.
+[SurveySparrow](https://surveysparrow.com) iOS SDK enables you to collect feedback from your mobile app. Embed the Classic, Chat & NPS surveys in your iOS application seamlessly with few lines of code.
 
 > Mobile SDK share channel is only available from SurveySparrow **Premium** plan onwards.
 
@@ -16,7 +16,7 @@ Add SurveySparrowSdk Framework to your project either by using CocoaPods or dire
 #### Using CocoaPods
 Add the following line to your `Podfile` file under `target`
 ```pod
-pod 'SurveySparrowSdk', :git => 'https://github.com/surveysparrow/surveysparrow-ios-sdk.git', :tag => '0.1.0'
+pod 'SurveySparrowSdk', :git => 'https://github.com/surveysparrow/surveysparrow-ios-sdk.git', :tag => '0.2.0'
 ```
 
 #### Not using CocoaPods! Directly import SurveySparrowSdk
@@ -110,6 +110,9 @@ We will show a customized alert to take a feedback survey whenever the `schedule
 
 **You can only create one schedule per token. Create multiple tokens if you want to create multiple schedules for same survey.*
 
+### NPS survey 
+Survey type can be changed to NPS by setting surveyType property to `.NPS`. You can also pass email as a custom param.
+
 ## Reference
 ### SsSurveyView
 View to display embedded surveys
@@ -118,6 +121,7 @@ View to display embedded surveys
 |-----------|------|------|
 |`domain: String`|Your SurveySparrow account domain|*|
 |`token: String`|SDK token of the survey|*|
+|`surveyType: SurveySparrow.SurveyType`|Type of the survey|`.CLASSIC`|
 |`params: [String: String]`|Custom params for the survey| - |
 |`surveyDelegate: SsSurveyDelegate`|Protocol to handle survey response| - |
 
@@ -133,6 +137,7 @@ ViewController to take full-screen feedback
 |-----------|------|---|
 |`domain: String`|Your SurveySparrow account domain| * |
 |`token: String`|SDK token of the survey| * |
+|`surveyType: SurveySparrow.SurveyType`|Type of the survey|`.CLASSIC`|
 |`params: [String: String]`|Custom params for the survey| - |
 |`thankyouTimeout: Double`|Duration to display thankyou screen in seconds| 3.0 |
 |`surveyDelegate: SsSurveyDelegate`|Protocol to handle survey response| - |
@@ -154,9 +159,18 @@ Class to handle survey scheduling
 #### Initializer
 `public init(domain: String, token: String)` : pass SurveySparrow account domain & survey SDK token
 
+#### Public constants
+`SurveySparrow.SurveyType`
+| Constant | Description |
+|----------|-------------|
+|`.CLASSIC`|Classic Survey|
+|`.CHAT`|Chat Survey|
+|`.NPS`|NPS Survey|
+
 #### Public Properties
 |Property|Description|Default Value|
 |-----------|------|------|
+|`surveyType: SurveySparrow.SurveyType`|Type of the survey|`.CLASSIC`|
 |`params: [String: String]`|Custom params for the survey| - |
 |`thankyouTimeout: Double`|Duration to display thankyou screen in seconds| 3.0 |
 |`surveyDelegate: SsSurveyDelegate`|Protocol to handle survey response| - |
