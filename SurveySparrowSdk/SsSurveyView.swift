@@ -16,6 +16,7 @@ import WebKit
   private let loader: UIActivityIndicatorView = UIActivityIndicatorView()
   
   public var params: [String: String] = [:]
+  public var surveyType: SurveySparrow.SurveyType = .CLASSIC
   
   @IBInspectable public var domain: String?
   @IBInspectable public var token: String?
@@ -77,7 +78,7 @@ import WebKit
       var urlComponent = URLComponents()
       urlComponent.scheme = "https"
       urlComponent.host = self.domain!.trimmingCharacters(in: CharacterSet.whitespaces)
-      urlComponent.path = "/s/ios/\(self.token!.trimmingCharacters(in: CharacterSet.whitespaces))"
+      urlComponent.path = "/\(surveyType == .NPS ? "n" : "s")/ios/\(self.token!.trimmingCharacters(in: CharacterSet.whitespaces))"
       urlComponent.queryItems = params.map {
         URLQueryItem(name: $0.key, value: $0.value)
       }

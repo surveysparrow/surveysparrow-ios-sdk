@@ -15,6 +15,7 @@ public class SurveySparrow: SsSurveyDelegate {
   private var domain: String
   private var token: String
   
+  public var surveyType: SurveyType = .CLASSIC
   public var params: [String: String]?
   public var thankyouTimout: Double = 3.0
   public var surveyDelegate: SsSurveyDelegate!
@@ -40,6 +41,13 @@ public class SurveySparrow: SsSurveyDelegate {
     isAlreadyTakenKey += token
     promptTimeKey += token
     incrementMultiplierKey += token
+  }
+  
+  // MARK: Data Type
+  public enum SurveyType {
+    case CLASSIC
+    case CHAT
+    case NPS
   }
   
   // MARK: Public methods

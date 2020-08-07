@@ -14,6 +14,7 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
   public var surveyDelegate: SsSurveyDelegate!
   
   public var params: [String: String] = [:]
+  public var surveyType: SurveySparrow.SurveyType = .CLASSIC
   
   @IBInspectable public var domain: String?
   @IBInspectable public var token: String?
