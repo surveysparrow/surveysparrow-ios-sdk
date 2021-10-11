@@ -49,4 +49,10 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
       self.dismiss(animated: true, completion: nil)
     }
   }
+
+  public func handleSurveyLoaded(response: [String : AnyObject]){
+    if surveyDelegate != nil {
+        surveyDelegate.handleSurveyLoaded(response: response)
+    }
+  }
 }

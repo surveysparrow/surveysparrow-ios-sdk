@@ -41,5 +41,9 @@ class ViewController: UIViewController, SsSurveyDelegate {
   func handleSurveyResponse(response: [String : AnyObject]) {
     print(response)
   }
+
+  func handleSurveyLoaded(response: [String : AnyObject]){
+    print(response)
+  }
 }
 

@@ -14,6 +14,8 @@ import WebKit
   private var ssWebView: WKWebView = WKWebView()
   private let surveyResponseHandler = WKUserContentController()
   private let loader: UIActivityIndicatorView = UIActivityIndicatorView()
+  private var surveyLoaded: String = "surveyLoadStarted"
+  private var surveyCompleted: String = "surveyCompleted"
   
   public var params: [String: String] = [:]
   public var surveyType: SurveySparrow.SurveyType = .CLASSIC
@@ -62,10 +64,16 @@ import WebKit
     loader.stopAnimating()
   }
   
-  public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+ public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
     if surveyDelegate != nil {
       let response = message.body as! [String: AnyObject]
-      surveyDelegate.handleSurveyResponse(response: response)
+      let responseType = response["type"] as! String
+      if(responseType == surveyLoaded){
+        surveyDelegate.handleSurveyLoaded(response: response)
+      }
+      if(responseType == surveyCompleted){
+        surveyDelegate.handleSurveyResponse(response: response)
+      }
     }
   }
   

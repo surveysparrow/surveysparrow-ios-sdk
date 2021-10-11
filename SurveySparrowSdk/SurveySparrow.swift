@@ -98,4 +98,10 @@ public class SurveySparrow: SsSurveyDelegate {
       self.surveyDelegate.handleSurveyResponse(response: response)
     }
   }
+
+  public func handleSurveyLoaded(response: [String : AnyObject]){
+    if surveyDelegate != nil {
+        surveyDelegate.handleSurveyResponse(response: response)
+    }
+  }
 }
