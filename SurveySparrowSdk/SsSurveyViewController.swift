@@ -15,6 +15,7 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
   
   public var params: [String: String] = [:]
   public var surveyType: SurveySparrow.SurveyType = .CLASSIC
+  public var getSurveyLoadedResponse: Bool = false
   
   @IBInspectable public var domain: String?
   @IBInspectable public var token: String?
@@ -29,6 +30,7 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
       let ssSurveyView = SsSurveyView()
       ssSurveyView.surveyDelegate = self
       ssSurveyView.params = params
+      ssSurveyView.getSurveyLoadedResponse = getSurveyLoadedResponse
       
       ssSurveyView.frame = view.bounds
       ssSurveyView.autoresizingMask = [.flexibleWidth, .flexibleHeight]

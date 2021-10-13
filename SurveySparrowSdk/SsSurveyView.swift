@@ -19,6 +19,7 @@ import WebKit
   
   public var params: [String: String] = [:]
   public var surveyType: SurveySparrow.SurveyType = .CLASSIC
+  public var getSurveyLoadedResponse: Bool = false
   
   @IBInspectable public var domain: String?
   @IBInspectable public var token: String?
@@ -87,6 +88,9 @@ import WebKit
       urlComponent.scheme = "https"
       urlComponent.host = self.domain!.trimmingCharacters(in: CharacterSet.whitespaces)
       urlComponent.path = "/\(surveyType == .NPS ? "n" : "s")/ios/\(self.token!.trimmingCharacters(in: CharacterSet.whitespaces))"
+      if(getSurveyLoadedResponse){
+        params["isSurveyLoaded"] = "true"
+      }
       urlComponent.queryItems = params.map {
         URLQueryItem(name: $0.key, value: $0.value)
       }
