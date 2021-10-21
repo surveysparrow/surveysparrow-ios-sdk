@@ -16,7 +16,7 @@ Add SurveySparrowSdk Framework to your project either by using CocoaPods or dire
 #### Using CocoaPods
 Add the following line to your `Podfile` file under `target`
 ```pod
-pod 'SurveySparrowSdk', :git => 'https://github.com/surveysparrow/surveysparrow-ios-sdk.git', :tag => '0.2.0'
+pod 'SurveySparrowSdk', :git => 'https://github.com/surveysparrow/surveysparrow-ios-sdk.git', :tag => '0.3.0'
 ```
 
 #### Not using CocoaPods! Directly import SurveySparrowSdk
@@ -44,10 +44,15 @@ ssSurveyViewController.token = "<sdk-token>"
 present(ssSurveyViewController, animated: true, completion: nil)
 ```
 
-#### Handle response
+#### Handle the initial question load and the response from the survey
 Implement the `SsSurveyDelegate` protocol to handle survey responses.
 ```swift
 class ViewController: UIViewController, SsSurveyDelegate {
+  //...
+  func handleSurveyLoaded(response: [String : AnyObject]) {
+    // This will be executed after the initial question in the survey is loaded
+    print(response)
+  }
   //...
   func handleSurveyResponse(response: [String : AnyObject]) {
     // Handle response here
@@ -154,6 +159,7 @@ Protocol to get survey responses
 |Method|Description|
 |-----------|------|
 |`handleSurveyResponse(response: [String: AnyObject])`|Handle survey response|
+|`handleSurveyLoaded(response: [String: AnyObject])`|Handle survey loaded|
 
 ### SurveySparrow
 Class to handle survey scheduling
@@ -176,7 +182,7 @@ Class to handle survey scheduling
 |`params: [String: String]`|Custom params for the survey| - |
 |`thankyouTimeout: Double`|Duration to display thankyou screen in seconds| 3.0 |
 |`surveyDelegate: SsSurveyDelegate`|Protocol to handle survey response| - |
-|`getSurveyLoadedResponse: Bool`|Set to true to get handleSurveyLoaded response (available in version >= 0.3.0)|false|
+|`getSurveyLoadedResponse: Bool`|Set to true to get handleSurveyLoaded response (available from version >= 0.3.0)|false|
 |`alertTitle: String`| Alert title | Rate us |
 |`alertMessage: String`| Alert message | Share your feedback and let us know how we are doing |
 |`alertPositiveButton: String`| Alert positive button text | Rate Now |
