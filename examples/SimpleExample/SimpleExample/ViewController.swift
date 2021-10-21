@@ -30,6 +30,7 @@ class ViewController: UIViewController, SsSurveyDelegate {
     let ssSurveyViewController = SsSurveyViewController()
     ssSurveyViewController.domain = "<account-domain>"
     ssSurveyViewController.token = "<sdk-token>"
+    ssSurveyViewController.getSurveyLoadedResponse = true
     ssSurveyViewController.surveyDelegate = self
     present(ssSurveyViewController, animated: true, completion: nil)
   }
@@ -39,6 +40,10 @@ class ViewController: UIViewController, SsSurveyDelegate {
   }
   
   func handleSurveyResponse(response: [String : AnyObject]) {
+    print(response)
+  }
+
+  func handleSurveyLoaded(response: [String : AnyObject]){
     print(response)
   }
 }
