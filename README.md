@@ -51,6 +51,7 @@ class ViewController: UIViewController, SsSurveyDelegate {
   //...
   func handleSurveyLoaded(response: [String : AnyObject]) {
     // This will be executed after the initial question in the survey is loaded
+    // NOTE: 'ssSurveyViewController.getSurveyLoadedResponse' should be set to true for this to work
     print(response)
   }
   //...
