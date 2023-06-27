@@ -38,12 +38,21 @@ class ViewController: UIViewController, SsSurveyDelegate {
   @IBAction func showEmbeddedSurvey(_ sender: UIButton) {
     ssSurveyView.loadSurvey()
   }
+
+  @IBAction func startSurvey(_ sender: UIButton) {
+    ssSurveyView.loadFullscreenSurvey(parent: self,delegate: self, domain:"<account-domain>",
+    token:"<sdk-token>")
+  }
   
   func handleSurveyResponse(response: [String : AnyObject]) {
     print(response)
   }
 
   func handleSurveyLoaded(response: [String : AnyObject]){
+    print(response)
+  }
+
+  func handleSurveyValidation(response: [String : AnyObject]) {
     print(response)
   }
 }

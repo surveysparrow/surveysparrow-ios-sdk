@@ -57,4 +57,12 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
         surveyDelegate.handleSurveyLoaded(response: response)
     }
   }
+  public func handleSurveyValidation(response: [String : AnyObject]) {
+    if surveyDelegate != nil {
+      surveyDelegate.handleSurveyValidation(response: response)
+    }
+    DispatchQueue.main.asyncAfter(deadline: .now() + thankyouTimeout) {
+      self.dismiss(animated: true, completion: nil)
+    }
+  }
 }
