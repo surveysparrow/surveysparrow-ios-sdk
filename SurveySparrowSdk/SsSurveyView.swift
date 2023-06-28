@@ -100,7 +100,7 @@ import WebKit
             reason = reasonData
         }
       }
-      validateSurvey(domain:domain,token:token,group: group,completion:completion);
+      validateSurvey(domain:domain,token:token,params: params, group: group,completion:completion);
       group.wait()
      if  isActive == true {
           parent.present(ssSurveyViewController, animated: true)
@@ -112,12 +112,11 @@ import WebKit
       }
     }
   }
-  
-  // MARK: Public method
-  public func loadSurvey(domain: String? = nil, token: String? = nil) {
+
+  public func loadEmbedSurvey(domain: String? = nil, token: String? = nil, params: [String: String]? = [:]) {
     self.domain = domain != nil ? domain! : self.domain
     self.token = token != nil ? token! : self.token
-    if self.domain != nil && self.token != nil {
+     if self.domain != nil && self.token != nil {
       var isActive: Bool = false
       var reason: String = ""
       let group = DispatchGroup()
@@ -130,29 +129,41 @@ import WebKit
             reason = reasonData
         }
       }
-      validateSurvey(domain:domain,token:token,group: group,completion:completion);
+      validateSurvey(domain:domain,token:token,params: params,group: group,completion:completion);
       group.wait()
       if  isActive == true {
-          loader.startAnimating()
-          var urlComponent = URLComponents()
-          urlComponent.scheme = "http"
-          urlComponent.host = self.domain!.trimmingCharacters(in: CharacterSet.whitespaces)
-          urlComponent.path = "/\(surveyType == .NPS ? "n" : "s")/ios/\(self.token!.trimmingCharacters(in: CharacterSet.whitespaces))"
-          if(getSurveyLoadedResponse){
-            params["isSurveyLoaded"] = "true"
-          }
-          urlComponent.queryItems = params.map {
-            URLQueryItem(name: $0.key, value: $0.value)
-          }
-          if let url = urlComponent.url {
-            let request = URLRequest(url: url)
-            ssWebView.load(request)
-          }
+        if(params != nil){
+        self.params = params ?? [:]
+        }
+        loadSurvey(domain:domain,token:token)
       } else {
-          self.handleSurveyValidation(response: [
+         self.handleSurveyValidation(response: [
             "active": String(isActive),
             "reason": reason,
           ] as  [String: AnyObject])
+      }
+     }
+  }
+  
+  // MARK: Public method
+  public func loadSurvey(domain: String? = nil, token: String? = nil) {
+    self.domain = domain != nil ? domain! : self.domain
+    self.token = token != nil ? token! : self.token
+    if self.domain != nil && self.token != nil {
+      loader.startAnimating()
+      var urlComponent = URLComponents()
+      urlComponent.scheme = "https"
+      urlComponent.host = self.domain!.trimmingCharacters(in: CharacterSet.whitespaces)
+      urlComponent.path = "/\(surveyType == .NPS ? "n" : "s")/ios/\(self.token!.trimmingCharacters(in: CharacterSet.whitespaces))"
+      if(getSurveyLoadedResponse){
+        params["isSurveyLoaded"] = "true"
+      }
+      urlComponent.queryItems = params.map {
+      URLQueryItem(name: $0.key, value: $0.value)
+      }
+      if let url = urlComponent.url {
+        let request = URLRequest(url: url)
+        ssWebView.load(request)
       }
     } else {
       print("Error: Domain or token is nil")

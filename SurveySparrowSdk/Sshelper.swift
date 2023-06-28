@@ -23,19 +23,18 @@ func validateSurvey(domain: String? = nil,
     }
     var email: String = "";
     var active: Bool = false;
-    //    if params != nil{
-    //     for (key, value) in params {
-    //     if(key == "email" || key == "emailaddress" ){
-    //     email = value
-    //     break
-    //   }
-    
-    // }
-    //    }
+    if let unwrappedParams = params {
+    for (key, value) in unwrappedParams {
+        if key == "emailaddress" {
+            email = value
+            break
+        }
+     }
+    }
     DispatchQueue.global().async {
         let parameters = User(email: email)
         var urlComponent = URLComponents()
-        urlComponent.scheme = "http"
+        urlComponent.scheme = "https"
         urlComponent.host = domain!.trimmingCharacters(in: CharacterSet.whitespaces)
         urlComponent.path = "/sdk/validate-survey/\(token!.trimmingCharacters(in: CharacterSet.whitespaces))"
         var validationUrl:URLRequest

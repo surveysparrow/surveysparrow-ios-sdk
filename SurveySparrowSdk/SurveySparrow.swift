@@ -66,6 +66,7 @@ public class SurveySparrow: SsSurveyDelegate {
       return
     }
     if self.domain != nil && self.token != nil {
+      if isConnectedToNetwork && (!isAlreadyTaken || repeatSurvey) && (promptTime < currentTime) {
       var isActive: Bool = false
       var reason: String = ""
       let group = DispatchGroup()
@@ -78,10 +79,10 @@ public class SurveySparrow: SsSurveyDelegate {
             reason = reasonData
         }
       }
-      validateSurvey(domain:domain,token:token,group: group,completion:completion);
+      validateSurvey(domain:domain,token:token,params:self.params, group: group,completion:completion);
       group.wait()
     if isActive == true {
-      if isConnectedToNetwork && (!isAlreadyTaken || repeatSurvey) && (promptTime < currentTime) {
+    
         let alertDialog = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: UIAlertController.Style.alert)
         alertDialog.addAction(UIAlertAction(title: alertPositiveButton, style: UIAlertAction.Style.default, handler: {action in
           let ssSurveyViewController = SsSurveyViewController()
@@ -100,13 +101,13 @@ public class SurveySparrow: SsSurveyDelegate {
         let timeTillNext = repeatInterval * Int64(incrementMultiplier)
         let nextPrompt = currentTime + timeTillNext
         UserDefaults.standard.set(nextPrompt, forKey: promptTimeKey)
-      }
-    } else {
+      } else {
        self.handleSurveyValidation(response: [
             "active": String(isActive),
             "reason": reason,
           ] as  [String: AnyObject])
     }
+    } 
   }
   }
 
