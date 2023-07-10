@@ -59,12 +59,34 @@ class ViewController: UIViewController, SsSurveyDelegate {
     // Handle response here
     print(response)
   }
+  func handleSurveyValidation(response: [String : AnyObject]) {
+    // Get survey validation fail json here
+    print(response)
+  }
   //...
 }
 ```
 Also set surveyDelegate property of the `SsSurveyViewController` object to `self`
 ```swift
 ssSurveyViewController.surveyDelegate = self
+```
+
+#### Handle survey validation
+
+Handle survey validation using the [`SsSurveyView`](#SsSurveyView).
+
+
+Add a `UIView` to storyboard and change the Class to `SsSurveyView` under *Identity Inspector* and also make sure that the Module is `SurveySparrowSdk`. Under *Attribute inspector*  provide `domain` and `token`. 
+
+Now connect the `SsSurveyView` as an `IBOutlet`
+```swift
+@IBOutlet weak var ssSurveyView: SsSurveyView!
+```
+Use `loadFullscreenSurvey()` on  the `ssSurveyView` to load the survey in full screen view, this method will handle the survey validations along with survey pop up. If a survey is not valid the error json can be captured in `handleSurveyValidation` method 
+
+```swift
+ssSurveyView.loadFullscreenSurvey(parent: self,delegate: self,domain:"some-company.surveysparrow.com", token: "tt-7f76bd",params:["emailaddress":"example@gmail.com", "email":"example@gmail.com"] )
+// Note : only params will be an optional field, email and emailaddress has to be passed in the params for creating a contact
 ```
 
 ### Embed survey 
@@ -79,9 +101,17 @@ Now connect the `SsSurveyView` as an `IBOutlet`
 ```swift
 @IBOutlet weak var ssSurveyView: SsSurveyView!
 ```
-Then call `loadSurvey()` on on the `ssSurveyView` to load the survey
+Then call `loadSurvey()` on  the `ssSurveyView` to load the survey
 ```swift
 ssSurveyView.loadSurvey()
+```
+#### Handle survey validation
+
+Use `loadEmbedSurvey()` on  the `ssSurveyView` to load the survey in Embed, this method will handle the survey validations along with survey embed. If a survey is not valid the error json can be captured in `handleSurveyValidation` method 
+
+```swift
+ssSurveyView.loadFullscreenSurvey(domain:"some-company.surveysparrow.com", token: "tt-7f76bd",params:["emailaddress":"example@gmail.com", "email":"example@gmail.com"] )
+// Note : only params will be an optional field, email and emailaddress has to be passed in the params for creating a contact
 ```
 #### Handle response
 Implement `SsSurveyDelegate` protocol to handle responses.
@@ -161,6 +191,7 @@ Protocol to get survey responses
 |-----------|------|
 |`handleSurveyResponse(response: [String: AnyObject])`|Handle survey response|
 |`handleSurveyLoaded(response: [String: AnyObject])`|Handle survey loaded|
+|`handleSurveyValidation(response: [String: AnyObject])`|Handle survey validation|
 
 ### SurveySparrow
 Class to handle survey scheduling
