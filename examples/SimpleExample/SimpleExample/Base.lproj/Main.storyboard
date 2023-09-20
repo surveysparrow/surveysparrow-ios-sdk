@@ -19,7 +19,7 @@
                                 <rect key="frame" x="126.5" y="94" width="161" height="30"/>
                                 <state key="normal" title="Start full-screen survey"/>
                                 <connections>
-                                    <action selector="startFullscreenSurvey:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Y9m-g2-yZy"/>
+                                    <action selector="startSurvey:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Y9m-g2-yZy"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5Qi-Ni-6vW">

@@ -14,6 +14,7 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
   public var surveyDelegate: SsSurveyDelegate!
   
   public var params: [String: String] = [:]
+  public var widgetContactId: Int64 = 0
   public var surveyType: SurveySparrow.SurveyType = .CLASSIC
   public var getSurveyLoadedResponse: Bool = false
   
@@ -30,6 +31,7 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
       let ssSurveyView = SsSurveyView()
       ssSurveyView.surveyDelegate = self
       ssSurveyView.params = params
+      SsSurveyView.widgetContactId = widgetContactId
       ssSurveyView.getSurveyLoadedResponse = getSurveyLoadedResponse
       
       ssSurveyView.frame = view.bounds

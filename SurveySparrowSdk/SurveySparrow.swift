@@ -70,13 +70,17 @@ public class SurveySparrow: SsSurveyDelegate {
       var isActive: Bool = false
       var reason: String = ""
       let group = DispatchGroup()
+      var widgetContactId: Int64 = 0 ;
       group.enter()
       let completion: ([String: Any]) -> Void = { result in
-          if let active = result["active"] as? Bool {
-            isActive = active
+        if let active = result["active"] as? Bool {
+          isActive = active
         }
-         if let reasonData = result["reason"] as? String {
-            reason = reasonData
+        if let reasonData = result["reason"] as? String {
+          reason = reasonData
+        }
+        if let widgetContactIdData = result["widgetContactId"] as? Int64 {
+          widgetContactId = widgetContactIdData
         }
       }
       validateSurvey(domain:domain,token:token,params:self.params, group: group,completion:completion);
@@ -89,6 +93,7 @@ public class SurveySparrow: SsSurveyDelegate {
           ssSurveyViewController.domain = self.domain
           ssSurveyViewController.token = self.token
           ssSurveyViewController.params = self.params
+          ssSurveyViewController.widgetContactId = widgetContactId
           ssSurveyViewController.getSurveyLoadedResponse = self.getSurveyLoadedResponse
           ssSurveyViewController.thankyouTimeout = self.thankyouTimout
           ssSurveyViewController.surveyDelegate = self
