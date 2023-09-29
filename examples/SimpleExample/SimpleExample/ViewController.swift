@@ -22,26 +22,28 @@ class ViewController: UIViewController, SsSurveyDelegate {
     super.viewDidAppear(animated)
     
     let surveySparrow = SurveySparrow(domain: "<account-domain>", token: "<sdk-token>")
+    surveySparrow.params = ["emailaddress":"email@email.com","email":"email@email.com"]
     surveySparrow.scheduleSurvey(parent: self)
   }
-
+  //    tt-9EBCDyTxxyguLKMh9MJaTt
   // MARK: Actions
   @IBAction func startFullscreenSurvey(_ sender: UIButton) {
     let ssSurveyViewController = SsSurveyViewController()
     ssSurveyViewController.domain = "<account-domain>"
     ssSurveyViewController.token = "<sdk-token>"
+    ssSurveyViewController.params = ["emailaddress":"email@email.com","email":"email@email.com"]
     ssSurveyViewController.getSurveyLoadedResponse = true
     ssSurveyViewController.surveyDelegate = self
     present(ssSurveyViewController, animated: true, completion: nil)
   }
-  
+
   @IBAction func showEmbeddedSurvey(_ sender: UIButton) {
-    ssSurveyView.loadSurvey()
+    ssSurveyView.loadEmbedSurvey(domain:"<account-domain>",token:"<sdk-token>", params:["emailaddress":"email@email.com","email":"email@email.com"])
   }
 
   @IBAction func startSurvey(_ sender: UIButton) {
     ssSurveyView.loadFullscreenSurvey(parent: self,delegate: self, domain:"<account-domain>",
-    token:"<sdk-token>")
+    token:"<sdk-token>", params:["emailaddress":"email@email.com","email":"email@email.com"])
   }
   
   func handleSurveyResponse(response: [String : AnyObject]) {
