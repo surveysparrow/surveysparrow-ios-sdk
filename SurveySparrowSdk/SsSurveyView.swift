@@ -49,11 +49,11 @@ import WebKit
   // MARK: Private methods
   private func addFeedbackView() {    
     let config = WKWebViewConfiguration()
+    config.preferences.javaScriptEnabled = true
     config.userContentController = surveyResponseHandler
-    
     ssWebView = WKWebView(frame: bounds, configuration: config)
     surveyResponseHandler.add(self, name: "surveyResponse")
-    
+    ssWebView.navigationDelegate = self
     ssWebView.backgroundColor = .gray
     ssWebView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     addSubview(ssWebView)
@@ -109,7 +109,6 @@ import WebKit
   func closeSurveyUI(isSuccess: Bool) {
     let emptyHTML = "<html><body></body></html>"
     ssWebView.loadHTMLString(emptyHTML, baseURL: nil)
-    ssWebView.isHidden = true
     closeButton.isHidden = true
 
     if let parentViewController = findParentViewController() {
@@ -128,6 +127,22 @@ import WebKit
     return nil
   }
   
+  public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        // Check if this is a navigation action caused by a hyperlink click.
+        if navigationAction.navigationType == .linkActivated {
+            // Handle the URL navigation here, for example:
+            if let url = navigationAction.request.url {
+                UIApplication.shared.openURL(url)
+                decisionHandler(.cancel) // Prevent WKWebView from loading the URL.
+                return
+            }
+        }
+        decisionHandler(.allow) // Allow other navigation actions.
+    }
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        print("Failed to load web page: \(error.localizedDescription)")
+    }
+
   public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     closeButton.translatesAutoresizingMaskIntoConstraints = false
     loader.stopAnimating()
@@ -147,7 +162,6 @@ import WebKit
         }
       }
       if(responseType == surveyCompleted){
-        closeButton.isHidden = true
         if surveyDelegate != nil {
           surveyDelegate.handleSurveyResponse(response: response)
         }
@@ -219,6 +233,7 @@ import WebKit
         self.params = params ?? [:]
         }
         loadSurvey(domain:domain,token:token)
+        closeButton.isHidden = false ;
       } else {
          self.handleSurveyValidation(response: [
             "active": String(isActive),
