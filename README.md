@@ -29,7 +29,7 @@ Add SurveySparrowSdk Package to your either StoryBoard or SwiftUI project
  - Enter https://github.com/surveysparrow/surveysparrow-ios-sdk.git 
  - Finally, Click Copy Dependency.
 
-Or You can also navigate to your target's General pane, and in the “Frameworks, Libraries, and Embedded Content” section, click the + button, select Add Other, and choose Add Package Dependency and repeat the above steps.
+Or You can also navigate to your target's General pane -> in the “Frameworks, Libraries, and Embedded Content” section, click the + button -> select Add Other -> and choose Add Package Dependency and repeat the above steps.
 
 | <p style="text-align: center;">Full-screen Survey</p> | <p style="text-align: center;">Embed survey</p> |
 | --- | --- |
