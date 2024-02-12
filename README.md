@@ -5,70 +5,126 @@
 > Mobile SDK share channel is only available from SurveySparrow **Premium** plan onwards.
 
 ## Features
-1. [Full-screen feedback whenever & wherever you want.](#Full-screen-feedback)
-2. [Integrate the feedback experience anywhere in your app.](#Embed-survey)
-3. [Schedule Surveys to take one-time or recurring feedbacks.](#Schedule-Surveys)
+1. Integration with both [SwiftUI](#swiftui-interface) & [StoryBoard](#storyboard-interface) Interface
+2. [Full-screen feedback whenever & wherever you want.](#full-screen-feedback)
+3. [Integrate the feedback experience anywhere in your app.](#Embed-survey)
+4. [Schedule Surveys to take one-time or recurring feedbacks.](#Schedule-Surveys)
+   
+<br>
 
-## SDK integration (Deployment Target 9+)
+> [!NOTE] 
+> ### iOS Deplyment Target
+> SwiftUI Interface    - iOS 14.0  
+> Storyboard Interface - iOS 13.0
 
-### Add SurveySparrowSdk Framework
-Add SurveySparrowSdk Framework to your project either by using CocoaPods or directly embedding binary
-#### Using CocoaPods
-Add the following line to your `Podfile` file under `target`
-```pod
-pod 'SurveySparrowSdk', :git => 'https://github.com/surveysparrow/surveysparrow-ios-sdk.git', :tag => '0.4.5'
-```
+<br>
 
-#### Not using CocoaPods! Directly import SurveySparrowSdk
-Add `SurveySparrowSdk.xcodeproj` or `SurveySparrowSdk.framework` to your project.
+## SDK integration
 
-### Full-screen feedback
-Take feedback using our pre-build `SsSurveyViewController` and get the response after submission by implementing the `SsSurveyDelegate`'s `handleSurveyResponse` protocol.
+### Add SurveySparrowSdk Package
 
-<img width="340" alt="SurveySparrow Android SDK full-screen view" src="https://user-images.githubusercontent.com/61273614/85126008-37b2a500-b24a-11ea-8b7d-1edd55ecc668.png">
+Add SurveySparrowSdk Package to your either StoryBoard or SwiftUI project 
+ - Select File 
+ - Add Package Dependency  
+ - Enter https://github.com/surveysparrow/surveysparrow-ios-sdk.git 
+ - Finally, Click Copy Dependency.
+
+Or You can also navigate to your target's General pane, and in the “Frameworks, Libraries, and Embedded Content” section, click the + button, select Add Other, and choose Add Package Dependency and repeat the above steps.
+
+<p style="text-align: center;">Full-screen Survey</p> | <p style="text-align: center;">Embed survey</p>
+--- | ---
+<img width="340"  alt="SurveySparrow Android SDK full-screen view" src="https://user-images.githubusercontent.com/61273614/85126008-37b2a500-b24a-11ea-8b7d-1edd55ecc668.png"> | <img width="375" alt="SurveySparrow Android SDK embed view" src="https://user-images.githubusercontent.com/61273614/85125981-2e293d00-b24a-11ea-8468-d56f1035dccb.png">
 
 
-#### Import framework
+### Import framework
 ```swift
 import SurveySparrowSdk
 ```
-#### Create a [`SsSurveyViewController`](#SsSurveyViewController)
-Create a `SsSurveyViewController` and set `domain` and `token`
+
+
+## SwiftUI Interface
+
+### Full-screen Surveys
+
+1. #### Create a Struct with implementing `UIViewControllerRepresentable`.
+   
+  ```swift
+  struct SsSurveyViewControllerWrapper: UIViewControllerRepresentable {
+      // Implement your functions here
+  }
+  ```
+2. #### Inside `makeUIViewController`, instantiate the `SsSurveyViewController` and set the necessary properties like `domain` and `token`.
+
+  ```swift
+  func makeUIViewController(context: Context) -> SsSurveyViewController {
+      // ...
+      let ssSurveyViewController = SsSurveyViewController()
+      ssSurveyViewController.domain = "<account-domain>"
+      ssSurveyViewController.token = "<sdk-token>"
+      // ...
+  }
+  ```
+Customize the presentation of `SsSurveyViewControllerWrapper` according to your app's requirements.
+
+### Handle survey validation
+
+Adding Validation to Full-screen Surveys are made easier !!!
+
+#### Call the function `loadFullscreenSurvey` from `SsSurveyView` 
+  ```swift
+  SsSurveyView().loadFullscreenSurvey(parent: parentViewController, delegate: SurveyDelegate(), domain: domain, token: token, params: params)
+  ```
+Passing the `parentViewController` in which the Survey Should be poped is required.
+
+### Embedded Surveys
+
+1. #### Create a Struct with implementing `UIViewRepresentable`.
+   
+  ```swift
+  struct UIViewRepresentableWrapper: UIViewRepresentable {
+      // Implement your functions here
+  }
+  ```
+2. #### Initialize `SsSurveyView` in it.
+   
+   ```swift
+   let surveyView = SsSurveyView()
+   ```
+
+3. #### Inside `makeUIView`, return the `surveyView`.
+4. #### Inside `updateUIView` call the function `loadEmbedSurvey`. This function also handles Validation to Embedded Surveys.
+
+  ```swift
+  func updateUIView(_ uiView: UIView, context: Context) {
+  //  Implement your functions for Opening and closing the view
+  surveyView.loadEmbedSurvey(domain: domain, token: token , params: ["email":"aa@aa.aa"])
+  // ...
+  }
+  ```
+
+  To skip validation you can use `loadSurvey` funtion and load it on the required screen
+  ```swift
+  surveyView.loadSurvey()
+  ```
+
+> [!TIP]
+> For further guidance, Refer SwiftUI-ExampleApp.
+
+## Storyboard Interface
+
+
+### Full-screen Surveys
+Take feedback using our pre-build `SsSurveyViewController` and get the response after submission by implementing the `SsSurveyDelegate`'s `handleSurveyResponse` protocol.
+
+1. #### Create a `SsSurveyViewController` and set `domain` and `token`
 ```swift
 let ssSurveyViewController = SsSurveyViewController()
 ssSurveyViewController.domain = "<account-domain>"
 ssSurveyViewController.token = "<sdk-token>"
 ```
-#### Present the SsSurveyViewController
+2. #### Present the SsSurveyViewController
 ```swift
 present(ssSurveyViewController, animated: true, completion: nil)
-```
-
-#### Handle the initial question load and the response from the survey
-Implement the `SsSurveyDelegate` protocol to handle survey responses.
-```swift
-class ViewController: UIViewController, SsSurveyDelegate {
-  //...
-  func handleSurveyLoaded(response: [String : AnyObject]) {
-    // This will be executed after the initial question in the survey is loaded
-    // NOTE: 'ssSurveyViewController.getSurveyLoadedResponse' should be set to true for this to work
-    print(response)
-  }
-  //...
-  func handleSurveyResponse(response: [String : AnyObject]) {
-    // Handle response here
-    print(response)
-  }
-  func handleSurveyValidation(response: [String : AnyObject]) {
-    // Get survey validation fail json here
-    print(response)
-  }
-  //...
-}
-```
-Also set surveyDelegate property of the `SsSurveyViewController` object to `self`
-```swift
-ssSurveyViewController.surveyDelegate = self
 ```
 
 #### Handle survey validation
@@ -85,14 +141,14 @@ Now connect the `SsSurveyView` as an `IBOutlet`
 Use `loadFullscreenSurvey()` on  the `ssSurveyView` to load the survey in full screen view, this method will handle the survey validations along with survey pop up. If a survey is not valid the error json can be captured in `handleSurveyValidation` method 
 
 ```swift
-ssSurveyView.loadFullscreenSurvey(parent: self,delegate: self,domain:"some-company.surveysparrow.com", token: "tt-7f76bd",params:["emailaddress":"example@gmail.com", "email":"example@gmail.com"] )
+ssSurveyView.loadFullscreenSurvey(parent: self,delegate: self,domain:"<account-domain>", token: "<survey-token>",params:["emailaddress":"example@gmail.com", "email":"example@gmail.com"] )
 // Note : only params will be an optional field, email and emailaddress has to be passed in the params for creating a contact
 ```
 
 ### Embed survey 
 Embed the feedback experience using the [`SsSurveyView`](#SsSurveyView).
 
-<img width="340" alt="SurveySparrow Android SDK embed view" src="https://user-images.githubusercontent.com/61273614/85125981-2e293d00-b24a-11ea-8468-d56f1035dccb.png">
+
 
 #### Add SsSurveyView
 Add a `UIView` to storyboard and change the Class to `SsSurveyView` under *Identity Inspector* and also make sure that the Module is `SurveySparrowSdk`. Under *Attribute inspector*  provide `domain` and `token`. 
@@ -110,11 +166,32 @@ ssSurveyView.loadSurvey()
 Use `loadEmbedSurvey()` on  the `ssSurveyView` to load the survey in Embed, this method will handle the survey validations along with survey embed. If a survey is not valid the error json can be captured in `handleSurveyValidation` method 
 
 ```swift
-ssSurveyView.loadFullscreenSurvey(domain:"some-company.surveysparrow.com", token: "tt-7f76bd",params:["emailaddress":"example@gmail.com", "email":"example@gmail.com"] )
+ssSurveyView.loadFullscreenSurvey(domain:"<account-domain>", token: "<survey-token>",params:["emailaddress":"emailaddress@gmail.com", "email":"email@gmail.com"] )
 // Note : only params will be an optional field, email and emailaddress has to be passed in the params for creating a contact
 ```
-#### Handle response
-Implement `SsSurveyDelegate` protocol to handle responses.
+
+## Handle the initial question load and the response from the survey
+Implement the `SsSurveyDelegate` protocol to handle survey responses and Add these in all the places required.
+```swift
+class SurveyDelegate: , SsSurveyDelegate {
+  //...
+  func handleSurveyLoaded(response: [String : AnyObject]) {
+    // This will be executed after the initial question in the survey is loaded
+    // NOTE: 'ssSurveyViewController.getSurveyLoadedResponse' should be set to true for this to work
+    print("Survey Loaded: \(response)")
+  }
+  //...
+  func handleSurveyResponse(response: [String : AnyObject]) {
+    // Handle response here
+    print("Survey Loaded: \(response)")
+  }
+  func handleSurveyValidation(response: [String : AnyObject]) {
+    // Get survey validation fail json here
+    print("Survey Validation: \(response)")
+  }
+  //...
+}
+```
 
 ### Schedule Surveys
 Ask the user to take a feedback survey when they open your app/ a screen after a period of time.
