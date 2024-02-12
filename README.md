@@ -6,7 +6,7 @@
 
 ## Features
 1. Integration with both [SwiftUI](#swiftui-interface) & [StoryBoard](#storyboard-interface) Interface
-2. [Full-screen feedback whenever & wherever you want.](#full-screen-feedback)
+2. [Full-screen feedback whenever & wherever you want.](#Full-screen-Surveys)
 3. [Integrate the feedback experience anywhere in your app.](#Embed-survey)
 4. [Schedule Surveys to take one-time or recurring feedbacks.](#Schedule-Surveys)
    
