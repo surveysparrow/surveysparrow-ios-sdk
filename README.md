@@ -31,9 +31,9 @@ Add SurveySparrowSdk Package to your either StoryBoard or SwiftUI project
 
 Or You can also navigate to your target's General pane, and in the “Frameworks, Libraries, and Embedded Content” section, click the + button, select Add Other, and choose Add Package Dependency and repeat the above steps.
 
-<p style="text-align: center;">Full-screen Survey</p> | <p style="text-align: center;">Embed survey</p>
---- | ---
-<img width="340"  alt="SurveySparrow Android SDK full-screen view" src="https://user-images.githubusercontent.com/61273614/85126008-37b2a500-b24a-11ea-8b7d-1edd55ecc668.png"> | <img width="375" alt="SurveySparrow Android SDK embed view" src="https://user-images.githubusercontent.com/61273614/85125981-2e293d00-b24a-11ea-8468-d56f1035dccb.png">
+| <p style="text-align: center;">Full-screen Survey</p> | <p style="text-align: center;">Embed survey</p> |
+| --- | --- |
+| <img width="340"  alt="SurveySparrow Android SDK full-screen view" src="https://user-images.githubusercontent.com/61273614/85126008-37b2a500-b24a-11ea-8b7d-1edd55ecc668.png"> | <img width="375" alt="SurveySparrow Android SDK embed view" src="https://user-images.githubusercontent.com/61273614/85125981-2e293d00-b24a-11ea-8468-d56f1035dccb.png"> |
 
 
 ### Import framework
@@ -170,10 +170,13 @@ ssSurveyView.loadFullscreenSurvey(domain:"<account-domain>", token: "<survey-tok
 // Note : only params will be an optional field, email and emailaddress has to be passed in the params for creating a contact
 ```
 
+> [!TIP]
+> For further guidance, Refer StoryBoard-ExampleApp.
+
 ## Handle the initial question load and the response from the survey
 Implement the `SsSurveyDelegate` protocol to handle survey responses and Add these in all the places required.
 ```swift
-class SurveyDelegate: , SsSurveyDelegate {
+class SurveyDelegate: SsSurveyDelegate {
   //...
   func handleSurveyLoaded(response: [String : AnyObject]) {
     // This will be executed after the initial question in the survey is loaded
