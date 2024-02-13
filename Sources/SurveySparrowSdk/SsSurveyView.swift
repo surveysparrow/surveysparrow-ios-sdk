@@ -59,25 +59,24 @@ import WebKit
         ssWebView.backgroundColor = .gray
         ssWebView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         addSubview(ssWebView)
-        let closeImage = UIImage(named: "close.svg")?.withRenderingMode(.alwaysTemplate)
-        closeButton.setImage(closeImage, for: .normal)
+        closeButton.setTitle("X", for: .normal)
+        closeButton.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         closeButton.tintColor = .black
-        closeButton.backgroundColor = .white
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         ssWebView.addSubview(closeButton)
         NSLayoutConstraint.activate([
             NSLayoutConstraint(
                 item: closeButton, attribute: .top, relatedBy: .equal, toItem: ssWebView,
-                attribute: .top, multiplier: 1, constant: -40),
+                attribute: .top, multiplier: 1, constant: 16),
             NSLayoutConstraint(
                 item: closeButton, attribute: .trailing, relatedBy: .equal, toItem: ssWebView,
                 attribute: .trailing, multiplier: 1, constant: -16),
             NSLayoutConstraint(
                 item: closeButton, attribute: .width, relatedBy: .equal, toItem: nil,
-                attribute: .notAnAttribute, multiplier: 1, constant: 40),
+                attribute: .notAnAttribute, multiplier: 1, constant: 24),
             NSLayoutConstraint(
                 item: closeButton, attribute: .height, relatedBy: .equal, toItem: nil,
-                attribute: .notAnAttribute, multiplier: 1, constant: 40),
+                attribute: .notAnAttribute, multiplier: 1, constant: 24),
         ])
         
         ssWebView.addSubview(loader)
