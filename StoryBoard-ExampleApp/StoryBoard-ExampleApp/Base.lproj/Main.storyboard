@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="StoryBoard_ExampleApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j9z-xz-JfK">
+                                <rect key="frame" x="93" y="106" width="207" height="35"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Show FullScreen Survey"/>
+                                <connections>
+                                    <action selector="showFullScreenSurvey:" destination="BYZ-38-t0r" eventType="touchUpInside" id="hoZ-Ty-byy"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Zn-eW-XZg">
+                                <rect key="frame" x="33.666666666666657" y="161" width="326" height="35"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Show FullScreen Survey With Validation"/>
+                                <connections>
+                                    <action selector="startSurvey:" destination="BYZ-38-t0r" eventType="touchUpInside" id="r6l-st-UbK"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4ge-gP-KT5">
+                                <rect key="frame" x="129" y="219" width="135" height="35"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Embed Survey"/>
+                                <connections>
+                                    <action selector="showEmbedSurvey:" destination="BYZ-38-t0r" eventType="touchUpInside" id="VKe-th-9Be"/>
+                                </connections>
+                            </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jth-i7-Zwo" customClass="SsSurveyView" customModule="SurveySparrowSdk">
+                                <rect key="frame" x="0.0" y="431" width="393" height="374"/>
+                                <color key="backgroundColor" systemColor="systemGray2Color"/>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="j9z-xz-JfK" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="47" id="GbN-Wh-q3c"/>
+                            <constraint firstItem="jth-i7-Zwo" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="HYC-EP-x8L"/>
+                            <constraint firstItem="0Zn-eW-XZg" firstAttribute="top" secondItem="j9z-xz-JfK" secondAttribute="bottom" constant="20" id="ISx-r4-K2J"/>
+                            <constraint firstItem="jth-i7-Zwo" firstAttribute="centerX" secondItem="0Zn-eW-XZg" secondAttribute="centerX" id="Lqd-WJ-kBl"/>
+                            <constraint firstItem="4ge-gP-KT5" firstAttribute="top" secondItem="0Zn-eW-XZg" secondAttribute="bottom" constant="23" id="Oet-Nl-KNw"/>
+                            <constraint firstItem="jth-i7-Zwo" firstAttribute="centerX" secondItem="4ge-gP-KT5" secondAttribute="centerX" id="Pmk-ia-mZf"/>
+                            <constraint firstItem="jth-i7-Zwo" firstAttribute="centerX" secondItem="j9z-xz-JfK" secondAttribute="centerX" id="Rwt-Tg-X30"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="jth-i7-Zwo" secondAttribute="bottom" constant="13" id="lDW-W1-BE6"/>
+                            <constraint firstItem="jth-i7-Zwo" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="431" id="rLc-kV-i4W"/>
+                            <constraint firstItem="jth-i7-Zwo" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="y3Y-0G-XDr"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="ssSurveyView" destination="jth-i7-Zwo" id="eNA-Og-awZ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-324.4274809160305" y="-306.33802816901408"/>
+        </scene>
+    </scenes>
+    <resources>
+        <systemColor name="systemGray2Color">
+            <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

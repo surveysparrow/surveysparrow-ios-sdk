@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "surveysparrow-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/surveysparrow/surveysparrow-ios-sdk.git",
+      "state" : {
+        "revision" : "4c8f457cce6b1ccb85653911500db4ee91099bff",
+        "version" : "1.0.1"
+      }
+    }
+  ],
+  "version" : 2
+}
