@@ -1,0 +1,978 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		153FD3A5B63AC3BCFEFE4E392D4A042C /* SsSurveyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5115ED4E404FE5514C396F1AA450770C /* SsSurveyView.swift */; };
+		48815261F8A0391451D17062B4DE7B27 /* Pods-SimpleExampleTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 2E25AD76872D30929BD1DAB1BBB55889 /* Pods-SimpleExampleTests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B2E94CCFB1415F735A806B462B7CB7F /* SurveySparrowSdk-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = ADC53E151B7F887E4FC3453A79DE69A8 /* SurveySparrowSdk-dummy.m */; };
+		6CEC0C19124D9143E372C0D0FAB9D883 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
+		7405E9D7CBC35DCADDFAAE6A5CCF3E81 /* SurveySparrowSdk-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = A789AC38BC194E9B7DAABBFD4F57024F /* SurveySparrowSdk-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		86AD722F1CE0E73EBE8E9D74C7DAC845 /* Pods-SimpleExample-SimpleExampleUITests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E525838483870095EFD72677E5F01D3 /* Pods-SimpleExample-SimpleExampleUITests-dummy.m */; };
+		96B21B6A70909D38F6F7855F32BA9B30 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
+		BCDE155FE7E9B757C1BB382C107CA5F8 /* SsSurveyDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E2C93C35A8478556A2790027C1DC6E7 /* SsSurveyDelegate.swift */; };
+		BEB4DE76EC4467133AE6DBB0C33B8259 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
+		BF80FFC004A6C13805ABF0008BE3C4D3 /* Pods-SimpleExample-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 6AF95F76EE6234D264B0F9EAA94D4396 /* Pods-SimpleExample-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C05ED3E67B96475D895F38CFFCF7562C /* Pods-SimpleExample-SimpleExampleUITests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 208EFE0653E8E1F6B6EA555048043B9C /* Pods-SimpleExample-SimpleExampleUITests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C2EDFE711470E9D9A5400517F7C866FB /* SsSurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74864B5F8AECCEA0F0F2EEDF17E6691 /* SsSurveyViewController.swift */; };
+		C93136CB975ECA63972EA785B5B0D474 /* SurveySparrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A20DFAD76B912AB0251A0126DA163 /* SurveySparrow.swift */; };
+		CEFF5CEFB64648C69E2FB5D835691FA6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
+		DC79EC2777A9813B16B6470C3E374D37 /* Pods-SimpleExample-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A3C52F156774FB9CA5BD6AD3D985388F /* Pods-SimpleExample-dummy.m */; };
+		E9156D039BED373CBFACF75BF9A3FA84 /* Pods-SimpleExampleTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B5F1BF514CC73C328970FEAEA318DCD /* Pods-SimpleExampleTests-dummy.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3CF9EC7BF80F6E4689E63BF2A947AC6C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 065770EB33FF2DDC55A8A215225503E9;
+			remoteInfo = SurveySparrowSdk;
+		};
+		64D088E6E7AE3C1F6D20A11AEBAC69A1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 065770EB33FF2DDC55A8A215225503E9;
+			remoteInfo = SurveySparrowSdk;
+		};
+		E43CEC227C97EF65309B5500B71E6135 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EAE0F8A4384601CDE45690312DEB287C;
+			remoteInfo = "Pods-SimpleExample";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		02E53ED145A0D7A2234C02DF4600920A /* Pods-SimpleExampleTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-SimpleExampleTests-acknowledgements.markdown"; sourceTree = "<group>"; };
+		052431CC936A571B583501031B7D7795 /* Pods-SimpleExample-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SimpleExample-Info.plist"; sourceTree = "<group>"; };
+		0AB78F09ADD4CE08566839B932854C4A /* Pods-SimpleExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SimpleExample.debug.xcconfig"; sourceTree = "<group>"; };
+		0E2C93C35A8478556A2790027C1DC6E7 /* SsSurveyDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SsSurveyDelegate.swift; path = SurveySparrowSdk/SsSurveyDelegate.swift; sourceTree = "<group>"; };
+		13F5F3E09F6E26412BB99CBEBC13FC49 /* SurveySparrowSdk-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SurveySparrowSdk-prefix.pch"; sourceTree = "<group>"; };
+		19317300CA4ED8DBDB4B5102C76BB17B /* Pods-SimpleExample-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-SimpleExample-frameworks.sh"; sourceTree = "<group>"; };
+		1AADF9FEB96E31FF75F2D3AAED2B936A /* Pods_SimpleExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_SimpleExampleTests.framework; path = "Pods-SimpleExampleTests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1BFB2B3EBD79F5853E5B2F052163B0E8 /* SurveySparrowSdk.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = SurveySparrowSdk.modulemap; sourceTree = "<group>"; };
+		1F9F122350CB1E9564889ECB96014E00 /* Pods-SimpleExampleTests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SimpleExampleTests-Info.plist"; sourceTree = "<group>"; };
+		208EFE0653E8E1F6B6EA555048043B9C /* Pods-SimpleExample-SimpleExampleUITests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-SimpleExample-SimpleExampleUITests-umbrella.h"; sourceTree = "<group>"; };
+		22E3DB345C21FD0C672F606D08654BC4 /* Pods-SimpleExample-SimpleExampleUITests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-SimpleExample-SimpleExampleUITests-acknowledgements.markdown"; sourceTree = "<group>"; };
+		2C0E55C56A401D44B1061B3AA6872D8C /* Pods_SimpleExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_SimpleExample.framework; path = "Pods-SimpleExample.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2DBC970F3952DC2C557C0F99EDEFF18A /* Pods-SimpleExampleTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-SimpleExampleTests.modulemap"; sourceTree = "<group>"; };
+		2E25AD76872D30929BD1DAB1BBB55889 /* Pods-SimpleExampleTests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-SimpleExampleTests-umbrella.h"; sourceTree = "<group>"; };
+		31AEAF727B5F37A29FA3D31FDCABC918 /* Pods-SimpleExample-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-SimpleExample-acknowledgements.markdown"; sourceTree = "<group>"; };
+		3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		3B4096ACE9F3E46AC4E6CE4FCE665C66 /* SurveySparrowSdk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = SurveySparrowSdk.framework; path = SurveySparrowSdk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B5F1BF514CC73C328970FEAEA318DCD /* Pods-SimpleExampleTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-SimpleExampleTests-dummy.m"; sourceTree = "<group>"; };
+		47AC73A5591522A0406527ABE3EBB66D /* Pods_SimpleExample_SimpleExampleUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_SimpleExample_SimpleExampleUITests.framework; path = "Pods-SimpleExample-SimpleExampleUITests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4AC877636CE7A85E76B039D5D6D5F22F /* Pods-SimpleExample-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SimpleExample-acknowledgements.plist"; sourceTree = "<group>"; };
+		5115ED4E404FE5514C396F1AA450770C /* SsSurveyView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SsSurveyView.swift; path = SurveySparrowSdk/SsSurveyView.swift; sourceTree = "<group>"; };
+		5E525838483870095EFD72677E5F01D3 /* Pods-SimpleExample-SimpleExampleUITests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-SimpleExample-SimpleExampleUITests-dummy.m"; sourceTree = "<group>"; };
+		616157903E0EE819FB88CA449BF4CC13 /* Pods-SimpleExample-SimpleExampleUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SimpleExample-SimpleExampleUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		6828EAFDA0E8CAC1917603F09FCF748C /* Pods-SimpleExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SimpleExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		6AF95F76EE6234D264B0F9EAA94D4396 /* Pods-SimpleExample-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-SimpleExample-umbrella.h"; sourceTree = "<group>"; };
+		7A66DF7CB6503EF09F1725F152DA1788 /* Pods-SimpleExampleTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SimpleExampleTests-acknowledgements.plist"; sourceTree = "<group>"; };
+		96FA1B927A1386CFE246C618F25162ED /* Pods-SimpleExample.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-SimpleExample.modulemap"; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		A2000E15B2F7EC6A93DFDCA02D7A1AD4 /* Pods-SimpleExample-SimpleExampleUITests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-SimpleExample-SimpleExampleUITests.modulemap"; sourceTree = "<group>"; };
+		A3C52F156774FB9CA5BD6AD3D985388F /* Pods-SimpleExample-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-SimpleExample-dummy.m"; sourceTree = "<group>"; };
+		A7887BCEDDA9ED4527BDE3BD9B04C65C /* Pods-SimpleExample-SimpleExampleUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SimpleExample-SimpleExampleUITests.release.xcconfig"; sourceTree = "<group>"; };
+		A789AC38BC194E9B7DAABBFD4F57024F /* SurveySparrowSdk-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SurveySparrowSdk-umbrella.h"; sourceTree = "<group>"; };
+		ADC53E151B7F887E4FC3453A79DE69A8 /* SurveySparrowSdk-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SurveySparrowSdk-dummy.m"; sourceTree = "<group>"; };
+		B55BFC2BB64B0E8D7FFC1946CD4E2008 /* Pods-SimpleExample-SimpleExampleUITests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SimpleExample-SimpleExampleUITests-acknowledgements.plist"; sourceTree = "<group>"; };
+		B9885DEDF3F662936B82DB005927FA06 /* Pods-SimpleExample-SimpleExampleUITests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-SimpleExample-SimpleExampleUITests-frameworks.sh"; sourceTree = "<group>"; };
+		C74864B5F8AECCEA0F0F2EEDF17E6691 /* SsSurveyViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SsSurveyViewController.swift; path = SurveySparrowSdk/SsSurveyViewController.swift; sourceTree = "<group>"; };
+		CB6E5879464649D2DEFE49FD2195301B /* Pods-SimpleExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SimpleExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+		CC4A20DFAD76B912AB0251A0126DA163 /* SurveySparrow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SurveySparrow.swift; path = SurveySparrowSdk/SurveySparrow.swift; sourceTree = "<group>"; };
+		D5CF0DCB7A8DF3F7D4D44203903738F7 /* Pods-SimpleExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SimpleExample.release.xcconfig"; sourceTree = "<group>"; };
+		D609465BC8C86B27BEEA5D5BA1751194 /* Pods-SimpleExample-SimpleExampleUITests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SimpleExample-SimpleExampleUITests-Info.plist"; sourceTree = "<group>"; };
+		DE3F5264E9103A86300A65B6298C4571 /* SurveySparrowSdk-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "SurveySparrowSdk-Info.plist"; sourceTree = "<group>"; };
+		EA492D2AE8EB4C6ED3C8D0577AEB2D3E /* SurveySparrowSdk.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SurveySparrowSdk.xcconfig; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5BE520CCC80340F68953C4E8EECBC119 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96B21B6A70909D38F6F7855F32BA9B30 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A47707158332FA3C8A4800DBB84CAF98 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEB4DE76EC4467133AE6DBB0C33B8259 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AEFFDB1401249E54299222D97DAA4562 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6CEC0C19124D9143E372C0D0FAB9D883 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BB221955BEE97F1AB328FA326A898D93 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CEFF5CEFB64648C69E2FB5D835691FA6 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3D7131C71A0A500301179BF4E84AFE8A /* Pods-SimpleExample */ = {
+			isa = PBXGroup;
+			children = (
+				96FA1B927A1386CFE246C618F25162ED /* Pods-SimpleExample.modulemap */,
+				31AEAF727B5F37A29FA3D31FDCABC918 /* Pods-SimpleExample-acknowledgements.markdown */,
+				4AC877636CE7A85E76B039D5D6D5F22F /* Pods-SimpleExample-acknowledgements.plist */,
+				A3C52F156774FB9CA5BD6AD3D985388F /* Pods-SimpleExample-dummy.m */,
+				19317300CA4ED8DBDB4B5102C76BB17B /* Pods-SimpleExample-frameworks.sh */,
+				052431CC936A571B583501031B7D7795 /* Pods-SimpleExample-Info.plist */,
+				6AF95F76EE6234D264B0F9EAA94D4396 /* Pods-SimpleExample-umbrella.h */,
+				0AB78F09ADD4CE08566839B932854C4A /* Pods-SimpleExample.debug.xcconfig */,
+				D5CF0DCB7A8DF3F7D4D44203903738F7 /* Pods-SimpleExample.release.xcconfig */,
+			);
+			name = "Pods-SimpleExample";
+			path = "Target Support Files/Pods-SimpleExample";
+			sourceTree = "<group>";
+		};
+		50114FC3BFBAE2D2BE10B95382A6FDFF /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				1BFB2B3EBD79F5853E5B2F052163B0E8 /* SurveySparrowSdk.modulemap */,
+				EA492D2AE8EB4C6ED3C8D0577AEB2D3E /* SurveySparrowSdk.xcconfig */,
+				ADC53E151B7F887E4FC3453A79DE69A8 /* SurveySparrowSdk-dummy.m */,
+				DE3F5264E9103A86300A65B6298C4571 /* SurveySparrowSdk-Info.plist */,
+				13F5F3E09F6E26412BB99CBEBC13FC49 /* SurveySparrowSdk-prefix.pch */,
+				A789AC38BC194E9B7DAABBFD4F57024F /* SurveySparrowSdk-umbrella.h */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/SurveySparrowSdk";
+			sourceTree = "<group>";
+		};
+		5CBBA4D3DA5BEB3570FDEAF169BA0A43 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				3D7131C71A0A500301179BF4E84AFE8A /* Pods-SimpleExample */,
+				72DC82B24AC4B2E2705E89C117FEEECA /* Pods-SimpleExample-SimpleExampleUITests */,
+				8A18B76B201C75171DEF99D79721B18F /* Pods-SimpleExampleTests */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		647B651B7F2C23699E0AF5EBBF68AED7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2C0E55C56A401D44B1061B3AA6872D8C /* Pods_SimpleExample.framework */,
+				47AC73A5591522A0406527ABE3EBB66D /* Pods_SimpleExample_SimpleExampleUITests.framework */,
+				1AADF9FEB96E31FF75F2D3AAED2B936A /* Pods_SimpleExampleTests.framework */,
+				3B4096ACE9F3E46AC4E6CE4FCE665C66 /* SurveySparrowSdk.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		72DC82B24AC4B2E2705E89C117FEEECA /* Pods-SimpleExample-SimpleExampleUITests */ = {
+			isa = PBXGroup;
+			children = (
+				A2000E15B2F7EC6A93DFDCA02D7A1AD4 /* Pods-SimpleExample-SimpleExampleUITests.modulemap */,
+				22E3DB345C21FD0C672F606D08654BC4 /* Pods-SimpleExample-SimpleExampleUITests-acknowledgements.markdown */,
+				B55BFC2BB64B0E8D7FFC1946CD4E2008 /* Pods-SimpleExample-SimpleExampleUITests-acknowledgements.plist */,
+				5E525838483870095EFD72677E5F01D3 /* Pods-SimpleExample-SimpleExampleUITests-dummy.m */,
+				B9885DEDF3F662936B82DB005927FA06 /* Pods-SimpleExample-SimpleExampleUITests-frameworks.sh */,
+				D609465BC8C86B27BEEA5D5BA1751194 /* Pods-SimpleExample-SimpleExampleUITests-Info.plist */,
+				208EFE0653E8E1F6B6EA555048043B9C /* Pods-SimpleExample-SimpleExampleUITests-umbrella.h */,
+				616157903E0EE819FB88CA449BF4CC13 /* Pods-SimpleExample-SimpleExampleUITests.debug.xcconfig */,
+				A7887BCEDDA9ED4527BDE3BD9B04C65C /* Pods-SimpleExample-SimpleExampleUITests.release.xcconfig */,
+			);
+			name = "Pods-SimpleExample-SimpleExampleUITests";
+			path = "Target Support Files/Pods-SimpleExample-SimpleExampleUITests";
+			sourceTree = "<group>";
+		};
+		8A18B76B201C75171DEF99D79721B18F /* Pods-SimpleExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				2DBC970F3952DC2C557C0F99EDEFF18A /* Pods-SimpleExampleTests.modulemap */,
+				02E53ED145A0D7A2234C02DF4600920A /* Pods-SimpleExampleTests-acknowledgements.markdown */,
+				7A66DF7CB6503EF09F1725F152DA1788 /* Pods-SimpleExampleTests-acknowledgements.plist */,
+				3B5F1BF514CC73C328970FEAEA318DCD /* Pods-SimpleExampleTests-dummy.m */,
+				1F9F122350CB1E9564889ECB96014E00 /* Pods-SimpleExampleTests-Info.plist */,
+				2E25AD76872D30929BD1DAB1BBB55889 /* Pods-SimpleExampleTests-umbrella.h */,
+				6828EAFDA0E8CAC1917603F09FCF748C /* Pods-SimpleExampleTests.debug.xcconfig */,
+				CB6E5879464649D2DEFE49FD2195301B /* Pods-SimpleExampleTests.release.xcconfig */,
+			);
+			name = "Pods-SimpleExampleTests";
+			path = "Target Support Files/Pods-SimpleExampleTests";
+			sourceTree = "<group>";
+		};
+		C0834CEBB1379A84116EF29F93051C60 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		CF1408CF629C7361332E53B88F7BD30C = {
+			isa = PBXGroup;
+			children = (
+				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
+				D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */,
+				F663FFA2E0669367A0A26635D3765844 /* Pods */,
+				647B651B7F2C23699E0AF5EBBF68AED7 /* Products */,
+				5CBBA4D3DA5BEB3570FDEAF169BA0A43 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C0834CEBB1379A84116EF29F93051C60 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F663FFA2E0669367A0A26635D3765844 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				F87F68C696EEFC4391BD47D61F38ABC6 /* SurveySparrowSdk */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		F87F68C696EEFC4391BD47D61F38ABC6 /* SurveySparrowSdk */ = {
+			isa = PBXGroup;
+			children = (
+				0E2C93C35A8478556A2790027C1DC6E7 /* SsSurveyDelegate.swift */,
+				5115ED4E404FE5514C396F1AA450770C /* SsSurveyView.swift */,
+				C74864B5F8AECCEA0F0F2EEDF17E6691 /* SsSurveyViewController.swift */,
+				CC4A20DFAD76B912AB0251A0126DA163 /* SurveySparrow.swift */,
+				50114FC3BFBAE2D2BE10B95382A6FDFF /* Support Files */,
+			);
+			name = SurveySparrowSdk;
+			path = SurveySparrowSdk;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		27F9D23CD2573E3203B74FFEBFD4501A /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7405E9D7CBC35DCADDFAAE6A5CCF3E81 /* SurveySparrowSdk-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9535A9B10895E5C8E52F9507AB3122F1 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				48815261F8A0391451D17062B4DE7B27 /* Pods-SimpleExampleTests-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C91735E5E0A734384FF10F75CC1560EB /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF80FFC004A6C13805ABF0008BE3C4D3 /* Pods-SimpleExample-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE485EB4E47FF820984B6EED2417007B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C05ED3E67B96475D895F38CFFCF7562C /* Pods-SimpleExample-SimpleExampleUITests-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		065770EB33FF2DDC55A8A215225503E9 /* SurveySparrowSdk */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B60D59FD13ABF7521D39BDAEAA336765 /* Build configuration list for PBXNativeTarget "SurveySparrowSdk" */;
+			buildPhases = (
+				27F9D23CD2573E3203B74FFEBFD4501A /* Headers */,
+				822ED57308ABD401B1D4D7F409DA55B5 /* Sources */,
+				5BE520CCC80340F68953C4E8EECBC119 /* Frameworks */,
+				CC85210A0690F9F29E4F761B6B3FD996 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SurveySparrowSdk;
+			productName = SurveySparrowSdk;
+			productReference = 3B4096ACE9F3E46AC4E6CE4FCE665C66 /* SurveySparrowSdk.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		4BA6F1852168C3A76B29D4821D9E0C3F /* Pods-SimpleExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9283B20F5873D65D5723045CD5BACBD4 /* Build configuration list for PBXNativeTarget "Pods-SimpleExampleTests" */;
+			buildPhases = (
+				9535A9B10895E5C8E52F9507AB3122F1 /* Headers */,
+				807D8798BA3CA6038B7B181BE861BEDA /* Sources */,
+				A47707158332FA3C8A4800DBB84CAF98 /* Frameworks */,
+				EEA7D1861DFA9C85CAE8441417F6D2AD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8746C11455E1CB5FCCB9CD230AD7FCC7 /* PBXTargetDependency */,
+			);
+			name = "Pods-SimpleExampleTests";
+			productName = "Pods-SimpleExampleTests";
+			productReference = 1AADF9FEB96E31FF75F2D3AAED2B936A /* Pods_SimpleExampleTests.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		739E6E32AD94B472E749E619C18078ED /* Pods-SimpleExample-SimpleExampleUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E531DA5A2EF5F2C63F1DABCCA95A76EB /* Build configuration list for PBXNativeTarget "Pods-SimpleExample-SimpleExampleUITests" */;
+			buildPhases = (
+				CE485EB4E47FF820984B6EED2417007B /* Headers */,
+				112A59CBBF9739763CFDC6533E65D929 /* Sources */,
+				BB221955BEE97F1AB328FA326A898D93 /* Frameworks */,
+				5F33229A2302BA47280E5871B2E84808 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7AC525DB806912E0866DA3A18016ED22 /* PBXTargetDependency */,
+			);
+			name = "Pods-SimpleExample-SimpleExampleUITests";
+			productName = "Pods-SimpleExample-SimpleExampleUITests";
+			productReference = 47AC73A5591522A0406527ABE3EBB66D /* Pods_SimpleExample_SimpleExampleUITests.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		EAE0F8A4384601CDE45690312DEB287C /* Pods-SimpleExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9E4EABD211BFB6FAC70E6CF4E93BE7C8 /* Build configuration list for PBXNativeTarget "Pods-SimpleExample" */;
+			buildPhases = (
+				C91735E5E0A734384FF10F75CC1560EB /* Headers */,
+				3492BFC7D69342A28990CB89E25E6660 /* Sources */,
+				AEFFDB1401249E54299222D97DAA4562 /* Frameworks */,
+				637D9A5C42D43EEA1C7DCA2B9FCFCF4C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				88F68B6E18E0143FBB2EF0553CC1F2D0 /* PBXTargetDependency */,
+			);
+			name = "Pods-SimpleExample";
+			productName = "Pods-SimpleExample";
+			productReference = 2C0E55C56A401D44B1061B3AA6872D8C /* Pods_SimpleExample.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1100;
+				LastUpgradeCheck = 1100;
+			};
+			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
+			productRefGroup = 647B651B7F2C23699E0AF5EBBF68AED7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EAE0F8A4384601CDE45690312DEB287C /* Pods-SimpleExample */,
+				739E6E32AD94B472E749E619C18078ED /* Pods-SimpleExample-SimpleExampleUITests */,
+				4BA6F1852168C3A76B29D4821D9E0C3F /* Pods-SimpleExampleTests */,
+				065770EB33FF2DDC55A8A215225503E9 /* SurveySparrowSdk */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5F33229A2302BA47280E5871B2E84808 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		637D9A5C42D43EEA1C7DCA2B9FCFCF4C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC85210A0690F9F29E4F761B6B3FD996 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EEA7D1861DFA9C85CAE8441417F6D2AD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		112A59CBBF9739763CFDC6533E65D929 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				86AD722F1CE0E73EBE8E9D74C7DAC845 /* Pods-SimpleExample-SimpleExampleUITests-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3492BFC7D69342A28990CB89E25E6660 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC79EC2777A9813B16B6470C3E374D37 /* Pods-SimpleExample-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		807D8798BA3CA6038B7B181BE861BEDA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E9156D039BED373CBFACF75BF9A3FA84 /* Pods-SimpleExampleTests-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		822ED57308ABD401B1D4D7F409DA55B5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BCDE155FE7E9B757C1BB382C107CA5F8 /* SsSurveyDelegate.swift in Sources */,
+				153FD3A5B63AC3BCFEFE4E392D4A042C /* SsSurveyView.swift in Sources */,
+				C2EDFE711470E9D9A5400517F7C866FB /* SsSurveyViewController.swift in Sources */,
+				C93136CB975ECA63972EA785B5B0D474 /* SurveySparrow.swift in Sources */,
+				4B2E94CCFB1415F735A806B462B7CB7F /* SurveySparrowSdk-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		7AC525DB806912E0866DA3A18016ED22 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SurveySparrowSdk;
+			target = 065770EB33FF2DDC55A8A215225503E9 /* SurveySparrowSdk */;
+			targetProxy = 3CF9EC7BF80F6E4689E63BF2A947AC6C /* PBXContainerItemProxy */;
+		};
+		8746C11455E1CB5FCCB9CD230AD7FCC7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Pods-SimpleExample";
+			target = EAE0F8A4384601CDE45690312DEB287C /* Pods-SimpleExample */;
+			targetProxy = E43CEC227C97EF65309B5500B71E6135 /* PBXContainerItemProxy */;
+		};
+		88F68B6E18E0143FBB2EF0553CC1F2D0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SurveySparrowSdk;
+			target = 065770EB33FF2DDC55A8A215225503E9 /* SurveySparrowSdk */;
+			targetProxy = 64D088E6E7AE3C1F6D20A11AEBAC69A1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		00666C2CE9F6E1B05741B5666328C863 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A7887BCEDDA9ED4527BDE3BD9B04C65C /* Pods-SimpleExample-SimpleExampleUITests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-SimpleExample-SimpleExampleUITests/Pods-SimpleExample-SimpleExampleUITests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-SimpleExample-SimpleExampleUITests/Pods-SimpleExample-SimpleExampleUITests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		30D51C7A85040CCA49EAC910E4778A1F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 616157903E0EE819FB88CA449BF4CC13 /* Pods-SimpleExample-SimpleExampleUITests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-SimpleExample-SimpleExampleUITests/Pods-SimpleExample-SimpleExampleUITests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-SimpleExample-SimpleExampleUITests/Pods-SimpleExample-SimpleExampleUITests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		5CDDE90614BD05301094ED15BEE896E9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA492D2AE8EB4C6ED3C8D0577AEB2D3E /* SurveySparrowSdk.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/SurveySparrowSdk/SurveySparrowSdk-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/SurveySparrowSdk/SurveySparrowSdk-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/SurveySparrowSdk/SurveySparrowSdk.modulemap";
+				PRODUCT_MODULE_NAME = SurveySparrowSdk;
+				PRODUCT_NAME = SurveySparrowSdk;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		86FC088185DD1AEEEA9F39F85D5230F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D5CF0DCB7A8DF3F7D4D44203903738F7 /* Pods-SimpleExample.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-SimpleExample/Pods-SimpleExample-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-SimpleExample/Pods-SimpleExample.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		939F1A8F6BCEB7F9F64D9EEE50CAE014 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_DEBUG=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+		9BD455EEEBC667191007D42FF5212CA0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CB6E5879464649D2DEFE49FD2195301B /* Pods-SimpleExampleTests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-SimpleExampleTests/Pods-SimpleExampleTests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-SimpleExampleTests/Pods-SimpleExampleTests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		A8F46D9D302145D582B20915A5D44BD2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA492D2AE8EB4C6ED3C8D0577AEB2D3E /* SurveySparrowSdk.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/SurveySparrowSdk/SurveySparrowSdk-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/SurveySparrowSdk/SurveySparrowSdk-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/SurveySparrowSdk/SurveySparrowSdk.modulemap";
+				PRODUCT_MODULE_NAME = SurveySparrowSdk;
+				PRODUCT_NAME = SurveySparrowSdk;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		AD8884D94D761290AD2AE19560CAA72E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6828EAFDA0E8CAC1917603F09FCF748C /* Pods-SimpleExampleTests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-SimpleExampleTests/Pods-SimpleExampleTests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-SimpleExampleTests/Pods-SimpleExampleTests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		B0550643DE937E3C115B6E0D64502FF6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0AB78F09ADD4CE08566839B932854C4A /* Pods-SimpleExample.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-SimpleExample/Pods-SimpleExample-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-SimpleExample/Pods-SimpleExample.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		ECB437504DF805BD96CAABF97400B526 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				939F1A8F6BCEB7F9F64D9EEE50CAE014 /* Debug */,
+				ECB437504DF805BD96CAABF97400B526 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9283B20F5873D65D5723045CD5BACBD4 /* Build configuration list for PBXNativeTarget "Pods-SimpleExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AD8884D94D761290AD2AE19560CAA72E /* Debug */,
+				9BD455EEEBC667191007D42FF5212CA0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9E4EABD211BFB6FAC70E6CF4E93BE7C8 /* Build configuration list for PBXNativeTarget "Pods-SimpleExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B0550643DE937E3C115B6E0D64502FF6 /* Debug */,
+				86FC088185DD1AEEEA9F39F85D5230F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B60D59FD13ABF7521D39BDAEAA336765 /* Build configuration list for PBXNativeTarget "SurveySparrowSdk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5CDDE90614BD05301094ED15BEE896E9 /* Debug */,
+				A8F46D9D302145D582B20915A5D44BD2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E531DA5A2EF5F2C63F1DABCCA95A76EB /* Build configuration list for PBXNativeTarget "Pods-SimpleExample-SimpleExampleUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				30D51C7A85040CCA49EAC910E4778A1F /* Debug */,
+				00666C2CE9F6E1B05741B5666328C863 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+}
