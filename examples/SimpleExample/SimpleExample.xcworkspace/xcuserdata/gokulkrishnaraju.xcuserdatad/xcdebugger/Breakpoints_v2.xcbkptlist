@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "2E428AA4-5F19-49EF-870C-DDBF1F418228"
+   type = "0"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "624FB586-18F9-4CDD-967F-0E2073EF0044"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../SurveySparrowSdk/SsSurveyView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "106"
+            endingLineNumber = "106"
+            landmarkName = "closeButtonTapped()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "624FB586-18F9-4CDD-967F-0E2073EF0044 - df7e809dd9631f5e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SurveySparrowSdk.SsSurveyView.closeButtonTapped() -&gt; ()"
+                  moduleName = "SurveySparrowSdk"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gokulkrishnaraju/Gk/SurveySparrow/surveysparrow-ios-sdk/SurveySparrowSdk/SsSurveyView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "106"
+                  endingLineNumber = "106"
+                  offsetFromSymbolStart = "1280">
+               </Location>
+               <Location
+                  uuid = "624FB586-18F9-4CDD-967F-0E2073EF0044 - df7e809dd9631f5e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SurveySparrowSdk.SsSurveyView.closeButtonTapped() -&gt; ()"
+                  moduleName = "SurveySparrowSdk"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gokulkrishnaraju/Gk/SurveySparrow/surveysparrow-ios-sdk/SurveySparrowSdk/SsSurveyView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "106"
+                  endingLineNumber = "106"
+                  offsetFromSymbolStart = "1256">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "FDE6E0CB-5340-4720-948E-8AABDC1EF72A"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../SurveySparrowSdk/SsSurveyView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "99"
+            endingLineNumber = "99"
+            landmarkName = "closeButtonTapped()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "FDE6E0CB-5340-4720-948E-8AABDC1EF72A - df7e809dd9631e35"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SurveySparrowSdk.SsSurveyView.closeButtonTapped() -&gt; ()"
+                  moduleName = "SurveySparrowSdk"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gokulkrishnaraju/Gk/SurveySparrow/surveysparrow-ios-sdk/SurveySparrowSdk/SsSurveyView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "99"
+                  endingLineNumber = "99"
+                  offsetFromSymbolStart = "1120">
+               </Location>
+               <Location
+                  uuid = "FDE6E0CB-5340-4720-948E-8AABDC1EF72A - df7e809dd9631e35"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SurveySparrowSdk.SsSurveyView.closeButtonTapped() -&gt; ()"
+                  moduleName = "SurveySparrowSdk"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gokulkrishnaraju/Gk/SurveySparrow/surveysparrow-ios-sdk/SurveySparrowSdk/SsSurveyView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "99"
+                  endingLineNumber = "99"
+                  offsetFromSymbolStart = "1100">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F6E5A3C6-D2B5-4ECA-B750-B8F26846D3DE"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../SurveySparrowSdk/Sshelper.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "89"
+            endingLineNumber = "89"
+            landmarkName = "closeSurvey(domain:widgetContactId:params:group:completion:)"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "F6E5A3C6-D2B5-4ECA-B750-B8F26846D3DE - d1a7757367d3bf1d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SurveySparrowSdk.closeSurvey(domain: Swift.Optional&lt;Swift.String&gt;, widgetContactId: Swift.Optional&lt;Swift.Int64&gt;, params: Swift.Optional&lt;Swift.Dictionary&lt;Swift.String, Swift.String&gt;&gt;, group: __C.OS_dispatch_group, completion: (Swift.Dictionary&lt;Swift.String, Any&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "SurveySparrowSdk"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gokulkrishnaraju/Gk/SurveySparrow/surveysparrow-ios-sdk/SurveySparrowSdk/Sshelper.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "96"
+                  endingLineNumber = "96"
+                  offsetFromSymbolStart = "372">
+               </Location>
+               <Location
+                  uuid = "F6E5A3C6-D2B5-4ECA-B750-B8F26846D3DE - d1a7757367d3be24"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SurveySparrowSdk.closeSurvey(domain: Swift.Optional&lt;Swift.String&gt;, widgetContactId: Swift.Optional&lt;Swift.Int64&gt;, params: Swift.Optional&lt;Swift.Dictionary&lt;Swift.String, Swift.String&gt;&gt;, group: __C.OS_dispatch_group, completion: (Swift.Dictionary&lt;Swift.String, Any&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "SurveySparrowSdk"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gokulkrishnaraju/Gk/SurveySparrow/surveysparrow-ios-sdk/SurveySparrowSdk/Sshelper.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "89"
+                  endingLineNumber = "89"
+                  offsetFromSymbolStart = "444">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>
