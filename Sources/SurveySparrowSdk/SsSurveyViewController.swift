@@ -60,6 +60,11 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
             surveyDelegate.handleSurveyLoaded(response: response)
         }
     }
+    
+    public func handleCloseButtonTap() {
+          print("CloseButtonTapped")
+    }
+
     public func handleSurveyValidation(response: [String : AnyObject]) {
         if surveyDelegate != nil {
             surveyDelegate.handleSurveyValidation(response: response)

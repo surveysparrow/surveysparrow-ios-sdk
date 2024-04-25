@@ -24,8 +24,8 @@ struct ContentView: View {
     @State private var showEmbedSurvey : Bool = false
     @State private var isValidationPresented : Bool = false
     
-    var domain: String = "mobile-sdk.surveysparrow.com"
-    var token: String = "ntt-aMYx9J89WmrV46pvbGEJNz"
+    var domain: String = "gokulkrishnaraju1183.surveysparrow.com"
+    var token: String = "tt-v1anVo2KsJuoLnpMvC29dX"
     
     var body: some View {
         VStack {

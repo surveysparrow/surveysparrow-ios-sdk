@@ -21,6 +21,7 @@ struct EmbeddedSurveyView: UIViewRepresentable {
 
     func updateUIView(_ uiView: UIView, context: Context) {
         if isSurveyActive {
+            surveyView.surveyDelegate = SurveyDelegate()
             surveyView.loadEmbedSurvey(domain: domain, token: token , params: ["emailaddress": "email@email.com", "email": "email@email.com"])
             DispatchQueue.main.async {
                 self.isSurveyActive = false

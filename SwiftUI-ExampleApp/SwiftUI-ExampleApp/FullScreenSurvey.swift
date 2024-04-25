@@ -9,6 +9,10 @@ import SwiftUI
 import SurveySparrowSdk
 
 class SurveyDelegate: SsSurveyDelegate {
+    func handleCloseButtonTap() {
+        print("CloseButtonTap")
+    }
+    
     func handleSurveyResponse(response: [String: AnyObject]) {
         print("Survey Response: \(response)")
     }
