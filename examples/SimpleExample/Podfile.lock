@@ -1,22 +1,16 @@
 PODS:
-  - SurveySparrowSdk (0.1.0)
+  - SurveySparrowSdk (0.4.7)
 
 DEPENDENCIES:
-  - SurveySparrowSdk (from `https://github.com/surveysparrow/surveysparrow-ios-sdk.git`, tag `0.1.0`)
+  - SurveySparrowSdk (from `/Users/gokulkrishnaraju/Gk/SurveySparrow/surveysparrow-ios-sdk`)
 
 EXTERNAL SOURCES:
   SurveySparrowSdk:
-    :git: https://github.com/surveysparrow/surveysparrow-ios-sdk.git
-    :tag: 0.1.0
-
-CHECKOUT OPTIONS:
-  SurveySparrowSdk:
-    :git: https://github.com/surveysparrow/surveysparrow-ios-sdk.git
-    :tag: 0.1.0
+    :path: "/Users/gokulkrishnaraju/Gk/SurveySparrow/surveysparrow-ios-sdk"
 
 SPEC CHECKSUMS:
-  SurveySparrowSdk: e45a3ed282f2c5d9885a6dca76b7041defc058a7
+  SurveySparrowSdk: aed84379019f3003f1e451e0b5531cce885335df
 
-PODFILE CHECKSUM: 43ca3ad2d813e6022fd68739719316d77723b4c6
+PODFILE CHECKSUM: 598205271a443b0a30920b10802dc46b7c295909
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.15.2

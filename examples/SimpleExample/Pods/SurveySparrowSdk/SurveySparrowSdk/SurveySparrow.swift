@@ -69,24 +69,24 @@ public class SurveySparrow: SsSurveyDelegate {
       if isConnectedToNetwork && (!isAlreadyTaken || repeatSurvey) && (promptTime < currentTime) {
       var isActive: Bool = false
       var reason: String = ""
-      var widgetContactId: Int64 = 0 ;
       let group = DispatchGroup()
+      var widgetContactId: Int64 = 0 ;
       group.enter()
       let completion: ([String: Any]) -> Void = { result in
-          if let active = result["active"] as? Bool {
-            isActive = active
+        if let active = result["active"] as? Bool {
+          isActive = active
         }
-         if let reasonData = result["reason"] as? String {
-            reason = reasonData
+        if let reasonData = result["reason"] as? String {
+          reason = reasonData
         }
         if let widgetContactIdData = result["widgetContactId"] as? Int64 {
-               widgetContactId = widgetContactIdData
-            }
+          widgetContactId = widgetContactIdData
+        }
       }
-    
       validateSurvey(domain:domain,token:token,params:self.params, group: group,completion:completion);
       group.wait()
     if isActive == true {
+    
         let alertDialog = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: UIAlertController.Style.alert)
         alertDialog.addAction(UIAlertAction(title: alertPositiveButton, style: UIAlertAction.Style.default, handler: {action in
           let ssSurveyViewController = SsSurveyViewController()

@@ -136,10 +136,14 @@ public class SurveySparrow: SsSurveyDelegate {
     }
   }
 
-   public func handleSurveyValidation(response: [String : AnyObject]) {
-    UserDefaults.standard.set(true, forKey: isAlreadyTakenKey)
-    if surveyDelegate != nil {
-      self.surveyDelegate.handleSurveyResponse(response: response)
-    }
+  public func handleCloseButtonTap() {
+      print("CloseButtonTapped")
+  }
+    
+  public func handleSurveyValidation(response: [String : AnyObject]) {
+   UserDefaults.standard.set(true, forKey: isAlreadyTakenKey)
+   if surveyDelegate != nil {
+     self.surveyDelegate.handleSurveyResponse(response: response)
+   }
   }
 }
