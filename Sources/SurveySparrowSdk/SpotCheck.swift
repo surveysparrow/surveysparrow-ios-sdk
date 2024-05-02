@@ -3,73 +3,67 @@ import SwiftUI
 @available(iOS 15.0, *)
 public struct Spotcheck: View {
     
-    var email: String
-    var firstName: String
-    var lastName: String
-    var phoneNumber: String
-
     @ObservedObject var state: SpotcheckState
-
-    public init(email: String , firstName: String = "", lastName: String = "", phoneNumber: String = "") {
-        self.email = email
-        self.firstName = firstName
-        self.lastName = lastName
-        self.phoneNumber = phoneNumber
-        self.state = SpotcheckState(email: email, firstName: firstName, lastName: lastName, phoneNumber: phoneNumber)
+    
+    public init(email: String, domainName:String, targetToken: String, firstName: String = "", lastName: String = "", phoneNumber: String = "", location: [String: Double] = [:]) {
+        self.state = SpotcheckState(email: email, targetToken: targetToken, domainName: domainName, firstName: firstName, lastName: lastName, phoneNumber: phoneNumber, location: location)
     }
     
     public func TrackScreen(_ screen: String) {
-        state.sendRequest(screen: screen, event: nil) { valid in
-            if valid {
-                state.start()
+        state.sendRequest(screen: screen, event: nil) { valid, multiShow in
+            if valid && !multiShow {
+                DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
+                    state.start()
+                }
             } else {
-                print("Invalid")
+                print("TrackScreen Failed")
             }
         }
     }
     
     public func TrackEvent(_ event: String) {
-        state.sendRequest(screen: nil, event: event) { valid in
-            if valid {
-                state.start()
+        state.sendRequest(screen: nil, event: event) { valid, multiShow in
+            if valid && !multiShow {
+                DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
+                    state.start()
+                }
             } else {
-                print("Invalid")
+                print("TrackEvent Failed")
             }
         }
     }
-
+    
     public var body: some View {
-        VStack{
-            if state.position == "bottom" {
-                Spacer()
-            }
-            WebView(urlString: state.spotcheckURL)
-                .frame(width: UIScreen.main.bounds.width, height: 360)
-                .fixedSize(horizontal: false, vertical: true)
-                .background(Color.white)
-                .clipShape(RoundedRectangle(cornerRadius: 0))
-                .shadow(radius: 20)
-                .overlay(alignment: .topTrailing) {
-                    Button {
-                        state.end()
-                    } label: {
-                        Image(systemName: "xmark").font(.title2)
-                    }
-                    .tint(Color.black)
-                    .padding()
+        ZStack{
+            Color.black.opacity(0.1)
+            VStack{
+                if state.position == "bottom" {
+                    Spacer()
                 }
-            if state.position == "top" {
-                Spacer()
+                WebView(urlString: state.spotcheckURL)
+                    .frame(width: UIScreen.main.bounds.width, height: 360)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 0))
+                    .shadow(radius: 20)
+                    .overlay(alignment: .topTrailing) {
+                        if(state.isCloseButtonEnabled){
+                            Button {
+                                state.closeSpotCheck()
+                                state.end()
+                            } label: {
+                                Image(systemName: "xmark").font(.title2)
+                            }
+                            .tint(Color.black)
+                            .padding()
+                        }
+                    }
+                if state.position == "top" {
+                    Spacer()
+                }
             }
+            .edgesIgnoringSafeArea(.bottom)
         }
-        .gesture(
-            DragGesture().onChanged { val in
-                
-                print(val)
-            }
-        )
-        .edgesIgnoringSafeArea(.bottom)
-        .background(Color.gray.opacity(0.0001))
         .offset(x: 0, y: state.offset)
     }
 }

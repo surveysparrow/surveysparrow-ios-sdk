@@ -18,3 +18,17 @@ struct SpotCheckScreen: View {
         }
     }
 }
+
+@available(iOS 15.0, *)
+struct SpotCheckScreen2: View {
+    var body: some View {
+        ZStack {
+            Text("SpotCheckScreen")
+        }
+        .onAppear {
+            spotCheck.TrackScreen("SpotCheckScreen2")
+        }
+    }
+}
+
+//ButtonClick
