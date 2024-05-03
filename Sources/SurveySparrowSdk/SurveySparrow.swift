@@ -142,6 +142,13 @@ public class SurveySparrow: SsSurveyDelegate {
             self.surveyDelegate.handleSurveyResponse(response: response)
         }
     }
+
+    public func handleCloseButtonTap() {
+        if surveyDelegate != nil {
+            surveyDelegate.handleCloseButtonTap()
+        }
+    }
+
 }
 
 #endif
