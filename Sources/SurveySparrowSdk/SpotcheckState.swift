@@ -11,18 +11,18 @@ import CoreLocation
 @available(iOS 15.0, *)
 public class SpotcheckState: ObservableObject {
     
-    @Published public var isValid: Bool = false
     @Published public var offset: CGFloat = 1000
     @Published public var position: String = ""
     @Published public var spotcheckURL: String = ""
     @Published public var spotcheckID: Int64 = 0
     @Published public var spotcheckContactID: Int64 = 0
     @Published public var afterDelay: Double = 0
+    @Published public var maxHeight: Double = 0
     @Published public var isCloseButtonEnabled: Bool = false
     
     @Published private var isSpotPassed: Bool = false
     @Published private var isChecksPassed: Bool = false
-    @Published private var multiShowSpotCheck: [[String: Any]] = [[:]]
+    @Published private var customEventsSpotChecks: [[String: Any]] = []
     
     var email: String
     var firstName: String
@@ -59,8 +59,7 @@ public class SpotcheckState: ObservableObject {
         }
     }
     
-    
-    public func sendRequest(screen: String?, event: String?, completion: @escaping (Bool, Bool) -> Void) {
+    public func sendTrackScreenRequest(screen: String, completion: @escaping (Bool, Bool) -> Void) {
         
         let payload: [String: Any] = [
             "screenName": screen ?? "",
@@ -88,32 +87,29 @@ public class SpotcheckState: ObservableObject {
                 "currentDate": self.getCurrentDate(),
                 "timezone": TimeZone.current.identifier
             ],
-            //            "eventTrigger": [
-            //                "customEvent": [ "buy": [ "amount": 500 ] ],
-            //            ]
         ]
         
-        var url: URL?
-        
-        //        , let event = event,
-        if let screen = screen, !screen.isEmpty {
-            url = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/properties")
-        }
-        //        else {
-        //            url = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/eventTrigger")
-        //        }
-        
-        guard let finalURL = url else {
+        guard let baseURL = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/properties") else {
             print("Invalid URL")
             completion(false, false)
             return
         }
-        
-        print(payload)
-        var request = URLRequest(url: finalURL)
+
+        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
+        components?.queryItems = [
+            URLQueryItem(name: "isSpotCheck", value: "true")
+        ]
+
+        guard let url = components?.url else {
+            print("Failed to create URL with query parameters")
+            completion(false, false)
+            return
+        }
+
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+
         var reqData: Data
         do {
             reqData = try JSONSerialization.data(withJSONObject: payload)
@@ -145,22 +141,23 @@ public class SpotcheckState: ObservableObject {
                     if let show = json?["show"] as? Bool {
                         
                         if show == true {
+                           
+                            if let appearance = json?["appearance"] as? [String: Any],
+                               let position = appearance["position"] as? String,
+                               let cardProp = appearance["cardProperties"] as? [String: Any],
+                               let isCloseButtonEnabled = appearance["closeButton"] as? Bool {
+                                if position == "top_full" {self.position = "top"}
+                                else if position == "center_center" {self.position = "center"}
+                                else if position == "bottom_full" {self.position = "bottom"}
+                                self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
+                                self.maxHeight = cardProp["maxHeight"] as? Double ?? 0
+                            }
+
                             
-                            
+                            self.isSpotPassed = show
                             self.spotcheckID = json?["spotCheckId"] as! Int64
                             self.spotcheckContactID = json?["spotCheckContactId"] as! Int64
                             self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.spotcheckID)?spotcheckContactId=\(self.spotcheckContactID)"
-                            
-                            if let appearance = json?["appearance"] as? [String: Any],
-                               let position = appearance["position"] as? String,
-                               let isCloseButtonEnabled = appearance["closeButton"] as? Bool {
-                                if position == "top_full" {self.position = "top"}
-                                if position == "center_center" {self.position = "center"}
-                                if position == "bottom_full" {self.position = "bottom"}
-                                self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
-                            }
-                            
-                            self.isSpotPassed = show
                             
                             completion(show, false)
                             
@@ -171,7 +168,6 @@ public class SpotcheckState: ObservableObject {
                         
                     } else {
                         print("Error: Show not Received")
-                        completion(false, false)
                     }
                     
                     if(self.isSpotPassed == false){
@@ -181,27 +177,32 @@ public class SpotcheckState: ObservableObject {
                             
                             if checkPassed == true {
                                 
-                                self.spotcheckID = json?["spotCheckId"] as! Int64
-                                self.spotcheckContactID = json?["spotCheckContactId"] as! Int64
-                                self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.spotcheckID)?spotcheckContactId=\(self.spotcheckContactID)"
-                                
                                 if let checkCondition = json?["checkCondition"] as? [String: Any]{
-                                    let afterDelay = checkCondition["afterDelay"] as? String
-                                    if let afterDelayDouble = Double(afterDelay ?? "0") {
+                                    if let afterDelay = checkCondition["afterDelay"] as? String,
+                                    let afterDelayDouble = Double(afterDelay ?? "0") {
                                         self.afterDelay = afterDelayDouble
                                     }
+                                    if let customEvent = checkCondition["customEvent"] as? [String: Any]{
+                                        self.customEventsSpotChecks = [(json ?? [:]) as [String: Any]]
+                                       }
                                 }
                                 
                                 if let appearance = json?["appearance"] as? [String: Any],
                                    let position = appearance["position"] as? String,
+                                   let cardProp = appearance["cardProperties"] as? [String: Any],
                                    let isCloseButtonEnabled = appearance["closeButton"] as? Bool {
                                     if position == "top_full" {self.position = "top"}
-                                    if position == "center_center" {self.position = "center"}
-                                    if position == "bottom_full" {self.position = "bottom"}
+                                    else if position == "center_center" {self.position = "center"}
+                                    else if position == "bottom_full" {self.position = "bottom"}
                                     self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
+                                    self.maxHeight = cardProp["maxHeight"] as? Double ?? 0
                                 }
                                 
                                 self.isChecksPassed = checkPassed
+                                self.spotcheckID = json?["spotCheckId"] as! Int64
+                                self.spotcheckContactID = json?["spotCheckContactId"] as! Int64
+                                self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.spotcheckID)?spotcheckContactId=\(self.spotcheckContactID)"
+                                
                                 completion(checkPassed, false)
                                 
                             } else {
@@ -210,7 +211,6 @@ public class SpotcheckState: ObservableObject {
                             }
                         } else {
                             print("Error: CheckPassed not Received")
-                            completion(false, false)
                         }
                     }
                     
@@ -220,43 +220,64 @@ public class SpotcheckState: ObservableObject {
                             
                             if multiShow == true {
                                 
-                                if let spotCheckList = json?["resultantSpotCheck"] as? [[String: Any]], !spotCheckList.isEmpty {
-                                    self.multiShowSpotCheck = spotCheckList
+                                if let spotCheckList = json?["resultantSpotCheck"] as? [[String: Any]] {
+                                    self.customEventsSpotChecks = spotCheckList
                                 }
                                 
-                                for spotCheck in self.multiShowSpotCheck {
+                                var selectedSpotCheck: [String: Any] = [:]
+                                var minDelay: Double = Double.greatestFiniteMagnitude
+                                
+                                for spotCheck in self.customEventsSpotChecks {
                                     
-                                    if let spots:[String:Any] = spotCheck["spots"] as? [String : Any] {
-                                        if let includedSpotList: [[String:Any]] = spots["include"] as? [[String : Any]] {
-                                            for includedSpot in includedSpotList {
-                                                if includedSpot["value"] as? String == screen {
-                                                    
-//                                                    self.spotcheckID = spotCheck["id"] as! Int64
-//                                                    self.spotcheckContactID = spotCheck["spotCheckContactId"] as! Int64
-//                                                    self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.spotcheckID)?spotcheckContactId=\(self.spotcheckContactID)"
-//                                                    
-//                                                    if let checkCondition = spotCheck["checkCondition"] as? [String: Any]{
-//                                                        let afterDelay = checkCondition["afterDelay"] as? String
-//                                                        if let afterDelayDouble = Double(afterDelay ?? "0") {
-//                                                            self.afterDelay = afterDelayDouble
-//                                                        }
-//                                                    }
-//                                                    
-//                                                    if let appearance = spotCheck["appearance"] as? [String: Any],
-//                                                       let position = appearance["position"] as? String,
-//                                                       let isCloseButtonEnabled = appearance["closeButton"] as? Bool {
-//                                                        if position == "top_full" {self.position = "top"}
-//                                                        if position == "center_center" {self.position = "center"}
-//                                                        if position == "bottom_full" {self.position = "bottom"}
-//                                                        self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
-//                                                    }
-                                                    
-                                                    completion(true , true)
-//                                                    self.start()
-                                                }
+                                    if let checks:[String:Any] = spotCheck["checks"] as? [String : Any] {
+                                        if checks.isEmpty {
+                                            selectedSpotCheck = spotCheck
+                                            break
+                                        } else if let afterDelay = checks["afterDelay"] as? String {
+                                            let delay = Double(afterDelay) ?? Double.greatestFiniteMagnitude
+                                            if minDelay > delay {
+                                                minDelay = delay
+                                                selectedSpotCheck = spotCheck
                                             }
                                         }
                                     }
+                                    
+                                }
+                                
+                                if !selectedSpotCheck.isEmpty {
+                                    
+                                    if let checkCondition = selectedSpotCheck["checks"] as? [String: Any] {
+                                        let afterDelay = checkCondition["afterDelay"] as? String
+                                        if let afterDelayDouble = Double(afterDelay ?? "0") {
+                                            self.afterDelay = afterDelayDouble
+                                        }
+                                    }
+                                    
+                                    if let appearance = json?["appearance"] as? [String: Any],
+                                       let position = appearance["position"] as? String,
+                                       let cardProp = appearance["cardProperties"] as? [String: Any],
+                                       let isCloseButtonEnabled = appearance["closeButton"] as? Bool {
+                                        if position == "top_full" {self.position = "top"}
+                                        else if position == "center_center" {self.position = "center"}
+                                        else if position == "bottom_full" {self.position = "bottom"}
+                                        self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
+                                        self.maxHeight = cardProp["maxHeight"] as? Double ?? 0
+                                    }
+                                    
+                                    self.spotcheckID = selectedSpotCheck["id"] as! Int64
+                                    if let spotCheckContact = selectedSpotCheck["spotCheckContact"] as? [String: Any],
+                                       let contactID = spotCheckContact["id"] as? Int64 {
+                                        self.spotcheckContactID = contactID
+                                    }
+                                    self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.spotcheckID)?spotcheckContactId=\(self.spotcheckContactID)"
+                                    
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + self.afterDelay) {
+                                        self.start()
+                                    }
+                                    completion(true , true)
+                                } else {
+                                    completion(false , true)
+                                    
                                 }
                                 
                             } else {
@@ -280,9 +301,186 @@ public class SpotcheckState: ObservableObject {
         }.resume()
     }
     
+    public func sendTrackEventRequest(screen: String, event: [String: Any], completion: @escaping (Bool) -> Void) {
+        
+        var selectedSpotCheckID = Int.max ;
+        
+        if self.customEventsSpotChecks.isEmpty {
+            
+            print("No Events in this screen")
+            completion(false)
+            
+        } else {
+            
+            for spotCheck in self.customEventsSpotChecks {
+                
+                if let checks = spotCheck["checks"] as? [String: Any] ?? spotCheck["checkCondition"] as? [String: Any] ,
+                   let customEvent:[String:Any] = checks["customEvent"] as? [String : Any] {
+                    if let eventName = customEvent["eventName"] as? String {
+                        if event.keys.contains(eventName) {
+                            selectedSpotCheckID = spotCheck["id"] as? Int ?? spotCheck["spotCheckId"] as? Int ?? Int.max
+                            
+                            
+                            if selectedSpotCheckID != Int.max {
+                                
+                                let payload: [String: Any] = [
+                                    "url": screen ?? "",
+                                    "variables": [:],
+                                    "userDetails": [
+                                        "email": self.email,
+                                        "firstName": self.firstName,
+                                        "lastName": self.lastName,
+                                        "phoneNumber": self.phoneNumber
+                                    ],
+                                    "visitor": [
+                                        "location": [
+                                            "coords": [
+                                                "latitude" : latitude,
+                                                "longitude" : longitude,
+                                            ]
+                                        ],
+                                        "ipAddress": self.fetchIPAddress() ?? "",
+                                        "deviceType": "Mobile",
+                                        "operatingSystem": UIDevice.current.systemName,
+                                        "screenResolution": [
+                                            "width": UIScreen.main.bounds.width,
+                                            "height": UIScreen.main.bounds.height
+                                        ],
+                                        "currentDate": self.getCurrentDate(),
+                                        "timezone": TimeZone.current.identifier
+                                    ],
+                                    "spotCheckId": selectedSpotCheckID,
+                                    "eventTrigger": [
+                                        "customEvent": event,
+                                    ]
+                                ]
+                                
+                                guard let baseURL = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/eventTrigger") else {
+                                    print("Invalid URL")
+                                    completion(false)
+                                    return
+                                }
+
+                                var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
+                                components?.queryItems = [
+                                    URLQueryItem(name: "isSpotCheck", value: "true")
+                                ]
+
+                                guard let url = components?.url else {
+                                    print("Failed to create URL with query parameters")
+                                    completion(false)
+                                    return
+                                }
+
+                                var request = URLRequest(url: url)
+                                request.httpMethod = "POST"
+                                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+
+                                var reqData: Data
+                                do {
+                                    reqData = try JSONSerialization.data(withJSONObject: payload)
+                                } catch {
+                                    print("Error serializing JSON: \(error)")
+                                    completion(false)
+                                    return
+                                }
+                                
+                                URLSession.shared.uploadTask(with: request, from: reqData) { data, response, error in
+                                    if let error = error {
+                                        print("Error: \(error)")
+                                        completion(false)
+                                        return
+                                    }
+                                    
+                                    guard let data = data else {
+                                        print("No data received")
+                                        completion(false)
+                                        return
+                                    }
+                                    
+                                    do {
+                                        // Responce
+                                        let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+                                        
+                                        DispatchQueue.main.async {
+                                            
+                                            var isShowFalse:Bool = false
+                                            
+                                            if let show = json?["show"] as? Bool {
+                                                
+                                                if !show {
+                                                    isShowFalse = true
+                                                    print("Error: Spots or Checks or Visitor or Reccurence Condition Failed")
+                                                    completion(false)
+                                                }
+                                            }
+                                            
+                                            if !isShowFalse {
+                                                if let eventShow = json?["eventShow"] as? Bool {
+                                                    
+                                                    if eventShow == true {
+                                                        
+                                                        if let checkCondition = json?["checkCondition"] as? [String: Any]{
+                                                            if let afterDelay = checkCondition["afterDelay"] as? String,
+                                                            let afterDelayDouble = Double(afterDelay ?? "0") {
+                                                                self.afterDelay = afterDelayDouble
+                                                            }
+                                                            if let customEvent = checkCondition["customEvent"] as? [String: Any] {
+                                                                if let afterDelay = customEvent["delayInSeconds"] as? String,
+                                                                let afterDelayDouble = Double(afterDelay ?? "0") {
+                                                                    self.afterDelay = afterDelayDouble
+                                                                }
+                                                            }
+                                                        }
+                                                        
+                                                        if let appearance = json?["appearance"] as? [String: Any],
+                                                           let position = appearance["position"] as? String,
+                                                           let cardProp = appearance["cardProperties"] as? [String: Any],
+                                                           let isCloseButtonEnabled = appearance["closeButton"] as? Bool {
+                                                            if position == "top_full" {self.position = "top"}
+                                                            else if position == "center_center" {self.position = "center"}
+                                                            else if position == "bottom_full" {self.position = "bottom"}
+                                                            self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
+                                                            self.maxHeight = cardProp["maxHeight"] as? Double ?? 0
+                                                        }
+                                                        
+                                                        self.spotcheckID = json?["spotCheckId"] as! Int64
+                                                        self.spotcheckContactID = json?["spotCheckContactId"] as! Int64
+                                                        self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.spotcheckID)?spotcheckContactId=\(self.spotcheckContactID)"
+                                                        
+                                                        completion(eventShow)
+                                                        
+                                                    } else {
+                                                        print("Error: EventShow Condition Failed")
+                                                        completion(false)
+                                                    }
+                                                } else {
+                                                    print("Error: EventShow not Received")
+                                                }
+                                            }
+                                        }
+                                    } catch {
+                                        print("Error parsing JSON: \(error)")
+                                        completion(false)
+                                    }
+                                    
+                                }.resume()
+                                
+                                break;
+                            }
+                            
+                            else {
+                                completion(false)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+        
     public func fetchIPAddress() -> String? {
         var address : String?
-        
         var ifaddr : UnsafeMutablePointer<ifaddrs>?
         guard getifaddrs(&ifaddr) == 0 else { return nil }
         guard let firstAddr = ifaddr else { return nil }
@@ -333,7 +531,7 @@ public class SpotcheckState: ObservableObject {
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-    
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Error: \(error)")
@@ -351,9 +549,23 @@ public class SpotcheckState: ObservableObject {
                 }
             }catch {
                 print("Error parsing JSON: \(error)")
-
+                
             }
         }.resume()
     }
     
+}
+
+class SurveyHandler: SsSurveyDelegate {
+    func handleSurveyResponse(response: [String : AnyObject]) {
+        print(response)
+    }
+    
+    func handleSurveyLoaded(response: [String : AnyObject]) {
+        print(response)
+    }
+    
+    func handleSurveyValidation(response: [String : AnyObject]) {
+        print(response)
+    }
 }

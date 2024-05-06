@@ -10,11 +10,20 @@ import SwiftUI
 @available(iOS 15.0, *)
 struct SpotCheckScreen: View {
     var body: some View {
-        ZStack {
+        VStack {
             Text("SpotCheckScreen")
+                .padding()
+            Button(
+                action: {
+                    spotCheck.TrackEvent(onScreen: "SpotCheckScreen", event: [ "MobileClick": [] ])
+                }
+            ){
+                Text("Click")
+            }
+            .padding()
         }
         .onAppear {
-            spotCheck.TrackScreen("SpotCheckScreen")
+            spotCheck.TrackScreen(screen: "SpotCheckScreen")
         }
     }
 }
@@ -22,11 +31,20 @@ struct SpotCheckScreen: View {
 @available(iOS 15.0, *)
 struct SpotCheckScreen2: View {
     var body: some View {
-        ZStack {
-            Text("SpotCheckScreen")
+        VStack {
+            Text("SpotCheckScreen2")
+                .padding()
+            Button(
+                action: {
+                    spotCheck.TrackEvent(onScreen: "SpotCheckScreen2", event: [ "MobileClick": [] ])
+                }
+            ){
+                Text("Click")
+            }
+            .padding()
         }
         .onAppear {
-            spotCheck.TrackScreen("SpotCheckScreen2")
+            spotCheck.TrackScreen(screen: "SpotCheckScreen2")
         }
     }
 }

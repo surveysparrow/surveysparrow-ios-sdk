@@ -26,8 +26,6 @@ struct FullScreenSurveyView: UIViewControllerRepresentable {
     
     var domain: String
     var token: String
-    
-    @State private var isSurveyLoaded: Bool = false
 
     func makeUIViewController(context: Context) -> SsSurveyViewController{
         let ssSurveyViewController = SsSurveyViewController()

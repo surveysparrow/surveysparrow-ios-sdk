@@ -1,7 +1,7 @@
 import SwiftUI
 
 @available(iOS 15.0, *)
-public struct Spotcheck: View {
+public struct Spotcheck: View, SsSurveyDelegate {
     
     @ObservedObject var state: SpotcheckState
     
@@ -9,61 +9,92 @@ public struct Spotcheck: View {
         self.state = SpotcheckState(email: email, targetToken: targetToken, domainName: domainName, firstName: firstName, lastName: lastName, phoneNumber: phoneNumber, location: location)
     }
     
-    public func TrackScreen(_ screen: String) {
-        state.sendRequest(screen: screen, event: nil) { valid, multiShow in
-            if valid && !multiShow {
-                DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
-                    state.start()
+    public func TrackScreen(screen: String) {
+        state.sendTrackScreenRequest(screen: screen) { valid, multiShow in
+            if multiShow {
+                if valid {
+                    print("MultiShow Passed")
+                } else {
+                    print("TrackScreen Failed")
                 }
             } else {
-                print("TrackScreen Failed")
+                if valid {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
+                        state.start()
+                    }
+                } else {
+                    print("TrackScreen Failed")
+                }
             }
+            
         }
     }
     
-    public func TrackEvent(_ event: String) {
-        state.sendRequest(screen: nil, event: event) { valid, multiShow in
-            if valid && !multiShow {
-                DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
-                    state.start()
+    public func TrackEvent(onScreen screen: String, event: [String: Any]) {
+        state.sendTrackEventRequest(screen: screen, event: event) { valid in
+                if valid {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
+                        state.start()
+                    }
+                } else {
+                    print("TrackEvent Failed")
                 }
-            } else {
-                print("TrackEvent Failed")
             }
-        }
     }
     
     public var body: some View {
+        
         ZStack{
-            Color.black.opacity(0.1)
-            VStack{
-                if state.position == "bottom" {
-                    Spacer()
-                }
-                WebView(urlString: state.spotcheckURL)
-                    .frame(width: UIScreen.main.bounds.width, height: 360)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 0))
-                    .shadow(radius: 20)
-                    .overlay(alignment: .topTrailing) {
-                        if(state.isCloseButtonEnabled){
-                            Button {
-                                state.closeSpotCheck()
-                                state.end()
-                            } label: {
-                                Image(systemName: "xmark").font(.title2)
-                            }
-                            .tint(Color.black)
-                            .padding()
-                        }
+            if  state.offset == 0 {
+                Color.black.opacity(0.1)
+                VStack{
+                    if state.position == "bottom" {
+                        Spacer()
                     }
-                if state.position == "top" {
-                    Spacer()
+                    WebView(urlString: state.spotcheckURL, delegate: self, state: state)
+                        .frame(width: UIScreen.main.bounds.width, height: max( UIScreen.main.bounds.height * state.maxHeight, 360))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .clipShape(RoundedRectangle(cornerRadius: 0))
+                        .shadow(radius: 20)
+                        .overlay(alignment: .topTrailing) {
+                            if(state.isCloseButtonEnabled){
+                                Button {
+                                    state.closeSpotCheck()
+                                    state.spotcheckID = 0
+                                    state.spotcheckContactID = 0
+                                    state.spotcheckURL = ""
+                                    state.end()
+                                } label: {
+                                    Image(systemName: "xmark").font(.title2)
+                                }
+                                .tint(Color.black)
+                                .padding()
+                            }
+                        }
+                    if state.position == "top" {
+                        Spacer()
+                    }
+                    
                 }
+                .edgesIgnoringSafeArea(.bottom)
+            } else {
+                EmptyView()
             }
-            .edgesIgnoringSafeArea(.bottom)
         }
         .offset(x: 0, y: state.offset)
+        
     }
+    
+    public func handleSurveyResponse(response: [String : AnyObject]) {
+        print("Submit Response",response)
+    }
+    
+    public func handleSurveyLoaded(response: [String : AnyObject]) {
+        print("Survey Loaded", response)
+    }
+    
+    public func handleSurveyValidation(response: [String : AnyObject]) {
+        print(response)
+    }
+    
 }
