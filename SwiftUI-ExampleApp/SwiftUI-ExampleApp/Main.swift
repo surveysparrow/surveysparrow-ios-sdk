@@ -33,8 +33,8 @@ struct ContentView: View {
     @State private var isValidationPresented : Bool = false
     @State private var scrollOffset: CGFloat = 0
     
-    var domain: String = ""
-    var token: String = ""
+    var domain: String = "<account-domain>"
+    var token: String = "<sdk-token>"
     
     var body: some View {
         ZStack {
