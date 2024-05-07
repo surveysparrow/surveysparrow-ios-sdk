@@ -64,7 +64,14 @@ public struct Spotcheck: View {
                     Spacer()
                 }
                 WebViewContainer(state: state)
-                    .frame(height: min(state.currentQuestionHeight, (state.maxHeight * UIScreen.main.bounds.height)))
+                    .frame(
+                        height:
+                            self.state.isFullScreenMode
+                        ? (UIScreen.main.bounds.height - 100)
+                        : min(
+                            state.currentQuestionHeight,
+                            (state.maxHeight * UIScreen.main.bounds.height)
+                        ))
                 if state.position == "top" {
                     Spacer()
                 }
@@ -91,7 +98,7 @@ struct WebViewContainer: View, SsSurveyDelegate {
                 .clipShape(RoundedRectangle(cornerRadius: 0))
                 .shadow(radius: 20)
                 .overlay(alignment: .topTrailing) {
-                    if(state.isCloseButtonEnabled && state.currentQuestionHeight != 0){
+                    if(state.isCloseButtonEnabled && (self.state.isFullScreenMode || state.currentQuestionHeight != 0)){
                         Button {
                             state.closeSpotCheck()
                             state.spotcheckID = 0

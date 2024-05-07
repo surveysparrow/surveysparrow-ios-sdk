@@ -36,7 +36,7 @@ struct SpotCheckScreen2: View {
                 .padding()
             Button(
                 action: {
-                    spotCheck.TrackEvent(onScreen: "SpotCheckScreen2", event: [ "MobileClick": [] ])
+                    spotCheck.TrackEvent(onScreen: "SpotCheckScreen2", event: [ "MobileClick": ["abc": "bbb"] ])
                 }
             ){
                 Text("Click")

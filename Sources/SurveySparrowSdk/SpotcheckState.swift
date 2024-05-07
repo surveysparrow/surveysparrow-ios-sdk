@@ -21,6 +21,7 @@ public class SpotcheckState: ObservableObject {
     @Published public var closeButtonStyle: [String: String] = [:]
     @Published public var isCloseButtonEnabled: Bool = false
     @Published public var currentQuestionHeight: Double = 0
+    @Published public var isFullScreenMode: Bool = true
     
     @Published private var isSpotPassed: Bool = false
     @Published private var isChecksPassed: Bool = false
@@ -142,8 +143,8 @@ public class SpotcheckState: ObservableObject {
                            
                             if let appearance = json?["appearance"] as? [String: Any],
                                let position = appearance["position"] as? String,
-                               let cardProp = appearance["cardProperties"] as? [String: Any],
                                let isCloseButtonEnabled = appearance["closeButton"] as? Bool ,
+                               let cardProp = appearance["cardProperties"] as? [String: Any],
                                let colors = appearance["colors"] as? [String: Any],
                                let overrides = colors["overrides"] as? [String: String] {
                                 if position == "top_full" {self.position = "top"}
@@ -153,6 +154,7 @@ public class SpotcheckState: ObservableObject {
                                 let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
                                 self.maxHeight = mxHeight / 100
                                 self.closeButtonStyle = overrides
+                                self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
                             }
                             
                             self.isSpotPassed = show
@@ -168,7 +170,7 @@ public class SpotcheckState: ObservableObject {
                         }
                         
                     } else {
-                        print("Error: Show not Received")
+                        print("Show not Received")
                     }
                     
                     if(self.isSpotPassed == false){
@@ -190,8 +192,8 @@ public class SpotcheckState: ObservableObject {
                                 
                                 if let appearance = json?["appearance"] as? [String: Any],
                                    let position = appearance["position"] as? String,
-                                   let cardProp = appearance["cardProperties"] as? [String: Any],
                                    let isCloseButtonEnabled = appearance["closeButton"] as? Bool ,
+                                   let cardProp = appearance["cardProperties"] as? [String: Any] ,
                                    let colors = appearance["colors"] as? [String: Any],
                                    let overrides = colors["overrides"] as? [String: String] {
                                     if position == "top_full" {self.position = "top"}
@@ -201,6 +203,7 @@ public class SpotcheckState: ObservableObject {
                                     let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
                                     self.maxHeight = mxHeight / 100
                                     self.closeButtonStyle = overrides
+                                    self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
                                 }
                                 
                                 self.isChecksPassed = checkPassed
@@ -215,7 +218,7 @@ public class SpotcheckState: ObservableObject {
                                 completion(false, false)
                             }
                         } else {
-                            print("Error: CheckPassed not Received")
+                            print("CheckPassed not Received")
                         }
                     }
                     
@@ -260,8 +263,8 @@ public class SpotcheckState: ObservableObject {
                                     
                                     if let appearance = selectedSpotCheck["appearance"] as? [String: Any],
                                        let position = appearance["position"] as? String,
-                                       let cardProp = appearance["cardProperties"] as? [String: Any],
                                        let isCloseButtonEnabled = appearance["closeButton"] as? Bool,
+                                       let cardProp = appearance["cardProperties"] as? [String: Any],
                                        let colors = appearance["colors"] as? [String: Any],
                                        let overrides = colors["overrides"] as? [String: String] {
                                         if position == "top_full" {self.position = "top"}
@@ -271,6 +274,7 @@ public class SpotcheckState: ObservableObject {
                                         let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
                                         self.maxHeight = mxHeight / 100
                                         self.closeButtonStyle = overrides
+                                        self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
                                     }
                                     
                                     self.spotcheckID = selectedSpotCheck["id"] as! Int64
@@ -295,7 +299,7 @@ public class SpotcheckState: ObservableObject {
                             }
                             
                         }else {
-                            print("Error: MultiShow not Received")
+                            print("MultiShow not Received")
                             completion(false, false)
                         }
                         
@@ -444,8 +448,8 @@ public class SpotcheckState: ObservableObject {
                                                         
                                                         if let appearance = json?["appearance"] as? [String: Any],
                                                            let position = appearance["position"] as? String,
-                                                           let cardProp = appearance["cardProperties"] as? [String: Any],
                                                            let isCloseButtonEnabled = appearance["closeButton"] as? Bool,
+                                                           let cardProp = appearance["cardProperties"] as? [String: Any],
                                                             let colors = appearance["colors"] as? [String: Any],
                                                             let overrides = colors["overrides"] as? [String: String] {
                                                             if position == "top_full" {self.position = "top"}
@@ -455,6 +459,7 @@ public class SpotcheckState: ObservableObject {
                                                             let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
                                                             self.maxHeight = mxHeight / 100
                                                             self.closeButtonStyle = overrides
+                                                            self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
                                                         }
                                                         
                                                         self.spotcheckID = json?["spotCheckId"] as! Int64
@@ -468,7 +473,7 @@ public class SpotcheckState: ObservableObject {
                                                         completion(false)
                                                     }
                                                 } else {
-                                                    print("Error: EventShow not Received")
+                                                    print("EventShow not Received")
                                                 }
                                             }
                                         }
@@ -558,7 +563,7 @@ public class SpotcheckState: ObservableObject {
             do {
                 let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
                 if(((json?["success"]) != nil) == true){
-                    print("Successfully Closed")
+                    print("SpotCheck Closed")
                 }
             }catch {
                 print("Error parsing JSON: \(error)")

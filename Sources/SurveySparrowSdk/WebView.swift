@@ -86,7 +86,6 @@ struct WebViewRepresentable: UIViewRepresentable {
                         if let currentQuestionSize = response["data"]?["currentQuestionSize"] as? [String: Any],
                            let height = currentQuestionSize["height"] as? Double {
                             self.parent.state.currentQuestionHeight = height
-                            print(height)
                         }
                     }
                 }
