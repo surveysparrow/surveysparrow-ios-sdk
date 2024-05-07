@@ -11,14 +11,16 @@ import CoreLocation
 @available(iOS 15.0, *)
 public class SpotcheckState: ObservableObject {
     
-    @Published public var offset: CGFloat = 1000
+    @Published public var isVisible = false
     @Published public var position: String = ""
     @Published public var spotcheckURL: String = ""
     @Published public var spotcheckID: Int64 = 0
     @Published public var spotcheckContactID: Int64 = 0
     @Published public var afterDelay: Double = 0
-    @Published public var maxHeight: Double = 0
+    @Published public var maxHeight: Double = 0.5
+    @Published public var closeButtonStyle: [String: String] = [:]
     @Published public var isCloseButtonEnabled: Bool = false
+    @Published public var currentQuestionHeight: Double = 0
     
     @Published private var isSpotPassed: Bool = false
     @Published private var isChecksPassed: Bool = false
@@ -46,17 +48,13 @@ public class SpotcheckState: ObservableObject {
     
     
     public func start() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            withAnimation(.spring()) {
-                self.offset = 0
-            }
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
+            self.isVisible = true
         }
     }
     
     public func end() {
-        withAnimation(.spring()) {
-            offset = 1000
-        }
+        self.isVisible = false
     }
     
     public func sendTrackScreenRequest(screen: String, completion: @escaping (Bool, Bool) -> Void) {
@@ -145,14 +143,17 @@ public class SpotcheckState: ObservableObject {
                             if let appearance = json?["appearance"] as? [String: Any],
                                let position = appearance["position"] as? String,
                                let cardProp = appearance["cardProperties"] as? [String: Any],
-                               let isCloseButtonEnabled = appearance["closeButton"] as? Bool {
+                               let isCloseButtonEnabled = appearance["closeButton"] as? Bool ,
+                               let colors = appearance["colors"] as? [String: Any],
+                               let overrides = colors["overrides"] as? [String: String] {
                                 if position == "top_full" {self.position = "top"}
                                 else if position == "center_center" {self.position = "center"}
                                 else if position == "bottom_full" {self.position = "bottom"}
                                 self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
-                                self.maxHeight = cardProp["maxHeight"] as? Double ?? 0
+                                let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
+                                self.maxHeight = mxHeight / 100
+                                self.closeButtonStyle = overrides
                             }
-
                             
                             self.isSpotPassed = show
                             self.spotcheckID = json?["spotCheckId"] as! Int64
@@ -190,12 +191,16 @@ public class SpotcheckState: ObservableObject {
                                 if let appearance = json?["appearance"] as? [String: Any],
                                    let position = appearance["position"] as? String,
                                    let cardProp = appearance["cardProperties"] as? [String: Any],
-                                   let isCloseButtonEnabled = appearance["closeButton"] as? Bool {
+                                   let isCloseButtonEnabled = appearance["closeButton"] as? Bool ,
+                                   let colors = appearance["colors"] as? [String: Any],
+                                   let overrides = colors["overrides"] as? [String: String] {
                                     if position == "top_full" {self.position = "top"}
                                     else if position == "center_center" {self.position = "center"}
                                     else if position == "bottom_full" {self.position = "bottom"}
                                     self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
-                                    self.maxHeight = cardProp["maxHeight"] as? Double ?? 0
+                                    let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
+                                    self.maxHeight = mxHeight / 100
+                                    self.closeButtonStyle = overrides
                                 }
                                 
                                 self.isChecksPassed = checkPassed
@@ -253,15 +258,19 @@ public class SpotcheckState: ObservableObject {
                                         }
                                     }
                                     
-                                    if let appearance = json?["appearance"] as? [String: Any],
+                                    if let appearance = selectedSpotCheck["appearance"] as? [String: Any],
                                        let position = appearance["position"] as? String,
                                        let cardProp = appearance["cardProperties"] as? [String: Any],
-                                       let isCloseButtonEnabled = appearance["closeButton"] as? Bool {
+                                       let isCloseButtonEnabled = appearance["closeButton"] as? Bool,
+                                       let colors = appearance["colors"] as? [String: Any],
+                                       let overrides = colors["overrides"] as? [String: String] {
                                         if position == "top_full" {self.position = "top"}
                                         else if position == "center_center" {self.position = "center"}
                                         else if position == "bottom_full" {self.position = "bottom"}
                                         self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
-                                        self.maxHeight = cardProp["maxHeight"] as? Double ?? 0
+                                        let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
+                                        self.maxHeight = mxHeight / 100
+                                        self.closeButtonStyle = overrides
                                     }
                                     
                                     self.spotcheckID = selectedSpotCheck["id"] as! Int64
@@ -436,12 +445,16 @@ public class SpotcheckState: ObservableObject {
                                                         if let appearance = json?["appearance"] as? [String: Any],
                                                            let position = appearance["position"] as? String,
                                                            let cardProp = appearance["cardProperties"] as? [String: Any],
-                                                           let isCloseButtonEnabled = appearance["closeButton"] as? Bool {
+                                                           let isCloseButtonEnabled = appearance["closeButton"] as? Bool,
+                                                            let colors = appearance["colors"] as? [String: Any],
+                                                            let overrides = colors["overrides"] as? [String: String] {
                                                             if position == "top_full" {self.position = "top"}
                                                             else if position == "center_center" {self.position = "center"}
                                                             else if position == "bottom_full" {self.position = "bottom"}
                                                             self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
-                                                            self.maxHeight = cardProp["maxHeight"] as? Double ?? 0
+                                                            let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
+                                                            self.maxHeight = mxHeight / 100
+                                                            self.closeButtonStyle = overrides
                                                         }
                                                         
                                                         self.spotcheckID = json?["spotCheckId"] as! Int64
@@ -554,18 +567,4 @@ public class SpotcheckState: ObservableObject {
         }.resume()
     }
     
-}
-
-class SurveyHandler: SsSurveyDelegate {
-    func handleSurveyResponse(response: [String : AnyObject]) {
-        print(response)
-    }
-    
-    func handleSurveyLoaded(response: [String : AnyObject]) {
-        print(response)
-    }
-    
-    func handleSurveyValidation(response: [String : AnyObject]) {
-        print(response)
-    }
 }

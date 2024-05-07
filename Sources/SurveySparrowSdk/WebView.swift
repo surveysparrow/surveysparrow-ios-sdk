@@ -11,7 +11,6 @@ import WebKit
 @available(iOS 15.0, *)
 public struct WebView: View {
     
-    let urlString: String
     let delegate: SsSurveyDelegate
     let state: SpotcheckState
     @State private var isLoading: Bool = true
@@ -22,7 +21,7 @@ public struct WebView: View {
                 ProgressView("Loading...")
                     .progressViewStyle(CircularProgressViewStyle())
             }
-            WebViewRepresentable(urlString: urlString, delegate: delegate, state: state, isLoading: $isLoading)
+            WebViewRepresentable(urlString: state.spotcheckURL, delegate: delegate, state: state, isLoading: $isLoading)
         }
     }
 }
@@ -35,7 +34,7 @@ struct WebViewRepresentable: UIViewRepresentable {
     @Binding var isLoading: Bool
     private let surveyResponseHandler = WKUserContentController()
     
-    static func dismantleUIView(_ uiView: WKWebView, coordinator: Coordinator) {
+    public static func dismantleUIView(_ uiView: WKWebView, coordinator: Coordinator) {
         URLCache.shared.removeAllCachedResponses()
         let htmlString = "<html><body></body></html>"
         uiView.loadHTMLString(htmlString, baseURL: nil)
@@ -48,6 +47,7 @@ struct WebViewRepresentable: UIViewRepresentable {
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = context.coordinator
         surveyResponseHandler.add(context.coordinator, name: "surveyResponse")
+        surveyResponseHandler.add(context.coordinator, name: "spotCheckData")
         return webView
     }
 
@@ -66,20 +66,28 @@ struct WebViewRepresentable: UIViewRepresentable {
         
         private var surveyLoaded: String = "surveyLoadStarted"
         private var surveyCompleted: String = "surveyCompleted"
+        private var spotCheckData: String = "spotCheckData"
         
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if self.parent.delegate != nil {
                 let response = message.body as! [String: AnyObject]
                 let responseType = response["type"] as! String
-                if(responseType == surveyLoaded) {
+                if responseType == surveyLoaded {
                     if self.parent.delegate != nil {
                         self.parent.delegate.handleSurveyLoaded(response: response)
                     }
-                }
-                if(responseType == surveyCompleted) {
+                } else if responseType == surveyCompleted {
                     if self.parent.delegate != nil {
                         self.parent.state.end()
                         self.parent.delegate.handleSurveyResponse(response: response)
+                    }
+                } else if responseType == spotCheckData {
+                    if self.parent.delegate != nil {
+                        if let currentQuestionSize = response["data"]?["currentQuestionSize"] as? [String: Any],
+                           let height = currentQuestionSize["height"] as? Double {
+                            self.parent.state.currentQuestionHeight = height
+                            print(height)
+                        }
                     }
                 }
             }
