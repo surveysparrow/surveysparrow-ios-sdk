@@ -173,7 +173,7 @@ public class SpotcheckState: ObservableObject {
                         print("Show not Received")
                     }
                     
-                    if(self.isSpotPassed == false){
+                    if(self.isSpotPassed == false) {
                         
                         // Checks
                         if let checkPassed = json?["checkPassed"] as? Bool {
@@ -333,11 +333,10 @@ public class SpotcheckState: ObservableObject {
                         if event.keys.contains(eventName) {
                             selectedSpotCheckID = spotCheck["id"] as? Int ?? spotCheck["spotCheckId"] as? Int ?? Int.max
                             
-                            
                             if selectedSpotCheckID != Int.max {
                                 
                                 let payload: [String: Any] = [
-                                    "url": screen ?? "",
+                                    "screenName": screen ?? "",
                                     "variables": [:],
                                     "userDetails": [
                                         "email": self.email,
