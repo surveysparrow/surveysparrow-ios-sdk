@@ -336,7 +336,7 @@ public class SpotcheckState: ObservableObject {
                             if selectedSpotCheckID != Int.max {
                                 
                                 let payload: [String: Any] = [
-                                    "url": screen ?? "",
+                                    "screenName": screen ?? "",
                                     "variables": [:],
                                     "userDetails": [
                                         "email": self.email,
