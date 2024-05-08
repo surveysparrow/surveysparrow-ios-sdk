@@ -36,6 +36,7 @@ public struct Spotcheck: View {
                 if valid {
                     DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay + 1) {
                         state.start()
+                        print("TrackScreen Passed")
                     }
                 } else {
                     print("TrackScreen Failed")
@@ -50,6 +51,7 @@ public struct Spotcheck: View {
             if valid {
                 DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay + 1) {
                     state.start()
+                    print("TrackEvent Passed")
                 }
             } else {
                 print("TrackEvent Failed")

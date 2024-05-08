@@ -336,7 +336,7 @@ public class SpotcheckState: ObservableObject {
                             if selectedSpotCheckID != Int.max {
                                 
                                 let payload: [String: Any] = [
-                                    "screenName": screen ?? "",
+                                    "url": screen ?? "",
                                     "variables": [:],
                                     "userDetails": [
                                         "email": self.email,
@@ -424,6 +424,29 @@ public class SpotcheckState: ObservableObject {
                                                     isShowFalse = true
                                                     print("Error: Spots or Checks or Visitor or Reccurence Condition Failed")
                                                     completion(false)
+                                                } else {
+                                                    if let appearance = json?["appearance"] as? [String: Any],
+                                                       let position = appearance["position"] as? String,
+                                                       let isCloseButtonEnabled = appearance["closeButton"] as? Bool,
+                                                       let cardProp = appearance["cardProperties"] as? [String: Any],
+                                                        let colors = appearance["colors"] as? [String: Any],
+                                                        let overrides = colors["overrides"] as? [String: String] {
+                                                        if position == "top_full" {self.position = "top"}
+                                                        else if position == "center_center" {self.position = "center"}
+                                                        else if position == "bottom_full" {self.position = "bottom"}
+                                                        self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
+                                                        let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
+                                                        self.maxHeight = mxHeight / 100
+                                                        self.closeButtonStyle = overrides
+                                                        self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
+                                                    }
+                                                    
+                                                    self.spotcheckID = json?["spotCheckId"] as! Int64
+                                                    self.spotcheckContactID = json?["spotCheckContactId"] as! Int64
+                                                    self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.spotcheckID)?spotcheckContactId=\(self.spotcheckContactID)"
+                                                    
+                                                    print("Spots & Checks & Visitor & Reccurence Condition Passed")
+                                                    completion(show)
                                                 }
                                             }
                                             
@@ -465,6 +488,7 @@ public class SpotcheckState: ObservableObject {
                                                         self.spotcheckContactID = json?["spotCheckContactId"] as! Int64
                                                         self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.spotcheckID)?spotcheckContactId=\(self.spotcheckContactID)"
                                                         
+                                                        print("EventShow Condition Passed ")
                                                         completion(eventShow)
                                                         
                                                     } else {
