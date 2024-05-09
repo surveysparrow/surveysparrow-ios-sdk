@@ -70,10 +70,17 @@ public struct Spotcheck: View {
                         height:
                             self.state.isFullScreenMode
                         ? (UIScreen.main.bounds.height - 100)
-                        : (min(
-                            state.currentQuestionHeight,
-                            (state.maxHeight * UIScreen.main.bounds.height)
-                        ) + (state.isBannerImageOn && state.currentQuestionHeight != 0  ? 100 : 0))
+                        : min(
+                            (UIScreen.main.bounds.height - 100),
+                            (
+                                min(
+                                    state.currentQuestionHeight,
+                                    (state.maxHeight * UIScreen.main.bounds.height)
+                                ) 
+                                +
+                                (state.isBannerImageOn && state.currentQuestionHeight != 0  ? 100 : 0)
+                            )
+                        )
                     )
                 if state.position == "top" {
                     Spacer()
