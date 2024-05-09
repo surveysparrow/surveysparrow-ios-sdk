@@ -22,6 +22,7 @@ public class SpotcheckState: ObservableObject {
     @Published public var isCloseButtonEnabled: Bool = false
     @Published public var currentQuestionHeight: Double = 0
     @Published public var isFullScreenMode: Bool = true
+    @Published public var isBannerImageOn: Bool = false
     
     @Published private var isSpotPassed: Bool = false
     @Published private var isChecksPassed: Bool = false
@@ -155,6 +156,10 @@ public class SpotcheckState: ObservableObject {
                                 self.maxHeight = mxHeight / 100
                                 self.closeButtonStyle = overrides
                                 self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
+                                if let bannerImage = appearance["bannerImage"] as? [String: Any],
+                                    let enabled = bannerImage["enabled"] as? Bool {
+                                    self.isBannerImageOn = enabled
+                                }
                             }
                             
                             self.isSpotPassed = show
@@ -204,6 +209,10 @@ public class SpotcheckState: ObservableObject {
                                     self.maxHeight = mxHeight / 100
                                     self.closeButtonStyle = overrides
                                     self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
+                                    if let bannerImage = appearance["bannerImage"] as? [String: Any], 
+                                        let enabled = bannerImage["enabled"] as? Bool {
+                                        self.isBannerImageOn = enabled
+                                    }
                                 }
                                 
                                 self.isChecksPassed = checkPassed
@@ -439,6 +448,10 @@ public class SpotcheckState: ObservableObject {
                                                         self.maxHeight = mxHeight / 100
                                                         self.closeButtonStyle = overrides
                                                         self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
+                                                        if let bannerImage = appearance["bannerImage"] as? [String: Any],
+                                                            let enabled = bannerImage["enabled"] as? Bool {
+                                                            self.isBannerImageOn = enabled
+                                                        }
                                                     }
                                                     
                                                     self.spotcheckID = json?["spotCheckId"] as! Int64
@@ -482,6 +495,10 @@ public class SpotcheckState: ObservableObject {
                                                             self.maxHeight = mxHeight / 100
                                                             self.closeButtonStyle = overrides
                                                             self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
+                                                            if let bannerImage = appearance["bannerImage"] as? [String: Any],
+                                                                let enabled = bannerImage["enabled"] as? Bool {
+                                                                self.isBannerImageOn = enabled
+                                                            }
                                                         }
                                                         
                                                         self.spotcheckID = json?["spotCheckId"] as! Int64
