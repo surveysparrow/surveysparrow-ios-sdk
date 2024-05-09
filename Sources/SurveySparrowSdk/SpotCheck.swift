@@ -73,7 +73,7 @@ public struct Spotcheck: View {
                         : (min(
                             state.currentQuestionHeight,
                             (state.maxHeight * UIScreen.main.bounds.height)
-                        ) + (state.isBannerImageOn ? 100 : 0))
+                        ) + (state.isBannerImageOn && state.currentQuestionHeight != 0  ? 100 : 0))
                     )
                 if state.position == "top" {
                     Spacer()
