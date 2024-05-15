@@ -34,16 +34,18 @@ public class SpotcheckState: ObservableObject {
     var phoneNumber: String
     var targetToken: String
     var domainName: String
+    var variables: [String: Any]
     var latitude: Double
     var longitude: Double
     
-    public init(email: String, targetToken:String, domainName: String, firstName: String = "", lastName: String = "", phoneNumber: String = "", location: [String: Double]) {
+    public init(email: String, targetToken:String, domainName: String, firstName: String = "", lastName: String = "", phoneNumber: String = "", variables: [String: Any], location: [String: Double]) {
         self.email = email
         self.targetToken = targetToken
         self.firstName = firstName
         self.lastName = lastName
         self.phoneNumber = phoneNumber
         self.domainName = domainName
+        self.variables = variables
         self.latitude = location["latitude"] ?? 0.0
         self.longitude = location["longitude"] ?? 0.0
     }
@@ -63,7 +65,7 @@ public class SpotcheckState: ObservableObject {
         
         let payload: [String: Any] = [
             "screenName": screen ?? "",
-            "variables": [:],
+            "variables": self.variables,
             "userDetails": [
                 "email": self.email,
                 "firstName": self.firstName,
@@ -79,7 +81,7 @@ public class SpotcheckState: ObservableObject {
                 ],
                 "ipAddress": self.fetchIPAddress() ?? "",
                 "deviceType": "Mobile",
-                "operatingSystem": UIDevice.current.systemName,
+                "operatingSystem": "iOS",
                 "screenResolution": [
                     "width": UIScreen.main.bounds.width,
                     "height": UIScreen.main.bounds.height
@@ -346,7 +348,7 @@ public class SpotcheckState: ObservableObject {
                                 
                                 let payload: [String: Any] = [
                                     "screenName": screen ?? "",
-                                    "variables": [:],
+                                    "variables": self.variables,
                                     "userDetails": [
                                         "email": self.email,
                                         "firstName": self.firstName,
@@ -362,7 +364,7 @@ public class SpotcheckState: ObservableObject {
                                         ],
                                         "ipAddress": self.fetchIPAddress() ?? "",
                                         "deviceType": "Mobile",
-                                        "operatingSystem": UIDevice.current.systemName,
+                                        "operatingSystem": "iOS",
                                         "screenResolution": [
                                             "width": UIScreen.main.bounds.width,
                                             "height": UIScreen.main.bounds.height

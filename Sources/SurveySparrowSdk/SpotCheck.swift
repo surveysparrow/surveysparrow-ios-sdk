@@ -11,6 +11,7 @@ public struct Spotcheck: View {
                  firstName: String = "",
                  lastName: String = "",
                  phoneNumber: String = "",
+                 variables: [String: Any] = [:],
                  location: [String: Double] = [:]
     ) {
         self.state = SpotcheckState(
@@ -20,6 +21,7 @@ public struct Spotcheck: View {
             firstName: firstName,
             lastName: lastName,
             phoneNumber: phoneNumber,
+            variables: variables,
             location: location
         )
     }
