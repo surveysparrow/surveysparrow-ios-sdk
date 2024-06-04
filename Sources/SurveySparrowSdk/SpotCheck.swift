@@ -12,7 +12,7 @@ public struct Spotcheck: View {
                  lastName: String = "",
                  phoneNumber: String = "",
                  variables: [String: Any] = [:],
-                 location: [String: Double] = [:]
+                 customProperties: [String: Any] = [:]
     ) {
         self.state = SpotcheckState(
             email: email,
@@ -22,7 +22,7 @@ public struct Spotcheck: View {
             lastName: lastName,
             phoneNumber: phoneNumber,
             variables: variables,
-            location: location
+            customProperties: customProperties
         )
     }
     
@@ -36,7 +36,7 @@ public struct Spotcheck: View {
                 }
             } else {
                 if valid {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay + 1) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
                         state.start()
                         print("TrackScreen Passed")
                     }
@@ -51,7 +51,7 @@ public struct Spotcheck: View {
     public func TrackEvent(onScreen screen: String, event: [String: Any]) {
         state.sendTrackEventRequest(screen: screen, event: event) { valid in
             if valid {
-                DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay + 1) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
                     state.start()
                     print("TrackEvent Passed")
                 }

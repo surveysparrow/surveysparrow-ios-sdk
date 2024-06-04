@@ -23,6 +23,7 @@ public class SpotcheckState: ObservableObject {
     @Published public var currentQuestionHeight: Double = 0
     @Published public var isFullScreenMode: Bool = true
     @Published public var isBannerImageOn: Bool = false
+    @Published public var triggerToken: String = ""
     
     @Published private var isSpotPassed: Bool = false
     @Published private var isChecksPassed: Bool = false
@@ -35,10 +36,10 @@ public class SpotcheckState: ObservableObject {
     var targetToken: String
     var domainName: String
     var variables: [String: Any]
-    var latitude: Double
-    var longitude: Double
+    var customProperties: [String: Any]
+    var traceId: String = ""
     
-    public init(email: String, targetToken:String, domainName: String, firstName: String = "", lastName: String = "", phoneNumber: String = "", variables: [String: Any], location: [String: Double]) {
+    public init(email: String, targetToken:String, domainName: String, firstName: String = "", lastName: String = "", phoneNumber: String = "", variables: [String: Any], customProperties: [String: Any]) {
         self.email = email
         self.targetToken = targetToken
         self.firstName = firstName
@@ -46,8 +47,10 @@ public class SpotcheckState: ObservableObject {
         self.phoneNumber = phoneNumber
         self.domainName = domainName
         self.variables = variables
-        self.latitude = location["latitude"] ?? 0.0
-        self.longitude = location["longitude"] ?? 0.0
+        self.customProperties = customProperties
+        if traceId.isEmpty {
+            self.traceId = generateTraceId()
+        }
     }
     
     
@@ -73,13 +76,6 @@ public class SpotcheckState: ObservableObject {
                 "phoneNumber": self.phoneNumber
             ],
             "visitor": [
-                "location": [
-                    "coords": [
-                        "latitude" : latitude,
-                        "longitude" : longitude,
-                    ]
-                ],
-                "ipAddress": self.fetchIPAddress() ?? "",
                 "deviceType": "Mobile",
                 "operatingSystem": "iOS",
                 "screenResolution": [
@@ -89,6 +85,7 @@ public class SpotcheckState: ObservableObject {
                 "currentDate": self.getCurrentDate(),
                 "timezone": TimeZone.current.identifier
             ],
+            "traceId": self.traceId
         ]
         
         guard let baseURL = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/properties") else {
@@ -143,32 +140,9 @@ public class SpotcheckState: ObservableObject {
                     if let show = json?["show"] as? Bool {
                         
                         if show == true {
-                           
-                            if let appearance = json?["appearance"] as? [String: Any],
-                               let position = appearance["position"] as? String,
-                               let isCloseButtonEnabled = appearance["closeButton"] as? Bool ,
-                               let cardProp = appearance["cardProperties"] as? [String: Any],
-                               let colors = appearance["colors"] as? [String: Any],
-                               let overrides = colors["overrides"] as? [String: String] {
-                                if position == "top_full" {self.position = "top"}
-                                else if position == "center_center" {self.position = "center"}
-                                else if position == "bottom_full" {self.position = "bottom"}
-                                self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
-                                let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
-                                self.maxHeight = mxHeight / 100
-                                self.closeButtonStyle = overrides
-                                self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
-                                if let bannerImage = appearance["bannerImage"] as? [String: Any],
-                                    let enabled = bannerImage["enabled"] as? Bool {
-                                    self.isBannerImageOn = enabled
-                                }
-                            }
                             
+                            self.setAppearance(json: json ?? [:], screen: screen)
                             self.isSpotPassed = show
-                            self.spotcheckID = json?["spotCheckId"] as! Int64
-                            self.spotcheckContactID = json?["spotCheckContactId"] as! Int64
-                            self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.spotcheckID)?spotcheckContactId=\(self.spotcheckContactID)"
-                            
                             completion(show, false)
                             
                         } else {
@@ -187,42 +161,20 @@ public class SpotcheckState: ObservableObject {
                             
                             if checkPassed == true {
                                 
-                                if let checkCondition = json?["checkCondition"] as? [String: Any]{
+                                if let checkCondition = json?["checkCondition"] as? [String: Any] {
                                     if let afterDelay = checkCondition["afterDelay"] as? String,
-                                    let afterDelayDouble = Double(afterDelay ?? "0") {
+                                       let afterDelayDouble = Double(afterDelay ?? "0") {
                                         self.afterDelay = afterDelayDouble
                                     }
-                                    if let customEvent = checkCondition["customEvent"] as? [String: Any]{
+                                    if let customEvent = checkCondition["customEvent"] as? [String: Any] {
                                         self.customEventsSpotChecks = [(json ?? [:]) as [String: Any]]
-                                       }
-                                }
-                                
-                                if let appearance = json?["appearance"] as? [String: Any],
-                                   let position = appearance["position"] as? String,
-                                   let isCloseButtonEnabled = appearance["closeButton"] as? Bool ,
-                                   let cardProp = appearance["cardProperties"] as? [String: Any] ,
-                                   let colors = appearance["colors"] as? [String: Any],
-                                   let overrides = colors["overrides"] as? [String: String] {
-                                    if position == "top_full" {self.position = "top"}
-                                    else if position == "center_center" {self.position = "center"}
-                                    else if position == "bottom_full" {self.position = "bottom"}
-                                    self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
-                                    let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
-                                    self.maxHeight = mxHeight / 100
-                                    self.closeButtonStyle = overrides
-                                    self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
-                                    if let bannerImage = appearance["bannerImage"] as? [String: Any], 
-                                        let enabled = bannerImage["enabled"] as? Bool {
-                                        self.isBannerImageOn = enabled
+                                        completion(false, false)
+                                    }else {
+                                        self.setAppearance(json: json ?? [:], screen: screen)
+                                        self.isChecksPassed = checkPassed
+                                        completion(checkPassed, false)
                                     }
                                 }
-                                
-                                self.isChecksPassed = checkPassed
-                                self.spotcheckID = json?["spotCheckId"] as! Int64
-                                self.spotcheckContactID = json?["spotCheckContactId"] as! Int64
-                                self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.spotcheckID)?spotcheckContactId=\(self.spotcheckContactID)"
-                                
-                                completion(checkPassed, false)
                                 
                             } else {
                                 print("Error: Checks Condition Failed")
@@ -271,30 +223,7 @@ public class SpotcheckState: ObservableObject {
                                             self.afterDelay = afterDelayDouble
                                         }
                                     }
-                                    
-                                    if let appearance = selectedSpotCheck["appearance"] as? [String: Any],
-                                       let position = appearance["position"] as? String,
-                                       let isCloseButtonEnabled = appearance["closeButton"] as? Bool,
-                                       let cardProp = appearance["cardProperties"] as? [String: Any],
-                                       let colors = appearance["colors"] as? [String: Any],
-                                       let overrides = colors["overrides"] as? [String: String] {
-                                        if position == "top_full" {self.position = "top"}
-                                        else if position == "center_center" {self.position = "center"}
-                                        else if position == "bottom_full" {self.position = "bottom"}
-                                        self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
-                                        let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
-                                        self.maxHeight = mxHeight / 100
-                                        self.closeButtonStyle = overrides
-                                        self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
-                                    }
-                                    
-                                    self.spotcheckID = selectedSpotCheck["id"] as! Int64
-                                    if let spotCheckContact = selectedSpotCheck["spotCheckContact"] as? [String: Any],
-                                       let contactID = spotCheckContact["id"] as? Int64 {
-                                        self.spotcheckContactID = contactID
-                                    }
-                                    self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.spotcheckID)?spotcheckContactId=\(self.spotcheckContactID)"
-                                    
+                                    self.setAppearance(json: selectedSpotCheck, screen: screen)
                                     DispatchQueue.main.asyncAfter(deadline: .now() + self.afterDelay) {
                                         self.start()
                                     }
@@ -349,6 +278,7 @@ public class SpotcheckState: ObservableObject {
                                 let payload: [String: Any] = [
                                     "screenName": screen ?? "",
                                     "variables": self.variables,
+                                    "traceId": self.traceId,
                                     "userDetails": [
                                         "email": self.email,
                                         "firstName": self.firstName,
@@ -356,13 +286,6 @@ public class SpotcheckState: ObservableObject {
                                         "phoneNumber": self.phoneNumber
                                     ],
                                     "visitor": [
-                                        "location": [
-                                            "coords": [
-                                                "latitude" : latitude,
-                                                "longitude" : longitude,
-                                            ]
-                                        ],
-                                        "ipAddress": self.fetchIPAddress() ?? "",
                                         "deviceType": "Mobile",
                                         "operatingSystem": "iOS",
                                         "screenResolution": [
@@ -436,30 +359,7 @@ public class SpotcheckState: ObservableObject {
                                                     print("Error: Spots or Checks or Visitor or Reccurence Condition Failed")
                                                     completion(false)
                                                 } else {
-                                                    if let appearance = json?["appearance"] as? [String: Any],
-                                                       let position = appearance["position"] as? String,
-                                                       let isCloseButtonEnabled = appearance["closeButton"] as? Bool,
-                                                       let cardProp = appearance["cardProperties"] as? [String: Any],
-                                                        let colors = appearance["colors"] as? [String: Any],
-                                                        let overrides = colors["overrides"] as? [String: String] {
-                                                        if position == "top_full" {self.position = "top"}
-                                                        else if position == "center_center" {self.position = "center"}
-                                                        else if position == "bottom_full" {self.position = "bottom"}
-                                                        self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
-                                                        let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
-                                                        self.maxHeight = mxHeight / 100
-                                                        self.closeButtonStyle = overrides
-                                                        self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
-                                                        if let bannerImage = appearance["bannerImage"] as? [String: Any],
-                                                            let enabled = bannerImage["enabled"] as? Bool {
-                                                            self.isBannerImageOn = enabled
-                                                        }
-                                                    }
-                                                    
-                                                    self.spotcheckID = json?["spotCheckId"] as! Int64
-                                                    self.spotcheckContactID = json?["spotCheckContactId"] as! Int64
-                                                    self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.spotcheckID)?spotcheckContactId=\(self.spotcheckContactID)"
-                                                    
+                                                    self.setAppearance(json: json ?? [:], screen: screen)
                                                     print("Spots & Checks & Visitor & Reccurence Condition Passed")
                                                     completion(show)
                                                 }
@@ -482,31 +382,7 @@ public class SpotcheckState: ObservableObject {
                                                                 }
                                                             }
                                                         }
-                                                        
-                                                        if let appearance = json?["appearance"] as? [String: Any],
-                                                           let position = appearance["position"] as? String,
-                                                           let isCloseButtonEnabled = appearance["closeButton"] as? Bool,
-                                                           let cardProp = appearance["cardProperties"] as? [String: Any],
-                                                            let colors = appearance["colors"] as? [String: Any],
-                                                            let overrides = colors["overrides"] as? [String: String] {
-                                                            if position == "top_full" {self.position = "top"}
-                                                            else if position == "center_center" {self.position = "center"}
-                                                            else if position == "bottom_full" {self.position = "bottom"}
-                                                            self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
-                                                            let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
-                                                            self.maxHeight = mxHeight / 100
-                                                            self.closeButtonStyle = overrides
-                                                            self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
-                                                            if let bannerImage = appearance["bannerImage"] as? [String: Any],
-                                                                let enabled = bannerImage["enabled"] as? Bool {
-                                                                self.isBannerImageOn = enabled
-                                                            }
-                                                        }
-                                                        
-                                                        self.spotcheckID = json?["spotCheckId"] as! Int64
-                                                        self.spotcheckContactID = json?["spotCheckContactId"] as! Int64
-                                                        self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.spotcheckID)?spotcheckContactId=\(self.spotcheckContactID)"
-                                                        
+                                                        self.setAppearance(json: json ?? [:], screen: screen)
                                                         print("EventShow Condition Passed ")
                                                         completion(eventShow)
                                                         
@@ -537,6 +413,38 @@ public class SpotcheckState: ObservableObject {
                 }
             }
         }
+    }
+    
+    public func setAppearance(json: [String: Any] = [:], screen: String) -> Void {
+        if let appearance = json["appearance"] as? [String: Any],
+           let position = appearance["position"] as? String,
+           let isCloseButtonEnabled = appearance["closeButton"] as? Bool,
+           let cardProp = appearance["cardProperties"] as? [String: Any],
+           let colors = appearance["colors"] as? [String: Any],
+           let overrides = colors["overrides"] as? [String: String] {
+            if position == "top_full" {self.position = "top"}
+            else if position == "center_center" {self.position = "center"}
+            else if position == "bottom_full" {self.position = "bottom"}
+            self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
+            let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
+            self.maxHeight = mxHeight / 100
+            self.closeButtonStyle = overrides
+            self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
+            if let bannerImage = appearance["bannerImage"] as? [String: Any],
+               let enabled = bannerImage["enabled"] as? Bool {
+                self.isBannerImageOn = enabled
+            }
+        }
+        
+        self.spotcheckID = (json["spotCheckId"] as? Int64) ?? (json["id"] as? Int64) ?? 0
+        self.spotcheckContactID = (json["spotCheckContactId"] as? Int64) ?? 0
+        if self.spotcheckContactID == 0,
+           let spotCheckContact = json["spotCheckContact"] as? [String: Any],
+           let contactID = json["id"] as? Int64 {
+            self.spotcheckContactID = contactID
+        }
+        self.triggerToken = json["triggerToken"] as! String
+        self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.triggerToken)?spotcheckContactId=\(self.spotcheckContactID)&traceId=\(self.traceId)&spotcheckUrl=\(screen)"
     }
         
     public func fetchIPAddress() -> String? {
@@ -614,4 +522,9 @@ public class SpotcheckState: ObservableObject {
         }.resume()
     }
     
+    func generateTraceId() -> String {
+        let uuid = UUID().uuidString
+        let timestamp = Int(Date().timeIntervalSince1970 * 1000)
+        return "\(uuid)-\(timestamp)"
+    }  
 }
