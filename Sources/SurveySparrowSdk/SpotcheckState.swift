@@ -48,7 +48,7 @@ public class SpotcheckState: ObservableObject {
         self.domainName = domainName
         self.variables = variables
         self.customProperties = customProperties
-        if traceId.isEmpty {
+        if self.traceId.isEmpty {
             self.traceId = generateTraceId()
         }
     }
@@ -69,6 +69,8 @@ public class SpotcheckState: ObservableObject {
         let payload: [String: Any] = [
             "screenName": screen ?? "",
             "variables": self.variables,
+            "customProperties": self.customProperties,
+            "traceId": self.traceId,
             "userDetails": [
                 "email": self.email,
                 "firstName": self.firstName,
@@ -84,8 +86,7 @@ public class SpotcheckState: ObservableObject {
                 ],
                 "currentDate": self.getCurrentDate(),
                 "timezone": TimeZone.current.identifier
-            ],
-            "traceId": self.traceId
+            ]
         ]
         
         guard let baseURL = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/properties") else {
@@ -278,6 +279,7 @@ public class SpotcheckState: ObservableObject {
                                 let payload: [String: Any] = [
                                     "screenName": screen ?? "",
                                     "variables": self.variables,
+                                    "customProperties": self.customProperties,
                                     "traceId": self.traceId,
                                     "userDetails": [
                                         "email": self.email,
@@ -440,45 +442,13 @@ public class SpotcheckState: ObservableObject {
         self.spotcheckContactID = (json["spotCheckContactId"] as? Int64) ?? 0
         if self.spotcheckContactID == 0,
            let spotCheckContact = json["spotCheckContact"] as? [String: Any],
-           let contactID = json["id"] as? Int64 {
+           let contactID = spotCheckContact["id"] as? Int64 {
             self.spotcheckContactID = contactID
         }
         self.triggerToken = json["triggerToken"] as! String
         self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.triggerToken)?spotcheckContactId=\(self.spotcheckContactID)&traceId=\(self.traceId)&spotcheckUrl=\(screen)"
     }
         
-    public func fetchIPAddress() -> String? {
-        var address : String?
-        var ifaddr : UnsafeMutablePointer<ifaddrs>?
-        guard getifaddrs(&ifaddr) == 0 else { return nil }
-        guard let firstAddr = ifaddr else { return nil }
-        
-        for ifptr in sequence(first: firstAddr, next: { $0.pointee.ifa_next }) {
-            let interface = ifptr.pointee
-            
-            let addrFamily = interface.ifa_addr.pointee.sa_family
-            if addrFamily == UInt8(AF_INET) || addrFamily == UInt8(AF_INET6) {
-                let name = String(cString: interface.ifa_name)
-                if  name == "en0" {
-                    var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-                    getnameinfo(interface.ifa_addr, socklen_t(interface.ifa_addr.pointee.sa_len),
-                                &hostname, socklen_t(hostname.count),
-                                nil, socklen_t(0), NI_NUMERICHOST)
-                    address = String(cString: hostname)
-                } else if (name == "pdp_ip0" || name == "pdp_ip1" || name == "pdp_ip2" || name == "pdp_ip3") {
-                    var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-                    getnameinfo(interface.ifa_addr, socklen_t(interface.ifa_addr.pointee.sa_len),
-                                &hostname, socklen_t(hostname.count),
-                                nil, socklen_t(1), NI_NUMERICHOST)
-                    address = String(cString: hostname)
-                }
-            }
-        }
-        freeifaddrs(ifaddr)
-        
-        return address
-    }
-    
     public func getCurrentDate() -> String {
         let currentDate = Date()
         let dateFormatter = DateFormatter()
@@ -491,6 +461,11 @@ public class SpotcheckState: ObservableObject {
     
     public func closeSpotCheck() {
         
+        let payload: [String: String] = [
+            "traceId": self.traceId,
+            "triggerToken": self.triggerToken
+        ]
+        
         guard let url = URL(string: "https://\(self.domainName)/api/internal/spotcheck/dismiss/\(self.spotcheckContactID)") else {
             print("Invalid URL")
             return
@@ -499,8 +474,16 @@ public class SpotcheckState: ObservableObject {
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        var reqData: Data
+        do {
+            reqData = try JSONSerialization.data(withJSONObject: payload)
+        } catch {
+            print("Error serializing JSON: \(error)")
+            return
+        }
         
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        URLSession.shared.uploadTask(with: request, from: reqData) { data, response, error in
             if let error = error {
                 print("Error: \(error)")
                 return
