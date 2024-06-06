@@ -67,6 +67,7 @@ struct WebViewRepresentable: UIViewRepresentable {
         private var surveyLoaded: String = "surveyLoadStarted"
         private var surveyCompleted: String = "surveyCompleted"
         private var spotCheckData: String = "spotCheckData"
+        private var closeModel: String = "closeModal"
         
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if self.parent.delegate != nil {
@@ -87,6 +88,11 @@ struct WebViewRepresentable: UIViewRepresentable {
                            let height = currentQuestionSize["height"] as? Double {
                             self.parent.state.currentQuestionHeight = height
                         }
+                    }
+                }else if responseType == closeModel {
+                    if self.parent.delegate != nil {
+                        self.parent.state.end()
+                        self.parent.delegate.handleCloseButtonTap()
                     }
                 }
             }

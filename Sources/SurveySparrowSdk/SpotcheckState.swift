@@ -18,8 +18,6 @@ public class SpotcheckState: ObservableObject {
     @Published public var spotcheckContactID: Int64 = 0
     @Published public var afterDelay: Double = 0
     @Published public var maxHeight: Double = 0.5
-    @Published public var closeButtonStyle: [String: String] = [:]
-    @Published public var isCloseButtonEnabled: Bool = false
     @Published public var currentQuestionHeight: Double = 0
     @Published public var isFullScreenMode: Bool = true
     @Published public var isBannerImageOn: Bool = false
@@ -420,17 +418,12 @@ public class SpotcheckState: ObservableObject {
     public func setAppearance(json: [String: Any] = [:], screen: String) -> Void {
         if let appearance = json["appearance"] as? [String: Any],
            let position = appearance["position"] as? String,
-           let isCloseButtonEnabled = appearance["closeButton"] as? Bool,
-           let cardProp = appearance["cardProperties"] as? [String: Any],
-           let colors = appearance["colors"] as? [String: Any],
-           let overrides = colors["overrides"] as? [String: String] {
+           let cardProp = appearance["cardProperties"] as? [String: Any]  {
             if position == "top_full" {self.position = "top"}
             else if position == "center_center" {self.position = "center"}
             else if position == "bottom_full" {self.position = "bottom"}
-            self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
             let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
             self.maxHeight = mxHeight / 100
-            self.closeButtonStyle = overrides
             self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
             if let bannerImage = appearance["bannerImage"] as? [String: Any],
                let enabled = bannerImage["enabled"] as? Bool {
@@ -457,52 +450,6 @@ public class SpotcheckState: ObservableObject {
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         let currentDateStr = dateFormatter.string(from: currentDate)
         return currentDateStr
-    }
-    
-    public func closeSpotCheck() {
-        
-        let payload: [String: String] = [
-            "traceId": self.traceId,
-            "triggerToken": self.triggerToken
-        ]
-        
-        guard let url = URL(string: "https://\(self.domainName)/api/internal/spotcheck/dismiss/\(self.spotcheckContactID)") else {
-            print("Invalid URL")
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        var reqData: Data
-        do {
-            reqData = try JSONSerialization.data(withJSONObject: payload)
-        } catch {
-            print("Error serializing JSON: \(error)")
-            return
-        }
-        
-        URLSession.shared.uploadTask(with: request, from: reqData) { data, response, error in
-            if let error = error {
-                print("Error: \(error)")
-                return
-            }
-            
-            guard let data = data else {
-                print("No data received")
-                return
-            }
-            do {
-                let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-                if(((json?["success"]) != nil) == true){
-                    print("SpotCheck Closed")
-                }
-            }catch {
-                print("Error parsing JSON: \(error)")
-                
-            }
-        }.resume()
     }
     
     func generateTraceId() -> String {
