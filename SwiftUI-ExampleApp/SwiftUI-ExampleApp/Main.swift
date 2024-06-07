@@ -40,11 +40,11 @@ struct ContentView: View {
         ZStack {
             NavigationView {
                 ScrollView {
-                    NavigationLink(destination: SpotCheckScreen()) {
-                        Text("SpotCheck")
+                    NavigationLink(destination: HomeScreen()) {
+                        Text("HomeScreen")
                     }.padding().padding(.top,60)
-                    NavigationLink(destination: SpotCheckScreen2()) {
-                        Text("SpotCheck")
+                    NavigationLink(destination: NetworkScreen()) {
+                        Text("NetworkScreen")
                     }
                     Button{
                         isModalPresented = true

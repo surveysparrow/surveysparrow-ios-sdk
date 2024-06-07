@@ -8,14 +8,14 @@
 import SwiftUI
 
 @available(iOS 15.0, *)
-struct SpotCheckScreen: View {
+struct HomeScreen: View {
     var body: some View {
         VStack {
-            Text("SpotCheckScreen")
+            Text("HomeScreen")
                 .padding()
             Button(
                 action: {
-                    spotCheck.TrackEvent(onScreen: "SpotCheckScreen", event: [ "MobileClick": [] ])
+                    spotCheck.TrackEvent(onScreen: "HomeScreen", event: [ "SendPost": ["postSentTime": "5.30pm"] ])
                 }
             ){
                 Text("Click")
@@ -23,20 +23,20 @@ struct SpotCheckScreen: View {
             .padding()
         }
         .onAppear {
-            spotCheck.TrackScreen(screen: "SpotCheckScreen")
+            spotCheck.TrackScreen(screen: "HomeScreen")
         }
     }
 }
 
 @available(iOS 15.0, *)
-struct SpotCheckScreen2: View {
+struct NetworkScreen: View {
     var body: some View {
         VStack {
-            Text("SpotCheckScreen2")
+            Text("NetworkScreen")
                 .padding()
             Button(
                 action: {
-                    spotCheck.TrackEvent(onScreen: "SpotCheckScreen2", event: [ "MobileClick": ["abc": "bbb"] ])
+                    spotCheck.TrackEvent(onScreen: "NetworkScreen", event: [ "MobileClick": ["abc": "bbb"] ])
                 }
             ){
                 Text("Click")
@@ -44,7 +44,7 @@ struct SpotCheckScreen2: View {
             .padding()
         }
         .onAppear {
-            spotCheck.TrackScreen(screen: "SpotCheckScreen2")
+            spotCheck.TrackScreen(screen: "NetworkScreen")
         }
     }
 }
