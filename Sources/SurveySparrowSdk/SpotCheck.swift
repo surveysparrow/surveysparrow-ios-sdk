@@ -63,29 +63,35 @@ public struct Spotcheck: View {
     
     public var body: some View {
         if  state.isVisible {
-            VStack(){
-                if state.position == "bottom" {
-                    Spacer()
-                }
-                WebViewContainer(state: state)
-                    .frame(
-                        height:
-                            self.state.isFullScreenMode
-                        ? (UIScreen.main.bounds.height - 100)
-                        : min(
-                            (UIScreen.main.bounds.height - 100),
-                            (
-                                min(
-                                    state.currentQuestionHeight,
-                                    (state.maxHeight * UIScreen.main.bounds.height)
-                                ) 
-                                +
-                                (state.isBannerImageOn && state.currentQuestionHeight != 0  ? 100 : 0)
+            ZStack {
+                Spacer()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.black.opacity(0.1))
+                
+                VStack(){
+                    if state.position == "bottom" {
+                        Spacer()
+                    }
+                    WebViewContainer(state: state)
+                        .frame(
+                            height:
+                                self.state.isFullScreenMode
+                            ? (UIScreen.main.bounds.height - 100)
+                            : min(
+                                (UIScreen.main.bounds.height - 100),
+                                (
+                                    min(
+                                        state.currentQuestionHeight,
+                                        (state.maxHeight * UIScreen.main.bounds.height)
+                                    )
+                                    +
+                                    (state.isBannerImageOn && state.currentQuestionHeight != 0  ? 100 : 0)
+                                )
                             )
                         )
-                    )
-                if state.position == "top" {
-                    Spacer()
+                    if state.position == "top" {
+                        Spacer()
+                    }
                 }
             }
         } else {

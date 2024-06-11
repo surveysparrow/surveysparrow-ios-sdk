@@ -36,6 +36,7 @@ public class SpotcheckState: ObservableObject {
     var variables: [String: Any]
     var customProperties: [String: Any]
     var traceId: String = ""
+    let defaults = UserDefaults.standard
     
     public init(email: String, targetToken:String, domainName: String, firstName: String = "", lastName: String = "", phoneNumber: String = "", variables: [String: Any], customProperties: [String: Any]) {
         self.email = email
@@ -48,6 +49,9 @@ public class SpotcheckState: ObservableObject {
         self.customProperties = customProperties
         if self.traceId.isEmpty {
             self.traceId = generateTraceId()
+            if defaults.string(forKey: "uuid") == nil {
+                defaults.set("", forKey: "uuid")
+            }
         }
     }
     
@@ -64,17 +68,32 @@ public class SpotcheckState: ObservableObject {
     
     public func sendTrackScreenRequest(screen: String, completion: @escaping (Bool, Bool) -> Void) {
         
+        var userDetails: [String: Any] = [:]
+        
+        if( self.email.isEmpty ) {
+            userDetails = [
+                "firstName": self.firstName,
+                "lastName": self.lastName,
+                "phoneNumber": self.phoneNumber
+            ]
+            if let uuid = defaults.string(forKey: "uuid") {
+                userDetails["uuid"] = uuid
+            }
+        } else {
+            userDetails = [
+                "email": self.email,
+                "firstName": self.firstName,
+                "lastName": self.lastName,
+                "phoneNumber": self.phoneNumber
+            ]
+        }
+        
         let payload: [String: Any] = [
             "screenName": screen ?? "",
             "variables": self.variables,
             "customProperties": self.customProperties,
             "traceId": self.traceId,
-            "userDetails": [
-                "email": self.email,
-                "firstName": self.firstName,
-                "lastName": self.lastName,
-                "phoneNumber": self.phoneNumber
-            ],
+            "userDetails": userDetails,
             "visitor": [
                 "deviceType": "Mobile",
                 "operatingSystem": "iOS",
@@ -133,6 +152,13 @@ public class SpotcheckState: ObservableObject {
             do {
                 // Responce
                 let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+                
+                if let uuid = json?["uuid"] as? String {
+                    let locuuid = self.defaults.string(forKey: "uuid")
+                    if locuuid == nil || ((locuuid?.isEmpty) != nil) {
+                        self.defaults.set(uuid, forKey: "uuid")
+                    }
+                }
                 
                 DispatchQueue.main.async {
                     
@@ -273,18 +299,33 @@ public class SpotcheckState: ObservableObject {
                             selectedSpotCheckID = spotCheck["id"] as? Int ?? spotCheck["spotCheckId"] as? Int ?? Int.max
                             
                             if selectedSpotCheckID != Int.max {
+                                                                
+                                var userDetails: [String: Any] = [:]
+                                
+                                if( self.email.isEmpty ) {
+                                    userDetails = [
+                                        "firstName": self.firstName,
+                                        "lastName": self.lastName,
+                                        "phoneNumber": self.phoneNumber
+                                    ]
+                                    if let uuid = defaults.string(forKey: "uuid") {
+                                        userDetails["uuid"] = uuid
+                                    }
+                                } else {
+                                    userDetails = [
+                                        "email": self.email,
+                                        "firstName": self.firstName,
+                                        "lastName": self.lastName,
+                                        "phoneNumber": self.phoneNumber
+                                    ]
+                                }
                                 
                                 let payload: [String: Any] = [
                                     "screenName": screen ?? "",
                                     "variables": self.variables,
                                     "customProperties": self.customProperties,
                                     "traceId": self.traceId,
-                                    "userDetails": [
-                                        "email": self.email,
-                                        "firstName": self.firstName,
-                                        "lastName": self.lastName,
-                                        "phoneNumber": self.phoneNumber
-                                    ],
+                                    "userDetails": userDetails,
                                     "visitor": [
                                         "deviceType": "Mobile",
                                         "operatingSystem": "iOS",
@@ -438,6 +479,7 @@ public class SpotcheckState: ObservableObject {
            let contactID = spotCheckContact["id"] as? Int64 {
             self.spotcheckContactID = contactID
         }
+        
         self.triggerToken = json["triggerToken"] as! String
         self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.triggerToken)?spotcheckContactId=\(self.spotcheckContactID)&traceId=\(self.traceId)&spotcheckUrl=\(screen)"
     }
