@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreLocation
 
-@available(iOS 15.0, *)
+@available(iOS 13.0, *)
 public class SpotcheckState: ObservableObject {
     
     @Published public var isVisible = false

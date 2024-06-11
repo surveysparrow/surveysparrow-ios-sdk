@@ -1,6 +1,6 @@
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 14.0, *)
 public struct Spotcheck: View {
     
     @ObservedObject var state: SpotcheckState
@@ -100,7 +100,7 @@ public struct Spotcheck: View {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 14.0, *)
 struct WebViewContainer: View, SsSurveyDelegate {
     var state: SpotcheckState
     

@@ -10,12 +10,12 @@ import SwiftUI
 import CoreLocation
 import SurveySparrowSdk
 
-@available(iOS 15.0, *)
+@available(iOS 14.0, *)
 
 var spotCheck = Spotcheck(email: "", domainName: "", targetToken: "")
 
 @main
-@available(iOS 15.0, *)
+@available(iOS 14.0, *)
 struct ExampleApp: App {
     var body: some Scene {
         WindowGroup {
@@ -25,7 +25,7 @@ struct ExampleApp: App {
 }
 
 
-@available(iOS 15.0, *)
+@available(iOS 14.0, *)
 struct ContentView: View {
     
     @State private var isModalPresented : Bool = false

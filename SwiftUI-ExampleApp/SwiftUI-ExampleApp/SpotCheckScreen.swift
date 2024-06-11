@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 14.0, *)
 struct HomeScreen: View {
     var body: some View {
         VStack {
@@ -28,7 +28,7 @@ struct HomeScreen: View {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 14.0, *)
 struct NetworkScreen: View {
     var body: some View {
         VStack {

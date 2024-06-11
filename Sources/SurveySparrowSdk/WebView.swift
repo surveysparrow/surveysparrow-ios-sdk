@@ -8,7 +8,7 @@
 import SwiftUI
 import WebKit
 
-@available(iOS 15.0, *)
+@available(iOS 14.0, *)
 public struct WebView: View {
     
     let delegate: SsSurveyDelegate
@@ -26,7 +26,7 @@ public struct WebView: View {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 13.0, *)
 struct WebViewRepresentable: UIViewRepresentable {
     let urlString: String
     let delegate: SsSurveyDelegate
