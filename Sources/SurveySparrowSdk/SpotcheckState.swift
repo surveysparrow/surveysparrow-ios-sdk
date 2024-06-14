@@ -71,7 +71,7 @@ public class SpotcheckState: ObservableObject {
         
         if(
             self.userDetails["email"] == nil
-            && self.userDetails["uniqueKey"] == nil
+            && self.userDetails["uuid"] == nil
             && self.userDetails["mobile"] == nil
         ) {
             if let uuid = defaults.string(forKey: "uuid") {
