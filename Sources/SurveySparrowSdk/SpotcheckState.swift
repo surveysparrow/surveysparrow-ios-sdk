@@ -22,29 +22,25 @@ public class SpotcheckState: ObservableObject {
     @Published public var isFullScreenMode: Bool = true
     @Published public var isBannerImageOn: Bool = false
     @Published public var triggerToken: String = ""
+    @Published public var closeButtonStyle: [String: String] = [:]
+    @Published public var isCloseButtonEnabled: Bool = false
     
     @Published private var isSpotPassed: Bool = false
     @Published private var isChecksPassed: Bool = false
     @Published private var customEventsSpotChecks: [[String: Any]] = []
     
-    var email: String
-    var firstName: String
-    var lastName: String
-    var phoneNumber: String
     var targetToken: String
     var domainName: String
+    var userDetails: [String: Any]
     var variables: [String: Any]
     var customProperties: [String: Any]
     var traceId: String = ""
     let defaults = UserDefaults.standard
     
-    public init(email: String, targetToken:String, domainName: String, firstName: String = "", lastName: String = "", phoneNumber: String = "", variables: [String: Any], customProperties: [String: Any]) {
-        self.email = email
+    public init(targetToken:String, domainName: String, userDetails: [String: Any], variables: [String: Any], customProperties: [String: Any]) {
         self.targetToken = targetToken
-        self.firstName = firstName
-        self.lastName = lastName
-        self.phoneNumber = phoneNumber
         self.domainName = domainName
+        self.userDetails = userDetails
         self.variables = variables
         self.customProperties = customProperties
         if self.traceId.isEmpty {
@@ -64,28 +60,23 @@ public class SpotcheckState: ObservableObject {
     
     public func end() {
         self.isVisible = false
+        self.spotcheckID = 0
+        self.position = ""
+        self.currentQuestionHeight = 0
+        self.spotcheckContactID = 0
+        self.spotcheckURL = ""
     }
     
     public func sendTrackScreenRequest(screen: String, completion: @escaping (Bool, Bool) -> Void) {
         
-        var userDetails: [String: Any] = [:]
-        
-        if( self.email.isEmpty ) {
-            userDetails = [
-                "firstName": self.firstName,
-                "lastName": self.lastName,
-                "phoneNumber": self.phoneNumber
-            ]
+        if(
+            self.userDetails["email"] == nil
+            && self.userDetails["uniqueKey"] == nil
+            && self.userDetails["mobile"] == nil
+        ) {
             if let uuid = defaults.string(forKey: "uuid") {
-                userDetails["uuid"] = uuid
+                self.userDetails["uuid"] = uuid
             }
-        } else {
-            userDetails = [
-                "email": self.email,
-                "firstName": self.firstName,
-                "lastName": self.lastName,
-                "phoneNumber": self.phoneNumber
-            ]
         }
         
         let payload: [String: Any] = [
@@ -93,7 +84,7 @@ public class SpotcheckState: ObservableObject {
             "variables": self.variables,
             "customProperties": self.customProperties,
             "traceId": self.traceId,
-            "userDetails": userDetails,
+            "userDetails": self.userDetails,
             "visitor": [
                 "deviceType": "Mobile",
                 "operatingSystem": "iOS",
@@ -299,33 +290,19 @@ public class SpotcheckState: ObservableObject {
                             selectedSpotCheckID = spotCheck["id"] as? Int ?? spotCheck["spotCheckId"] as? Int ?? Int.max
                             
                             if selectedSpotCheckID != Int.max {
-                                                                
-                                var userDetails: [String: Any] = [:]
                                 
-                                if( self.email.isEmpty ) {
-                                    userDetails = [
-                                        "firstName": self.firstName,
-                                        "lastName": self.lastName,
-                                        "phoneNumber": self.phoneNumber
-                                    ]
+                                if(self.userDetails["email"] == nil || self.userDetails["uniqueKey"] == nil) {
                                     if let uuid = defaults.string(forKey: "uuid") {
-                                        userDetails["uuid"] = uuid
+                                        self.userDetails["uuid"] = uuid
                                     }
-                                } else {
-                                    userDetails = [
-                                        "email": self.email,
-                                        "firstName": self.firstName,
-                                        "lastName": self.lastName,
-                                        "phoneNumber": self.phoneNumber
-                                    ]
                                 }
-                                
+
                                 let payload: [String: Any] = [
                                     "screenName": screen ?? "",
                                     "variables": self.variables,
                                     "customProperties": self.customProperties,
                                     "traceId": self.traceId,
-                                    "userDetails": userDetails,
+                                    "userDetails": self.userDetails,
                                     "visitor": [
                                         "deviceType": "Mobile",
                                         "operatingSystem": "iOS",
@@ -459,12 +436,17 @@ public class SpotcheckState: ObservableObject {
     public func setAppearance(json: [String: Any] = [:], screen: String) -> Void {
         if let appearance = json["appearance"] as? [String: Any],
            let position = appearance["position"] as? String,
-           let cardProp = appearance["cardProperties"] as? [String: Any]  {
+           let isCloseButtonEnabled = appearance["closeButton"] as? Bool,
+           let cardProp = appearance["cardProperties"] as? [String: Any],
+           let colors = appearance["colors"] as? [String: Any],
+           let overrides = colors["overrides"] as? [String: String] {
             if position == "top_full" {self.position = "top"}
             else if position == "center_center" {self.position = "center"}
             else if position == "bottom_full" {self.position = "bottom"}
+            self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
             let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
             self.maxHeight = mxHeight / 100
+            self.closeButtonStyle = overrides
             self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
             if let bannerImage = appearance["bannerImage"] as? [String: Any],
                let enabled = bannerImage["enabled"] as? Bool {
@@ -492,6 +474,52 @@ public class SpotcheckState: ObservableObject {
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         let currentDateStr = dateFormatter.string(from: currentDate)
         return currentDateStr
+    }
+    
+    public func closeSpotCheck() {
+        
+        let payload: [String: String] = [
+            "traceId": self.traceId,
+            "triggerToken": self.triggerToken
+        ]
+        
+        guard let url = URL(string: "https://\(self.domainName)/api/internal/spotcheck/dismiss/\(self.spotcheckContactID)") else {
+            print("Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        var reqData: Data
+        do {
+            reqData = try JSONSerialization.data(withJSONObject: payload)
+        } catch {
+            print("Error serializing JSON: \(error)")
+            return
+        }
+        
+        URLSession.shared.uploadTask(with: request, from: reqData) { data, response, error in
+            if let error = error {
+                print("Error: \(error)")
+                return
+            }
+            
+            guard let data = data else {
+                print("No data received")
+                return
+            }
+            do {
+                let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+                if(((json?["success"]) != nil) == true){
+                    print("SpotCheck Closed")
+                }
+            }catch {
+                print("Error parsing JSON: \(error)")
+                
+            }
+        }.resume()
     }
     
     func generateTraceId() -> String {

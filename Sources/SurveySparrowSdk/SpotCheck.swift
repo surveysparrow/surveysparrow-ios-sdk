@@ -1,26 +1,21 @@
 import SwiftUI
 
-@available(iOS 14.0, *)
+@available(iOS 15.0, *)
 public struct Spotcheck: View {
     
     @ObservedObject var state: SpotcheckState
     
-    public init( email: String,
+    public init(
                  domainName:String,
                  targetToken: String,
-                 firstName: String = "",
-                 lastName: String = "",
-                 phoneNumber: String = "",
+                 userDetails: [String: Any] = [:],
                  variables: [String: Any] = [:],
                  customProperties: [String: Any] = [:]
     ) {
         self.state = SpotcheckState(
-            email: email,
             targetToken: targetToken,
             domainName: domainName,
-            firstName: firstName,
-            lastName: lastName,
-            phoneNumber: phoneNumber,
+            userDetails: userDetails,
             variables: variables,
             customProperties: customProperties
         )
@@ -64,10 +59,11 @@ public struct Spotcheck: View {
     public var body: some View {
         if  state.isVisible {
             ZStack {
-                Spacer()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.black.opacity(0.1))
-                
+                if state.currentQuestionHeight != 0 {
+                    Spacer()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.black.opacity(0.1))
+                }
                 VStack(){
                     if state.position == "bottom" {
                         Spacer()
@@ -100,7 +96,7 @@ public struct Spotcheck: View {
     }
 }
 
-@available(iOS 14.0, *)
+@available(iOS 15.0, *)
 struct WebViewContainer: View, SsSurveyDelegate {
     var state: SpotcheckState
     
@@ -115,6 +111,31 @@ struct WebViewContainer: View, SsSurveyDelegate {
                 .fixedSize(horizontal: true, vertical: false)
                 .clipShape(RoundedRectangle(cornerRadius: 0))
                 .shadow(radius: 20)
+                .overlay(alignment: .topTrailing) {
+                    if(state.isCloseButtonEnabled && (self.state.isFullScreenMode || state.currentQuestionHeight != 0)){
+                        Button {
+                            state.closeSpotCheck()
+                            state.spotcheckID = 0
+                            state.position = ""
+                            state.currentQuestionHeight = 0
+                            state.isCloseButtonEnabled = false
+                            state.closeButtonStyle = [:]
+                            state.spotcheckContactID = 0
+                            state.spotcheckURL = ""
+                            state.end()
+                        } label: {
+                            Image(systemName: "xmark")
+                        }
+                        .buttonStyle(
+                            CustomButtonStyle(
+                                iconColor: (
+                                    state.closeButtonStyle["ctaButton"] != nil
+                                    && state.closeButtonStyle["ctaButton"]!.isNotHex()
+                                ) ? "#000000" : state.closeButtonStyle["ctaButton"] ?? "#000000"
+                            )
+                        )
+                    }
+                }
         }
     }
     
@@ -133,5 +154,40 @@ struct WebViewContainer: View, SsSurveyDelegate {
     public func handleSurveyValidation(response: [String : AnyObject]) {
         print(response)
     }
-    
+}
+
+@available(iOS 13.4, *)
+struct CustomButtonStyle: ButtonStyle {
+    var iconColor: String
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 15))
+            .padding(24)
+            .foregroundColor(Color(hex: iconColor))
+            .contentShape(Rectangle())
+    }
+}
+
+@available(iOS 13.0, *)
+extension Color {
+    init(hex: String) {
+        let scanner = Scanner(string: hex)
+        scanner.currentIndex = hex.hasPrefix("#") ? hex.index(after: hex.startIndex) : hex.startIndex
+        var rgb: UInt64 = 0
+        scanner.scanHexInt64(&rgb)
+        let r = Double((rgb >> 16) & 0xFF) / 255.0
+        let g = Double((rgb >> 8) & 0xFF) / 255.0
+        let b = Double(rgb & 0xFF) / 255.0
+        self.init(red: r, green: g, blue: b)
+    }
+}
+
+extension String {
+    func isNotHex() -> Bool {
+        let hexPattern = "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        let regex = try? NSRegularExpression(pattern: hexPattern, options: .caseInsensitive)
+        let matches = regex?.matches(in: self, options: [], range: NSRange(location: 0, length: self.count))
+        return matches?.count == 0
+    }
 }

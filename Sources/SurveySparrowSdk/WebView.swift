@@ -8,7 +8,7 @@
 import SwiftUI
 import WebKit
 
-@available(iOS 14.0, *)
+@available(iOS 15.0, *)
 public struct WebView: View {
     
     let delegate: SsSurveyDelegate
@@ -88,11 +88,6 @@ struct WebViewRepresentable: UIViewRepresentable {
                            let height = currentQuestionSize["height"] as? Double {
                             self.parent.state.currentQuestionHeight = height
                         }
-                    }
-                }else if responseType == closeModel {
-                    if self.parent.delegate != nil {
-                        self.parent.state.end()
-                        self.parent.delegate.handleCloseButtonTap()
                     }
                 }
             }
