@@ -45,8 +45,8 @@ public class SpotcheckState: ObservableObject {
         self.customProperties = customProperties
         if self.traceId.isEmpty {
             self.traceId = generateTraceId()
-            if defaults.string(forKey: "uuid") == nil {
-                defaults.set("", forKey: "uuid")
+            if defaults.string(forKey: "SurveySparrowUUID") == nil {
+                defaults.set("", forKey: "SurveySparrowUUID")
             }
         }
     }
@@ -74,7 +74,8 @@ public class SpotcheckState: ObservableObject {
             && self.userDetails["uuid"] == nil
             && self.userDetails["mobile"] == nil
         ) {
-            if let uuid = defaults.string(forKey: "uuid") {
+            if let uuid = defaults.string(forKey: "SurveySparrowUUID"),
+               !uuid.isEmpty {
                 self.userDetails["uuid"] = uuid
             }
         }
@@ -145,9 +146,9 @@ public class SpotcheckState: ObservableObject {
                 let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
                 
                 if let uuid = json?["uuid"] as? String {
-                    let locuuid = self.defaults.string(forKey: "uuid")
+                    let locuuid = self.defaults.string(forKey: "SurveySparrowUUID")
                     if locuuid == nil || ((locuuid?.isEmpty) != nil) {
-                        self.defaults.set(uuid, forKey: "uuid")
+                        self.defaults.set(uuid, forKey: "SurveySparrowUUID")
                     }
                 }
                 
@@ -291,8 +292,13 @@ public class SpotcheckState: ObservableObject {
                             
                             if selectedSpotCheckID != Int.max {
                                 
-                                if(self.userDetails["email"] == nil || self.userDetails["uniqueKey"] == nil) {
-                                    if let uuid = defaults.string(forKey: "uuid") {
+                                if(
+                                    self.userDetails["email"] == nil
+                                    && self.userDetails["uuid"] == nil
+                                    && self.userDetails["mobile"] == nil
+                                ) {
+                                    if let uuid = defaults.string(forKey: "SurveySparrowUUID"),
+                                       !uuid.isEmpty {
                                         self.userDetails["uuid"] = uuid
                                     }
                                 }
