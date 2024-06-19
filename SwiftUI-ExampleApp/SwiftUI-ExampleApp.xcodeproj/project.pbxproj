@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7011636D2C0F3A2C00BA54D0 /* SurveySparrowSdk in Frameworks */ = {isa = PBXBuildFile; productRef = 7011636C2C0F3A2C00BA54D0 /* SurveySparrowSdk */; };
+		701B83C42C1C724900A5EB06 /* SurveySparrowSdk in Frameworks */ = {isa = PBXBuildFile; productRef = 701B83C32C1C724900A5EB06 /* SurveySparrowSdk */; };
 		704472CF2B6A1D5800EF81A6 /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 704472CE2B6A1D5800EF81A6 /* Main.swift */; };
 		704472D32B6A1D5900EF81A6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 704472D22B6A1D5900EF81A6 /* Assets.xcassets */; };
 		704472D62B6A1D5900EF81A6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 704472D52B6A1D5900EF81A6 /* Preview Assets.xcassets */; };
@@ -17,7 +19,9 @@
 		704473072B6A200A00EF81A6 /* EmbedSurvey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 704473062B6A200A00EF81A6 /* EmbedSurvey.swift */; };
 		70538CE72B95EDE70069EFDD /* SurveySparrowSdk in Frameworks */ = {isa = PBXBuildFile; productRef = 70538CE62B95EDE70069EFDD /* SurveySparrowSdk */; };
 		70538CEA2B95F8610069EFDD /* SurveySparrowSdk in Frameworks */ = {isa = PBXBuildFile; productRef = 70538CE92B95F8610069EFDD /* SurveySparrowSdk */; };
+		7074E9EE2C23026D00A41C6B /* SurveySparrowSdk in Frameworks */ = {isa = PBXBuildFile; productRef = 7074E9ED2C23026D00A41C6B /* SurveySparrowSdk */; };
 		70B45B1C2B919E87000CBCEB /* SpotCheckScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B45B1B2B919E87000CBCEB /* SpotCheckScreen.swift */; };
+		70D9AC062C117CAB0077DC9D /* SurveySparrowSdk in Frameworks */ = {isa = PBXBuildFile; productRef = 70D9AC052C117CAB0077DC9D /* SurveySparrowSdk */; };
 		70EE8B4B2BBBEB7700B9D424 /* SurveySparrowSdk in Frameworks */ = {isa = PBXBuildFile; productRef = 70EE8B4A2BBBEB7700B9D424 /* SurveySparrowSdk */; };
 /* End PBXBuildFile section */
 
@@ -50,6 +54,7 @@
 		704472EB2B6A1D5900EF81A6 /* SwiftUI_ExampleAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUI_ExampleAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		704473042B6A1FFB00EF81A6 /* FullScreenSurvey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenSurvey.swift; sourceTree = "<group>"; };
 		704473062B6A200A00EF81A6 /* EmbedSurvey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbedSurvey.swift; sourceTree = "<group>"; };
+		7074E9EF2C23092E00A41C6B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		70B45B1B2B919E87000CBCEB /* SpotCheckScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotCheckScreen.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -59,7 +64,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				70538CEA2B95F8610069EFDD /* SurveySparrowSdk in Frameworks */,
+				70D9AC062C117CAB0077DC9D /* SurveySparrowSdk in Frameworks */,
+				701B83C42C1C724900A5EB06 /* SurveySparrowSdk in Frameworks */,
 				70538CE72B95EDE70069EFDD /* SurveySparrowSdk in Frameworks */,
+				7011636D2C0F3A2C00BA54D0 /* SurveySparrowSdk in Frameworks */,
+				7074E9EE2C23026D00A41C6B /* SurveySparrowSdk in Frameworks */,
 				70EE8B4B2BBBEB7700B9D424 /* SurveySparrowSdk in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -104,6 +113,7 @@
 		704472CD2B6A1D5800EF81A6 /* SwiftUI-ExampleApp */ = {
 			isa = PBXGroup;
 			children = (
+				7074E9EF2C23092E00A41C6B /* Info.plist */,
 				704472CE2B6A1D5800EF81A6 /* Main.swift */,
 				704473062B6A200A00EF81A6 /* EmbedSurvey.swift */,
 				70B45B1B2B919E87000CBCEB /* SpotCheckScreen.swift */,
@@ -159,6 +169,10 @@
 				70538CE62B95EDE70069EFDD /* SurveySparrowSdk */,
 				70538CE92B95F8610069EFDD /* SurveySparrowSdk */,
 				70EE8B4A2BBBEB7700B9D424 /* SurveySparrowSdk */,
+				7011636C2C0F3A2C00BA54D0 /* SurveySparrowSdk */,
+				70D9AC052C117CAB0077DC9D /* SurveySparrowSdk */,
+				701B83C32C1C724900A5EB06 /* SurveySparrowSdk */,
+				7074E9ED2C23026D00A41C6B /* SurveySparrowSdk */,
 			);
 			productName = "SwiftUI-ExampleApp";
 			productReference = 704472CB2B6A1D5800EF81A6 /* SwiftUI-ExampleApp.app */;
@@ -233,7 +247,7 @@
 			);
 			mainGroup = 704472C22B6A1D5800EF81A6;
 			packageReferences = (
-				70538CE82B95F8610069EFDD /* XCLocalSwiftPackageReference ".." */,
+				7074E9EC2C23026D00A41C6B /* XCLocalSwiftPackageReference ".." */,
 			);
 			productRefGroup = 704472CC2B6A1D5800EF81A6 /* Products */;
 			projectDirPath = "";
@@ -447,11 +461,12 @@
 				DEVELOPMENT_TEAM = K82TH94VUY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "SwiftUI-ExampleApp/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = Required;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -479,11 +494,12 @@
 				DEVELOPMENT_TEAM = K82TH94VUY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "SwiftUI-ExampleApp/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = Required;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -618,18 +634,34 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		70538CE82B95F8610069EFDD /* XCLocalSwiftPackageReference ".." */ = {
+		7074E9EC2C23026D00A41C6B /* XCLocalSwiftPackageReference ".." */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ..;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		7011636C2C0F3A2C00BA54D0 /* SurveySparrowSdk */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SurveySparrowSdk;
+		};
+		701B83C32C1C724900A5EB06 /* SurveySparrowSdk */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SurveySparrowSdk;
+		};
 		70538CE62B95EDE70069EFDD /* SurveySparrowSdk */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SurveySparrowSdk;
 		};
 		70538CE92B95F8610069EFDD /* SurveySparrowSdk */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SurveySparrowSdk;
+		};
+		7074E9ED2C23026D00A41C6B /* SurveySparrowSdk */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SurveySparrowSdk;
+		};
+		70D9AC052C117CAB0077DC9D /* SurveySparrowSdk */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SurveySparrowSdk;
 		};
