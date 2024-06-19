@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@available(iOS 14.0, *)
+@available(iOS 15.0, *)
 struct HomeScreen: View {
     var body: some View {
         VStack {
@@ -15,7 +15,7 @@ struct HomeScreen: View {
                 .padding()
             Button(
                 action: {
-                    spotCheck.TrackEvent(onScreen: "HomeScreen", event: [ "SendPost": ["postSentTime": "5.30pm"] ])
+                    spotCheck.TrackEvent(onScreen: "HomeScreen", event: [ "GameCompleted": ["postSentTime": "5.30pm"] ])
                 }
             ){
                 Text("Click")
@@ -28,7 +28,7 @@ struct HomeScreen: View {
     }
 }
 
-@available(iOS 14.0, *)
+@available(iOS 15.0, *)
 struct NetworkScreen: View {
     var body: some View {
         VStack {

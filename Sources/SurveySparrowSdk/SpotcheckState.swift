@@ -12,7 +12,7 @@ import CoreLocation
 public class SpotcheckState: ObservableObject {
     
     @Published public var isVisible = false
-    @Published public var position: String = ""
+    @Published public var position: String = "bottom"
     @Published public var spotcheckURL: String = ""
     @Published public var spotcheckID: Int64 = 0
     @Published public var spotcheckContactID: Int64 = 0
@@ -87,7 +87,7 @@ public class SpotcheckState: ObservableObject {
             "traceId": self.traceId,
             "userDetails": self.userDetails,
             "visitor": [
-                "deviceType": "Mobile",
+                "deviceType": "MOBILE",
                 "operatingSystem": "iOS",
                 "screenResolution": [
                     "width": UIScreen.main.bounds.width,
@@ -310,7 +310,7 @@ public class SpotcheckState: ObservableObject {
                                     "traceId": self.traceId,
                                     "userDetails": self.userDetails,
                                     "visitor": [
-                                        "deviceType": "Mobile",
+                                        "deviceType": "MOBILE",
                                         "operatingSystem": "iOS",
                                         "screenResolution": [
                                             "width": UIScreen.main.bounds.width,
