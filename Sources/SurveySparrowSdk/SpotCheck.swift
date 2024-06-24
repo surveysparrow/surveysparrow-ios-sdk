@@ -75,13 +75,9 @@ public struct Spotcheck: View {
                             ? (UIScreen.main.bounds.height - 100)
                             : min(
                                 (UIScreen.main.bounds.height - 100),
-                                (
-                                    min(
-                                        state.currentQuestionHeight,
-                                        (state.maxHeight * UIScreen.main.bounds.height)
-                                    )
-                                    +
-                                    (state.isBannerImageOn && state.currentQuestionHeight != 0  ? 100 : 0)
+                                min(
+                                    state.currentQuestionHeight,
+                                    (state.maxHeight * UIScreen.main.bounds.height)
                                 )
                             )
                         )
