@@ -33,7 +33,7 @@ public struct Spotcheck: View {
                 if valid {
                     DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
                         state.start()
-                        print("TrackScreen Passed")
+                        print("TrackScreen Passed. Delay: \(state.afterDelay) Seconds")
                     }
                 } else {
                     print("TrackScreen Failed")
@@ -48,7 +48,7 @@ public struct Spotcheck: View {
             if valid {
                 DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
                     state.start()
-                    print("TrackEvent Passed")
+                    print("TrackEvent Passed. Delay: \(state.afterDelay) Seconds")
                 }
             } else {
                 print("TrackEvent Failed")
@@ -65,7 +65,7 @@ public struct Spotcheck: View {
                         .background(Color.black.opacity(0.1))
                 }
                 VStack(){
-                    if state.position == "bottom" {
+                    if state.spotcheckPosition == "bottom" {
                         Spacer()
                     }
                     WebViewContainer(state: state)
@@ -81,7 +81,7 @@ public struct Spotcheck: View {
                                 )
                             )
                         )
-                    if state.position == "top" {
+                    if state.spotcheckPosition == "top" {
                         Spacer()
                     }
                 }
@@ -111,13 +111,6 @@ struct WebViewContainer: View, SsSurveyDelegate {
                     if(state.isCloseButtonEnabled && (self.state.isFullScreenMode || state.currentQuestionHeight != 0)){
                         Button {
                             state.closeSpotCheck()
-                            state.spotcheckID = 0
-                            state.position = ""
-                            state.currentQuestionHeight = 0
-                            state.isCloseButtonEnabled = false
-                            state.closeButtonStyle = [:]
-                            state.spotcheckContactID = 0
-                            state.spotcheckURL = ""
                             state.end()
                         } label: {
                             Image(systemName: "xmark")

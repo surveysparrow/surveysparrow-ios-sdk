@@ -12,11 +12,11 @@ import CoreLocation
 public class SpotcheckState: ObservableObject {
     
     @Published public var isVisible = false
-    @Published public var position: String = "bottom"
+    @Published public var spotcheckPosition: String = "bottom"
     @Published public var spotcheckURL: String = ""
     @Published public var spotcheckID: Int64 = 0
     @Published public var spotcheckContactID: Int64 = 0
-    @Published public var afterDelay: Double = 0
+    @Published public var afterDelay: Double = 0.0
     @Published public var maxHeight: Double = 0.5
     @Published public var currentQuestionHeight: Double = 0
     @Published public var isFullScreenMode: Bool = true
@@ -61,10 +61,12 @@ public class SpotcheckState: ObservableObject {
     public func end() {
         self.isVisible = false
         self.spotcheckID = 0
-        self.position = ""
+        self.spotcheckPosition = "bottom"
         self.currentQuestionHeight = 0
         self.spotcheckContactID = 0
         self.spotcheckURL = ""
+        self.isCloseButtonEnabled = false
+        self.closeButtonStyle = [:]
     }
     
     public func sendTrackScreenRequest(screen: String, completion: @escaping (Bool, Bool) -> Void) {
@@ -179,14 +181,13 @@ public class SpotcheckState: ObservableObject {
                             if checkPassed == true {
                                 
                                 if let checkCondition = json?["checkCondition"] as? [String: Any] {
-                                    if let afterDelay = checkCondition["afterDelay"] as? String,
-                                       let afterDelayDouble = Double(afterDelay ?? "0") {
-                                        self.afterDelay = afterDelayDouble
+                                    if let afterDelay = checkCondition["afterDelay"] as? Double ?? Double(checkCondition["afterDelay"] as? String ?? "0") {
+                                        self.afterDelay = afterDelay
                                     }
                                     if let customEvent = checkCondition["customEvent"] as? [String: Any] {
                                         self.customEventsSpotChecks = [(json ?? [:]) as [String: Any]]
                                         completion(false, false)
-                                    }else {
+                                    } else {
                                         self.setAppearance(json: json ?? [:], screen: screen)
                                         self.isChecksPassed = checkPassed
                                         completion(checkPassed, false)
@@ -221,7 +222,7 @@ public class SpotcheckState: ObservableObject {
                                         if checks.isEmpty {
                                             selectedSpotCheck = spotCheck
                                             break
-                                        } else if let afterDelay = checks["afterDelay"] as? String {
+                                        } else if let afterDelay = checks["afterDelay"] as? Double {
                                             let delay = Double(afterDelay) ?? Double.greatestFiniteMagnitude
                                             if minDelay > delay {
                                                 minDelay = delay
@@ -234,14 +235,12 @@ public class SpotcheckState: ObservableObject {
                                 
                                 if !selectedSpotCheck.isEmpty {
                                     
-                                    if let checkCondition = selectedSpotCheck["checks"] as? [String: Any] {
-                                        let afterDelay = checkCondition["afterDelay"] as? String
-                                        if let afterDelayDouble = Double(afterDelay ?? "0") {
-                                            self.afterDelay = afterDelayDouble
-                                        }
+                                    if let checkCondition = selectedSpotCheck["checks"] as? [String: Any],
+                                        let aftrDelay = checkCondition["afterDelay"] as? Double  ?? Double(checkCondition["afterDelay"] as? String ?? "0") {
+                                            self.afterDelay = aftrDelay
                                     }
                                     self.setAppearance(json: selectedSpotCheck, screen: screen)
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + self.afterDelay) {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + Double(self.afterDelay)) {
                                         self.start()
                                     }
                                     completion(true , true)
@@ -395,14 +394,12 @@ public class SpotcheckState: ObservableObject {
                                                     if eventShow == true {
                                                         
                                                         if let checkCondition = json?["checkCondition"] as? [String: Any]{
-                                                            if let afterDelay = checkCondition["afterDelay"] as? String,
-                                                            let afterDelayDouble = Double(afterDelay ?? "0") {
-                                                                self.afterDelay = afterDelayDouble
+                                                            if let aftrDelay = checkCondition["afterDelay"] as? Double ?? Double(checkCondition["afterDelay"] as? String ?? "0") {
+                                                                self.afterDelay = aftrDelay
                                                             }
                                                             if let customEvent = checkCondition["customEvent"] as? [String: Any] {
-                                                                if let afterDelay = customEvent["delayInSeconds"] as? String,
-                                                                let afterDelayDouble = Double(afterDelay ?? "0") {
-                                                                    self.afterDelay = afterDelayDouble
+                                                                if let aftrDelay = customEvent["delayInSeconds"] as? Double ??  Double(customEvent["delayInSeconds"] as? String ?? "0") {
+                                                                    self.afterDelay = aftrDelay
                                                                 }
                                                             }
                                                         }
@@ -427,9 +424,7 @@ public class SpotcheckState: ObservableObject {
                                 }.resume()
                                 
                                 break;
-                            }
-                            
-                            else {
+                            }else {
                                 completion(false)
                             }
                         }
@@ -446,9 +441,9 @@ public class SpotcheckState: ObservableObject {
            let cardProp = appearance["cardProperties"] as? [String: Any],
            let colors = appearance["colors"] as? [String: Any],
            let overrides = colors["overrides"] as? [String: String] {
-            if position == "top_full" {self.position = "top"}
-            else if position == "center_center" {self.position = "center"}
-            else if position == "bottom_full" {self.position = "bottom"}
+            if position == "top_full" {self.spotcheckPosition = "top"}
+            else if position == "center_center" {self.spotcheckPosition = "center"}
+            else if position == "bottom_full" {self.spotcheckPosition = "bottom"}
             self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
             let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
             self.maxHeight = mxHeight / 100
