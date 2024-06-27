@@ -134,18 +134,17 @@ import WebKit
     }
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        // Check if this is a navigation action caused by a hyperlink click.
         if navigationAction.navigationType == .linkActivated {
-            // Handle the URL navigation here, for example:
             if let url = navigationAction.request.url {
                 UIApplication.shared.open(url)
-                decisionHandler(.cancel) // Prevent WKWebView from loading the URL.
+                decisionHandler(.cancel)
                 return
             }
         }
-        decisionHandler(.allow) // Allow other navigation actions.
+        decisionHandler(.allow)
     }
-    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error){
         print("Failed to load web page: \(error.localizedDescription)")
     }
     

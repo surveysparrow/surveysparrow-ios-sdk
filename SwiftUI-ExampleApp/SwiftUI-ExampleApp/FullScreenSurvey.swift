@@ -30,14 +30,12 @@ struct FullScreenSurveyView: UIViewControllerRepresentable {
     
     var domain: String
     var token: String
-    
-    @State private var isSurveyLoaded: Bool = false
 
     func makeUIViewController(context: Context) -> SsSurveyViewController{
         let ssSurveyViewController = SsSurveyViewController()
         ssSurveyViewController.domain = domain
         ssSurveyViewController.token = token
-        ssSurveyViewController.params = ["emailaddress": "email@email.com", "email": "email@email.com"]
+        ssSurveyViewController.params = ["emailaddress": "email@email.com", "email": "email@email.com", "labeltest":"value"]
         ssSurveyViewController.getSurveyLoadedResponse = true
         ssSurveyViewController.surveyDelegate = SurveyDelegate()
         return ssSurveyViewController
