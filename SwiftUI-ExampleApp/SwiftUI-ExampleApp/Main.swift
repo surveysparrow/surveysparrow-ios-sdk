@@ -24,9 +24,9 @@ struct ContentView: View {
     @State private var showEmbedSurvey : Bool = false
     @State private var isValidationPresented : Bool = false
     
-    var domain: String = "gokul-spot.datasparrow.com"
-    var token: String = "tt-eggt5EiqVI"
-    var sparrowLang: String = "ta"
+    var domain: String = "<account-domain>"
+    var token: String = "<sdk-token>"
+    var sparrowLang: String = "<your-preferred-language-code>"
     var params: [String:String] = ["emailaddress": "email@email.com", "email": "email@email.com"]
     
     var body: some View {
