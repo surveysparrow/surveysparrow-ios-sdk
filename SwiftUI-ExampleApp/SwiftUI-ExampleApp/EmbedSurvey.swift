@@ -13,6 +13,9 @@ struct EmbeddedSurveyView: UIViewRepresentable {
     @Binding var isSurveyActive: Bool
     var domain: String
     var token: String
+    let sparrowLang: String
+    let params: [String: String]
+    
     let surveyView = SsSurveyView()
 
     func makeUIView(context: Context) -> UIView {
@@ -22,7 +25,7 @@ struct EmbeddedSurveyView: UIViewRepresentable {
     func updateUIView(_ uiView: UIView, context: Context) {
         if isSurveyActive {
             surveyView.surveyDelegate = SurveyDelegate()
-            surveyView.loadEmbedSurvey(domain: domain, token: token , params: ["emailaddress": "email@email.com", "email": "email@email.com"])
+            surveyView.loadEmbedSurvey(domain: domain, token: token , params: params , sparrowLang: sparrowLang)
             DispatchQueue.main.async {
                 self.isSurveyActive = false
             }

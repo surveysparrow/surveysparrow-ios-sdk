@@ -21,6 +21,7 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
     
     @IBInspectable public var domain: String?
     @IBInspectable public var token: String?
+    @IBInspectable public var sparrowLang: String?
     @IBInspectable public var thankyouTimeout: Double = 3.0
     
     // MARK: Initialize
@@ -38,7 +39,7 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
             ssSurveyView.frame = view.bounds
             ssSurveyView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             
-            ssSurveyView.loadSurvey(domain: domain, token: token)
+            ssSurveyView.loadSurvey(domain: domain, token: token, sparrowLang: sparrowLang)
             view.addSubview(ssSurveyView)
         } else {
             print("Error: Domain or token is nil")

@@ -24,8 +24,10 @@ struct ContentView: View {
     @State private var showEmbedSurvey : Bool = false
     @State private var isValidationPresented : Bool = false
     
-    var domain: String = "<account-domain>"
-    var token: String = "<sdk-token>"
+    var domain: String = "gokul-spot.datasparrow.com"
+    var token: String = "tt-eggt5EiqVI"
+    var sparrowLang: String = "ta"
+    var params: [String:String] = ["emailaddress": "email@email.com", "email": "email@email.com"]
     
     var body: some View {
         VStack {
@@ -35,7 +37,7 @@ struct ContentView: View {
                 Text("Show Full Screen Survey")
             }.padding().padding(.top,60)
             Button{
-                FullScreenSurveyWithValidation(domain: domain, token: token).startFullScreenSurveyWithValidation()
+                FullScreenSurveyWithValidation(domain: domain, token: token, sparrowLang: sparrowLang, params: params).startFullScreenSurveyWithValidation()
             } label:{
                 Text("Show Full Screen Survey with Validation")
             }.padding()
@@ -45,10 +47,10 @@ struct ContentView: View {
                 Text("Show Embed Survey")
             }
             Spacer()
-            EmbeddedSurveyView(isSurveyActive: $showEmbedSurvey, domain: domain, token: token)
+            EmbeddedSurveyView(isSurveyActive: $showEmbedSurvey, domain: domain, token: token, sparrowLang: sparrowLang, params: params)
                 .frame(height: 400)
         }.sheet(isPresented: $isModalPresented) {
-            FullScreenSurveyView(domain: domain, token: token)
+            FullScreenSurveyView(domain: domain, token: token, sparrowLang: sparrowLang, params: params)
         }
     }
 }
