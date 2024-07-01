@@ -44,7 +44,7 @@ struct ContentView: View {
             )
             
             CustomTextField(
-                placeholder: "$parrowLang",
+                placeholder: "SparrowLang",
                 text: $sparrowLang
             )
             
@@ -58,9 +58,10 @@ struct ContentView: View {
             } label:{
                 Text("Show Full Screen Survey with Validation")
             }.padding()
-            Button{
-                showEmbedSurvey.toggle()
-            }label: {
+            
+            Button {
+                showEmbedSurvey = true
+            } label: {
                 Text("Show Embed Survey")
             }
             Spacer()
