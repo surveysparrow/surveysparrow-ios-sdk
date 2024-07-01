@@ -29,7 +29,7 @@ class ViewController: UIViewController, SsSurveyDelegate {
         surveySparrow.params = ["emailaddress":"email@email.com","email":"email@email.com"]
         surveySparrow.scheduleSurvey(parent: self)
     }
-    //    tt-9EBCDyTxxyguLKMh9MJaTt
+
     // MARK: Actions
     @IBAction func startFullscreenSurvey(_ sender: UIButton) {
         let ssSurveyViewController = SsSurveyViewController()

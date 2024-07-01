@@ -9,6 +9,7 @@
 import UIKit
 import WebKit
 
+@available(iOS 13.0, *)
 @IBDesignable public class SsSurveyView: UIView, WKScriptMessageHandler, WKNavigationDelegate {
     // MARK: Properties
     private var ssWebView: WKWebView = WKWebView()
@@ -58,24 +59,31 @@ import WebKit
         ssWebView.backgroundColor = .gray
         ssWebView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         addSubview(ssWebView)
-        closeButton.setTitle("X", for: .normal)
-        closeButton.titleLabel?.font = UIFont.systemFont(ofSize: 20)
+        
+        let closeButtonWrapper = UIView()
+        ssWebView.addSubview(closeButtonWrapper)
+        
+        closeButton.setImage(UIImage(systemName: "xmark"), for: .normal)
         closeButton.tintColor = .black
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-        ssWebView.addSubview(closeButton)
+        
+        closeButtonWrapper.addSubview(closeButton)
+        closeButtonWrapper.translatesAutoresizingMaskIntoConstraints = false
+        closeButtonWrapper.backgroundColor = .white
+        closeButtonWrapper.layer.cornerRadius = 4
+        closeButtonWrapper.clipsToBounds = true
+
         NSLayoutConstraint.activate([
-            NSLayoutConstraint(
-                item: closeButton, attribute: .top, relatedBy: .equal, toItem: ssWebView,
-                attribute: .top, multiplier: 1, constant: 16),
-            NSLayoutConstraint(
-                item: closeButton, attribute: .trailing, relatedBy: .equal, toItem: ssWebView,
-                attribute: .trailing, multiplier: 1, constant: -16),
-            NSLayoutConstraint(
-                item: closeButton, attribute: .width, relatedBy: .equal, toItem: nil,
-                attribute: .notAnAttribute, multiplier: 1, constant: 24),
-            NSLayoutConstraint(
-                item: closeButton, attribute: .height, relatedBy: .equal, toItem: nil,
-                attribute: .notAnAttribute, multiplier: 1, constant: 24),
+            
+            closeButtonWrapper.topAnchor.constraint(equalTo: ssWebView.topAnchor, constant: 16),
+            closeButtonWrapper.trailingAnchor.constraint(equalTo: ssWebView.trailingAnchor, constant: -16),
+            closeButtonWrapper.widthAnchor.constraint(equalToConstant: 35),
+            closeButtonWrapper.heightAnchor.constraint(equalToConstant: 35),
+
+            closeButton.centerXAnchor.constraint(equalTo: closeButtonWrapper.centerXAnchor),
+            closeButton.centerYAnchor.constraint(equalTo: closeButtonWrapper.centerYAnchor),
+            closeButton.widthAnchor.constraint(equalToConstant: 14),
+            closeButton.heightAnchor.constraint(equalToConstant: 14)
         ])
         
         ssWebView.addSubview(loader)
@@ -133,23 +141,45 @@ import WebKit
     }
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        // Check if this is a navigation action caused by a hyperlink click.
         if navigationAction.navigationType == .linkActivated {
-            // Handle the URL navigation here, for example:
             if let url = navigationAction.request.url {
                 UIApplication.shared.openURL(url)
-                decisionHandler(.cancel) // Prevent WKWebView from loading the URL.
+                decisionHandler(.cancel)
                 return
             }
         }
-        decisionHandler(.allow) // Allow other navigation actions.
+        decisionHandler(.allow)
     }
+    
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         print("Failed to load web page: \(error.localizedDescription)")
     }
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         closeButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        let jsCode = """
+                        var observer = new MutationObserver(function(mutations) {
+                            mutations.forEach(function(mutation) {
+                                var elements = document.getElementsByClassName('ss-language-selector--wrapper ss-survey-font-family');
+                                if (elements.length > 0) {
+                                    for (var i = 0; i < elements.length; i++) {
+                                        elements[i].style.marginRight = '45px';
+                                    }
+                                    observer.disconnect();
+                                }
+                            });
+                        });
+                        
+                        observer.observe(document.body, { childList: true, subtree: true });
+                        """
+        
+        webView.evaluateJavaScript(jsCode, completionHandler: { (result, error) in
+            if let error = error {
+                print("Error in CloseButton")
+            }
+        })
+        
         loader.stopAnimating()
     }
     
