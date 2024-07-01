@@ -9,6 +9,7 @@
 #if canImport(UIKit)
 import UIKit
 
+@available(iOS 13.0, *)
 public class SurveySparrow: SsSurveyDelegate {
     // MARK: Properties
     private var dataStore = NSUbiquitousKeyValueStore()

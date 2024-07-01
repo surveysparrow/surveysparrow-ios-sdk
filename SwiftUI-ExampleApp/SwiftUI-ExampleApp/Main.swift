@@ -32,33 +32,21 @@ struct ContentView: View {
     var params: [String:String] = ["emailaddress": "email@email.com", "email": "email@email.com"]
     
     var body: some View {
-        VStack {
-            TextField(
-                "Domain",
+        ScrollView {
+            CustomTextField(
+                placeholder: "Domain",
                 text: $domain
             )
-            .textInputAutocapitalization(.never)
-            .disableAutocorrection(true)
-            .border(.secondary)
-            .padding()
             
-            TextField(
-                "Token",
+            CustomTextField(
+                placeholder: "Token",
                 text: $token
             )
-            .textInputAutocapitalization(.never)
-            .disableAutocorrection(true)
-            .border(.secondary)
-            .padding()
             
-            TextField(
-                "$parrowLang",
+            CustomTextField(
+                placeholder: "$parrowLang",
                 text: $sparrowLang
             )
-            .textInputAutocapitalization(.never)
-            .disableAutocorrection(true)
-            .border(.secondary)
-            .padding()
             
             Button{
                 isModalPresented = true
@@ -81,5 +69,28 @@ struct ContentView: View {
         }.sheet(isPresented: $isModalPresented) {
             FullScreenSurveyView(domain: domain, token: token, sparrowLang: sparrowLang, params: params)
         }
+    }
+}
+
+
+@available(iOS 15.0, *)
+struct CustomTextField: View {
+    var placeholder: String
+    @Binding var text: String
+
+    var body: some View {
+        TextField(placeholder, text: $text)
+            .padding(.vertical, 10)
+            .overlay(
+                VStack {
+                    Spacer()
+                    Rectangle()
+                        .frame(height: 1)
+                        .foregroundColor(Color.secondary)
+                }
+            )
+            .textInputAutocapitalization(.never)
+            .disableAutocorrection(true)
+            .padding(.horizontal)
     }
 }

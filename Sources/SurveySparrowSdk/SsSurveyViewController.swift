@@ -9,6 +9,7 @@
 #if canImport(UIKit)
 import UIKit
 
+@available(iOS 13.0, *)
 @IBDesignable
 public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
     // MARK: Properties
