@@ -465,6 +465,10 @@ public class SpotcheckState: ObservableObject {
         
         self.triggerToken = json["triggerToken"] as! String
         self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.triggerToken)?spotcheckContactId=\(self.spotcheckContactID)&traceId=\(self.traceId)&spotcheckUrl=\(screen)"
+        
+        self.variables.forEach { key, value in
+            self.spotcheckURL = self.spotcheckURL + "&\(key)=\(value)"
+        }
     }
         
     public func getCurrentDate() -> String {
