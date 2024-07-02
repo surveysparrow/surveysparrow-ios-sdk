@@ -104,6 +104,10 @@ import WebKit
     }
     // Close the survey
     closeSurveyUI(isSuccess: isSuccess)
+      
+    if surveyDelegate != nil {
+        surveyDelegate.handleCloseButtonTap()
+    }
   }
 
   func closeSurveyUI(isSuccess: Bool) {
