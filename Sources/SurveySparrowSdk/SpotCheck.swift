@@ -59,10 +59,14 @@ public struct Spotcheck: View {
     public var body: some View {
         if  state.isVisible {
             ZStack {
-                if state.currentQuestionHeight != 0 {
+                if state.currentQuestionHeight == 0 {
+                    Loader()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.black.opacity(0.4))
+                }else {
                     Spacer()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color.black.opacity(0.1))
+                        .background(Color.black.opacity(0.4))
                 }
                 VStack(){
                     if state.spotcheckPosition == "bottom" {
@@ -178,5 +182,30 @@ extension String {
         let regex = try? NSRegularExpression(pattern: hexPattern, options: .caseInsensitive)
         let matches = regex?.matches(in: self, options: [], range: NSRange(location: 0, length: self.count))
         return matches?.count == 0
+    }
+}
+
+@available(iOS 13.0, *)
+struct Loader: View {
+    @State private var isAnimating = false
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(style: StrokeStyle(lineWidth: 6.0, lineCap: .round, lineJoin: .round))
+                .opacity(0.3)
+                .foregroundColor(Color.black)
+            
+            Circle()
+                .trim(from: 0.0, to: 0.7)
+                .stroke(lineWidth: 6.0)
+                .foregroundColor(Color.white)
+                .rotationEffect(Angle(degrees: isAnimating ? 360 : 0))
+                .animation(Animation.linear(duration: 1.5).repeatForever(autoreverses: false))
+                .onAppear {
+                    self.isAnimating = true
+                }
+        }
+        .frame(width: 60.0, height: 60.0)
     }
 }
