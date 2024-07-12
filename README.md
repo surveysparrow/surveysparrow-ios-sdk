@@ -8,7 +8,7 @@
 # SpotChecks
 
 ### SpotCheck Documentation is available here
-### [SpotCheck-Flutter-Docs](https://surveysparrow.gitbook.io/spotchecks/how-to-use-spotchecks/mobile-spotcheck/ios)
+### [SpotCheck-iOS-Docs](https://surveysparrow.gitbook.io/spotchecks/how-to-use-spotchecks/mobile-spotcheck/ios)
 
 <br>
 <br>
