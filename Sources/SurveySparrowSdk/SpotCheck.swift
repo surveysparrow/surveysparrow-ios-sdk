@@ -10,14 +10,16 @@ public struct Spotcheck: View {
                  targetToken: String,
                  userDetails: [String: Any] = [:],
                  variables: [String: Any] = [:],
-                 customProperties: [String: Any] = [:]
+                 customProperties: [String: Any] = [:],
+                 sparrowLang: String = ""
     ) {
         self.state = SpotcheckState(
             targetToken: targetToken,
             domainName: domainName,
             userDetails: userDetails,
             variables: variables,
-            customProperties: customProperties
+            customProperties: customProperties,
+            sparrowLang: sparrowLang
         )
     }
     

@@ -13,7 +13,12 @@ import SurveySparrowSdk
 @available(iOS 15.0, *)
 
 
-var spotCheck = Spotcheck(email: "", domainName: "", targetToken: "")
+var spotCheck = Spotcheck(
+    domainName: "",
+    targetToken: "",
+    userDetails: [:],
+    sparrowLang: ""
+)
 
 @main
 @available(iOS 15.0, *)

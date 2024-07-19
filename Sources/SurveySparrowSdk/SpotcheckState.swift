@@ -35,14 +35,16 @@ public class SpotcheckState: ObservableObject {
     var variables: [String: Any]
     var customProperties: [String: Any]
     var traceId: String = ""
+    var sparrowLang: String = ""
     let defaults = UserDefaults.standard
     
-    public init(targetToken:String, domainName: String, userDetails: [String: Any], variables: [String: Any], customProperties: [String: Any]) {
+    public init(targetToken:String, domainName: String, userDetails: [String: Any], variables: [String: Any], customProperties: [String: Any], sparrowLang: String) {
         self.targetToken = targetToken
         self.domainName = domainName
         self.userDetails = userDetails
         self.variables = variables
         self.customProperties = customProperties
+        self.sparrowLang = sparrowLang
         if self.traceId.isEmpty {
             self.traceId = generateTraceId()
             if defaults.string(forKey: "SurveySparrowUUID") == nil {
@@ -469,6 +471,11 @@ public class SpotcheckState: ObservableObject {
         self.variables.forEach { key, value in
             self.spotcheckURL = self.spotcheckURL + "&\(key)=\(value)"
         }
+        
+        if(sparrowLang != nil && !sparrowLang.isEmpty) {
+            self.spotcheckURL = self.spotcheckURL + "&sparrowLang=\(sparrowLang)"
+        }
+        
     }
         
     public func getCurrentDate() -> String {
