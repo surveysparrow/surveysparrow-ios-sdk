@@ -30,8 +30,8 @@ struct FullScreenSurveyView: UIViewControllerRepresentable {
     
     var domain: String
     var token: String
-    let sparrowLang: String
     let params: [String: String]
+    let properties: [String: Any]
     
     @State private var isSurveyLoaded: Bool = false
 
@@ -39,8 +39,8 @@ struct FullScreenSurveyView: UIViewControllerRepresentable {
         let ssSurveyViewController = SsSurveyViewController()
         ssSurveyViewController.domain = domain
         ssSurveyViewController.token = token
-        ssSurveyViewController.sparrowLang = sparrowLang
         ssSurveyViewController.params = params
+        ssSurveyViewController.properties = properties
         ssSurveyViewController.getSurveyLoadedResponse = true
         ssSurveyViewController.surveyDelegate = SurveyDelegate()
         return ssSurveyViewController
@@ -57,13 +57,13 @@ struct FullScreenSurveyWithValidation {
     
     let domain: String?
     let token: String?
-    let sparrowLang: String?
+    let properties: [String: Any]
     let params: [String: String]?
 
     func startFullScreenSurveyWithValidation() {
            if let parentViewController = UIApplication.shared.windows.first?.rootViewController {
                print("Success")
-               SsSurveyView().loadFullscreenSurvey(parent: parentViewController, delegate: SurveyDelegate(), domain: domain, token: token, params: params, sparrowLang: sparrowLang)
+               SsSurveyView(properties: properties).loadFullscreenSurvey(parent: parentViewController, delegate: SurveyDelegate(), domain: domain, token: token, params: params)
            } else {
                print("Error: Unable to access parentViewController.")
            }

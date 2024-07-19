@@ -35,13 +35,15 @@ import WebKit
     
     @IBInspectable public var domain: String?
     @IBInspectable public var token: String?
-    @IBInspectable public var sparrowLang: String?
     
     public var surveyDelegate: SsSurveyDelegate!
     
+    var properties: [String: Any]?
+    
     // MARK: Initialization
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    public init(properties: [String: Any]) {
+        super.init(frame: .zero)
+        self.properties = properties
         addFeedbackView()
     }
     
@@ -62,32 +64,35 @@ import WebKit
         ssWebView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         addSubview(ssWebView)
         
-        let closeButtonWrapper = UIView()
-        ssWebView.addSubview(closeButtonWrapper)
-        
-        closeButton.setImage(UIImage(systemName: "xmark"), for: .normal)
-        closeButton.tintColor = .black
-        closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-        
-        closeButtonWrapper.addSubview(closeButton)
-        closeButtonWrapper.translatesAutoresizingMaskIntoConstraints = false
-        closeButtonWrapper.backgroundColor = .white
-        closeButtonWrapper.layer.cornerRadius = 4
-        closeButtonWrapper.clipsToBounds = true
-
-        NSLayoutConstraint.activate([
+        if let isCloseButtonEnabled = properties?["isCloseButtonEnabled"] as? Bool,
+           isCloseButtonEnabled {
             
-            closeButtonWrapper.topAnchor.constraint(equalTo: ssWebView.topAnchor, constant: 16),
-            closeButtonWrapper.trailingAnchor.constraint(equalTo: ssWebView.trailingAnchor, constant: -16),
-            closeButtonWrapper.widthAnchor.constraint(equalToConstant: 35),
-            closeButtonWrapper.heightAnchor.constraint(equalToConstant: 35),
-
-            closeButton.centerXAnchor.constraint(equalTo: closeButtonWrapper.centerXAnchor),
-            closeButton.centerYAnchor.constraint(equalTo: closeButtonWrapper.centerYAnchor),
-            closeButton.widthAnchor.constraint(equalToConstant: 14),
-            closeButton.heightAnchor.constraint(equalToConstant: 14)
-        ])
-        
+            let closeButtonWrapper = UIView()
+            ssWebView.addSubview(closeButtonWrapper)
+            
+            closeButton.setImage(UIImage(systemName: "xmark"), for: .normal)
+            closeButton.tintColor = .black
+            closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+            
+            closeButtonWrapper.addSubview(closeButton)
+            closeButtonWrapper.translatesAutoresizingMaskIntoConstraints = false
+            closeButtonWrapper.backgroundColor = .white
+            closeButtonWrapper.layer.cornerRadius = 4
+            closeButtonWrapper.clipsToBounds = true
+            
+            NSLayoutConstraint.activate([
+                
+                closeButtonWrapper.topAnchor.constraint(equalTo: ssWebView.topAnchor, constant: 16),
+                closeButtonWrapper.trailingAnchor.constraint(equalTo: ssWebView.trailingAnchor, constant: -16),
+                closeButtonWrapper.widthAnchor.constraint(equalToConstant: 35),
+                closeButtonWrapper.heightAnchor.constraint(equalToConstant: 35),
+                
+                closeButton.centerXAnchor.constraint(equalTo: closeButtonWrapper.centerXAnchor),
+                closeButton.centerYAnchor.constraint(equalTo: closeButtonWrapper.centerYAnchor),
+                closeButton.widthAnchor.constraint(equalToConstant: 14),
+                closeButton.heightAnchor.constraint(equalToConstant: 14)
+            ])
+        }
         ssWebView.addSubview(loader)
         ssWebView.navigationDelegate = self
         loader.translatesAutoresizingMaskIntoConstraints = false
@@ -162,27 +167,20 @@ import WebKit
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         loader.stopAnimating()
         
-        let jsCode = """
-                var observer = new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mutation) {
-                        var elements = document.getElementsByClassName('ss-language-selector--wrapper ss-survey-font-family');
-                        if (elements.length > 0) {
-                            for (var i = 0; i < elements.length; i++) {
-                                elements[i].style.marginRight = '45px';
-                            }
-                            observer.disconnect();
-                        }
-                    });
-                });
-                
-                observer.observe(document.body, { childList: true, subtree: true });
+        if let isCloseButtonSpaceEnabled = properties?["isCloseButtonSpaceEnabled"] as? Bool,
+           isCloseButtonSpaceEnabled {
+            let jsCode = """
+                const styleTag = document.createElement("style");
+                styleTag.innerHTML = `.ss-language-selector--wrapper { margin-right: 45px; }`;
+                document.body.appendChild(styleTag);
                 """
-        
-        webView.evaluateJavaScript(jsCode, completionHandler: { (result, error) in
-            if let error = error {
-                print("Error in CloseButton")
-            }
-        })
+            
+            webView.evaluateJavaScript(jsCode, completionHandler: { (result, error) in
+                if let error = error {
+                    // print(error)
+                }
+            })
+        }
     }
     
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -206,11 +204,11 @@ import WebKit
         }
     }
     
-    public func loadFullscreenSurvey(parent: UIViewController,delegate:SsSurveyDelegate, domain: String? = nil, token: String? = nil, params: [String: String]? = [:], sparrowLang: String? = nil) {
+    public func loadFullscreenSurvey(parent: UIViewController,delegate:SsSurveyDelegate, domain: String? = nil, token: String? = nil, params: [String: String]? = [:] ) {
         let ssSurveyViewController = SsSurveyViewController()
         ssSurveyViewController.domain = domain
         ssSurveyViewController.token = token
-        ssSurveyViewController.sparrowLang = sparrowLang
+        ssSurveyViewController.properties = self.properties ?? [:]
         if(params != nil){
             ssSurveyViewController.params = params ?? [:]
         }
@@ -245,10 +243,9 @@ import WebKit
         }
     }
     
-    public func loadEmbedSurvey(domain: String? = nil, token: String? = nil, params: [String: String]? = [:], sparrowLang: String? = nil) {
+    public func loadEmbedSurvey(domain: String? = nil, token: String? = nil, params: [String: String]? = [:]) {
         self.domain = domain != nil ? domain! : self.domain
         self.token = token != nil ? token! : self.token
-        self.sparrowLang = sparrowLang != nil ? sparrowLang! : self.sparrowLang
         if self.domain != nil && self.token != nil {
             var isActive: Bool = false
             var reason: String = ""
@@ -271,7 +268,7 @@ import WebKit
                 if(params != nil){
                     self.params = params ?? [:]
                 }
-                loadSurvey(domain:domain,token:token,sparrowLang: sparrowLang)
+                loadSurvey(domain:domain,token:token)
                 closeButton.isHidden = false ;
             } else {
                 self.handleSurveyValidation(response: [
@@ -283,10 +280,9 @@ import WebKit
     }
     
     // MARK: Public method
-    public func loadSurvey(domain: String? = nil, token: String? = nil, sparrowLang: String? = nil) {
+    public func loadSurvey(domain: String? = nil, token: String? = nil) {
         self.domain = domain != nil ? domain! : self.domain
         self.token = token != nil ? token! : self.token
-        self.sparrowLang = sparrowLang != nil ? sparrowLang! : self.sparrowLang
         if self.domain != nil && self.token != nil {
             loader.startAnimating()
             var urlComponent = URLComponents()
@@ -299,7 +295,7 @@ import WebKit
             urlComponent.queryItems = params.map {
                 URLQueryItem(name: $0.key, value: $0.value)
             }
-            urlComponent.queryItems?.append(URLQueryItem(name: "sparrowLang", value: sparrowLang))
+            urlComponent.queryItems?.append(URLQueryItem(name: "sparrowLang", value: properties?["sparrowLang"] as? String))
             if let url = urlComponent.url {
                 let request = URLRequest(url: url)
                 ssWebView.load(request)

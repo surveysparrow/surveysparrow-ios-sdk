@@ -15,7 +15,7 @@ public class SurveySparrow: SsSurveyDelegate {
     private var dataStore = NSUbiquitousKeyValueStore()
     private var domain: String
     private var token: String
-    private var sparrowLang: String
+    private var properties: [String: String] = [:]
     
     public var surveyType: SurveyType = .CLASSIC
     public var params: [String: String] = [:]
@@ -37,10 +37,10 @@ public class SurveySparrow: SsSurveyDelegate {
     private var incrementMultiplierKey = "incrementMultiplier_"
     
     // MARK: Initialization
-    public init(domain: String, token: String, sparrowLang: String? = "") {
+    public init(domain: String, token: String, properties: [String: String]) {
         self.domain = domain
         self.token = token
-        self.sparrowLang = sparrowLang ?? ""
+        self.properties = properties
         
         isAlreadyTakenKey += token
         promptTimeKey += token
@@ -95,8 +95,8 @@ public class SurveySparrow: SsSurveyDelegate {
                         let ssSurveyViewController = SsSurveyViewController()
                         ssSurveyViewController.domain = self.domain
                         ssSurveyViewController.token = self.token
-                        ssSurveyViewController.sparrowLang = self.sparrowLang
                         ssSurveyViewController.params = self.params
+                        ssSurveyViewController.properties = self.properties
                         ssSurveyViewController.widgetContactId = widgetContactId
                         ssSurveyViewController.getSurveyLoadedResponse = self.getSurveyLoadedResponse
                         ssSurveyViewController.thankyouTimeout = self.thankyouTimout
