@@ -167,8 +167,8 @@ import WebKit
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         loader.stopAnimating()
         
-        if let isCloseButtonSpaceEnabled = properties?["isCloseButtonSpaceEnabled"] as? Bool,
-           isCloseButtonSpaceEnabled {
+        if let isCloseButtonEnabled = properties?["isCloseButtonEnabled"] as? Bool,
+           isCloseButtonEnabled {
             let jsCode = """
                 const styleTag = document.createElement("style");
                 styleTag.innerHTML = `.ss-language-selector--wrapper { margin-right: 45px; }`;

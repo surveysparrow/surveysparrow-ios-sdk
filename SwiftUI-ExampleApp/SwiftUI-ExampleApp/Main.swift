@@ -30,8 +30,7 @@ struct ContentView: View {
     @State private var token: String = "<sdk-token>"
     let properties: [String: Any] = [
         "sparrowLang": "",
-        "isCloseButtonEnabled" : true,
-        "isCloseButtonSpaceEnabled": true
+        "isCloseButtonEnabled" : true
     ]
     
     var params: [String:String] = ["emailaddress": "email@email.com", "email": "email@email.com"]
