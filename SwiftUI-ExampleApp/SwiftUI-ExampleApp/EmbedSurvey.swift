@@ -14,8 +14,8 @@ struct EmbeddedSurveyView: UIViewControllerRepresentable {
     @Binding var isSurveyActive: Bool
     var domain: String
     var token: String
-    let sparrowLang: String
     let params: [String: String]
+    let properties: [String: Any]
     
     func makeUIViewController(context: Context) -> UIViewController {
         let viewController = UIViewController()
@@ -24,9 +24,9 @@ struct EmbeddedSurveyView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {        
         if isSurveyActive {
-            let surveyView = SsSurveyView()
+            let surveyView = SsSurveyView(properties: properties)
             surveyView.surveyDelegate = SurveyDelegate()
-            surveyView.loadEmbedSurvey(domain: domain, token: token, params: params, sparrowLang: sparrowLang)
+            surveyView.loadEmbedSurvey(domain: domain, token: token, params: params)
             uiViewController.view.addSubview(surveyView)
             surveyView.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([

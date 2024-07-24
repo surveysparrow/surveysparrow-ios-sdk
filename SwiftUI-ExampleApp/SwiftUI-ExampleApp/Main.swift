@@ -40,7 +40,11 @@ struct ContentView: View {
     
     @State private var domain: String = "<account-domain>"
     @State private var token: String = "<sdk-token>"
-    @State private var sparrowLang: String = "<your-preferred-language-code>"
+    let properties: [String: Any] = [
+        "sparrowLang": "",
+        "isCloseButtonEnabled" : true
+    ]
+    
     var params: [String:String] = ["emailaddress": "email@email.com", "email": "email@email.com"]
     
     var body: some View {
@@ -59,7 +63,7 @@ struct ContentView: View {
                         Text("Show Full Screen Survey")
                     }.padding()
                     Button{
-                        FullScreenSurveyWithValidation(domain: domain, token: token, sparrowLang: sparrowLang, params: params).startFullScreenSurveyWithValidation()
+                        FullScreenSurveyWithValidation(domain: domain, token: token, properties: properties, params: params).startFullScreenSurveyWithValidation()
                     } label:{
                         Text("Show Full Screen Survey with Validation")
                     }.padding()
@@ -69,10 +73,10 @@ struct ContentView: View {
                         Text("Show Embed Survey")
                     }
                     Spacer()
-                    EmbeddedSurveyView(isSurveyActive: $showEmbedSurvey, domain: domain, token: token, sparrowLang: sparrowLang, params: params)
+                    EmbeddedSurveyView(isSurveyActive: $showEmbedSurvey, domain: domain, token: token, params: params, properties: properties)
                         .frame(height: 400)
                 }.sheet(isPresented: $isModalPresented) {
-                    FullScreenSurveyView(domain: domain, token: token, sparrowLang: sparrowLang, params: params)
+                    FullScreenSurveyView(domain: domain, token: token, params: params, properties: properties)
                 }
             }
             spotCheck
