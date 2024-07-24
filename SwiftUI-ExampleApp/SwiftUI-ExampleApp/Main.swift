@@ -5,10 +5,21 @@
 //  Created by Gokulkrishna Raju on 05/01/24.
 //
 
+
 import SwiftUI
+import CoreLocation
 import SurveySparrowSdk
 
- 
+@available(iOS 15.0, *)
+
+
+var spotCheck = Spotcheck(
+    domainName: "",
+    targetToken: "",
+    userDetails: [:],
+    sparrowLang: ""
+)
+
 @main
 @available(iOS 15.0, *)
 struct ExampleApp: App {
@@ -25,6 +36,7 @@ struct ContentView: View {
     @State private var isModalPresented : Bool = false
     @State private var showEmbedSurvey : Bool = false
     @State private var isValidationPresented : Bool = false
+    @State private var scrollOffset: CGFloat = 0
     
     @State private var domain: String = "<account-domain>"
     @State private var token: String = "<sdk-token>"
@@ -36,42 +48,46 @@ struct ContentView: View {
     var params: [String:String] = ["emailaddress": "email@email.com", "email": "email@email.com"]
     
     var body: some View {
-        ScrollView {
-            CustomTextField(
-                placeholder: "Domain",
-                text: $domain
-            )
-            
-            CustomTextField(
-                placeholder: "Token",
-                text: $token
-            )
-            
-            Button{
-                isModalPresented = true
-            } label:{
-                Text("Show Full Screen Survey")
-            }.padding().padding(.top,60)
-            Button{
-                FullScreenSurveyWithValidation(domain: domain, token: token, properties: properties, params: params).startFullScreenSurveyWithValidation()
-            } label:{
-                Text("Show Full Screen Survey with Validation")
-            }.padding()
-            
-            Button {
-                showEmbedSurvey = true
-            } label: {
-                Text("Show Embed Survey")
+        ZStack {
+            NavigationView {
+                ScrollView {
+                    NavigationLink(destination: HomeScreen()) {
+                        Text("HomeScreen")
+                    }.padding().padding(.top,60)
+                    NavigationLink(destination: NetworkScreen()) {
+                        Text("NetworkScreen")
+                    }
+                    Button{
+                        isModalPresented = true
+                    } label:{
+                        Text("Show Full Screen Survey")
+                    }.padding()
+                    Button{
+                        FullScreenSurveyWithValidation(domain: domain, token: token, properties: properties, params: params).startFullScreenSurveyWithValidation()
+                    } label:{
+                        Text("Show Full Screen Survey with Validation")
+                    }.padding()
+                    Button{
+                        showEmbedSurvey.toggle()
+                    }label: {
+                        Text("Show Embed Survey")
+                    }
+                    Spacer()
+                    EmbeddedSurveyView(isSurveyActive: $showEmbedSurvey, domain: domain, token: token, params: params, properties: properties)
+                        .frame(height: 400)
+                }.sheet(isPresented: $isModalPresented) {
+                    FullScreenSurveyView(domain: domain, token: token, params: params, properties: properties)
+                }
             }
-            Spacer()
-            EmbeddedSurveyView(isSurveyActive: $showEmbedSurvey, domain: domain, token: token, params: params, properties: properties)
-                .frame(height: 400)
-        }.sheet(isPresented: $isModalPresented) {
-            FullScreenSurveyView(domain: domain, token: token, params: params, properties: properties)
+            spotCheck
         }
     }
 }
 
+//@available(iOS 15.0, *)
+//#Preview{
+//    ContentView()
+//}
 
 @available(iOS 15.0, *)
 struct CustomTextField: View {
