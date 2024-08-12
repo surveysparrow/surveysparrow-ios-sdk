@@ -10,19 +10,27 @@ import SwiftUI
 @available(iOS 15.0, *)
 struct HomeScreen: View {
     var body: some View {
-        VStack {
-            Text("HomeScreen")
-                .padding()
-            Button(
-                action: {
-                    spotCheck.TrackEvent(onScreen: "HomeScreen", event: [ "GameCompleted": ["postSentTime": "5.30pm"] ])
+        ZStack{
+            VStack {
+                Text("HomeScreen")
+                    .padding()
+                Button(
+                    action: {
+                        spotCheck.TrackEvent(onScreen: "HomeScreen", event: [ "onEvent": [] ])
+                    }
+                ){
+                    Text("Click")
                 }
-            ){
-                Text("Click")
+                .padding()
+                NavigationLink(destination: NetworkScreen()) {
+                    Text("NetworkScreen")
+                }
+                .padding()
             }
-            .padding()
+            spotCheck
         }
         .onAppear {
+            print("HomeScreen")
             spotCheck.TrackScreen(screen: "HomeScreen")
         }
     }
@@ -31,19 +39,23 @@ struct HomeScreen: View {
 @available(iOS 15.0, *)
 struct NetworkScreen: View {
     var body: some View {
-        VStack {
-            Text("NetworkScreen")
-                .padding()
-            Button(
-                action: {
-                    spotCheck.TrackEvent(onScreen: "NetworkScreen", event: [ "MobileClick": ["abc": "bbb"] ])
+        ZStack{
+            VStack {
+                Text("NetworkScreen")
+                    .padding()
+                Button(
+                    action: {
+                        spotCheck.TrackEvent(onScreen: "NetworkScreen", event: [ "MobileClick": ["abc": "bbb"] ])
+                    }
+                ){
+                    Text("Click")
                 }
-            ){
-                Text("Click")
+                .padding()
             }
-            .padding()
+            spotCheck
         }
         .onAppear {
+            print("NetworkScreen")
             spotCheck.TrackScreen(screen: "NetworkScreen")
         }
     }

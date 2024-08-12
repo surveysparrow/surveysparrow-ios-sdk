@@ -13,11 +13,8 @@ import SurveySparrowSdk
 @available(iOS 15.0, *)
 
 
-var spotCheck = Spotcheck(
-    domainName: "",
-    targetToken: "",
-    userDetails: [:],
-    sparrowLang: ""
+var spotCheck = Spotcheck( domainName: "kalaiprojects.surveysparrow.com",
+                           targetToken: "tar-5AB5te8uZgK7rShTQrcods"
 )
 
 @main
@@ -44,7 +41,7 @@ struct ContentView: View {
     var params: [String:String] = ["emailaddress": "email@email.com", "email": "email@email.com"]
     
     var body: some View {
-        ZStack {
+//        ZStack {
             NavigationView {
                 ScrollView {
                     NavigationLink(destination: HomeScreen()) {
@@ -75,7 +72,11 @@ struct ContentView: View {
                     FullScreenSurveyView(domain: domain, token: token, sparrowLang: sparrowLang, params: params)
                 }
             }
-            spotCheck
+//            spotCheck
+//        }
+        .onAppear {
+            print("MainScreen")
+            spotCheck.TrackScreen(screen: "MainScreen")
         }
     }
 }
