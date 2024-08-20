@@ -99,7 +99,8 @@ public class SpotcheckState: ObservableObject {
                 ],
                 "currentDate": self.getCurrentDate(),
                 "timezone": TimeZone.current.identifier
-            ]
+            ],
+            "sdk": "IOS"
         ]
         
         guard let baseURL = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/properties") else {
