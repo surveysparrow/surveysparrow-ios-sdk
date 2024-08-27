@@ -64,8 +64,9 @@ import WebKit
         ssWebView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         addSubview(ssWebView)
         
-        if let isCloseButtonEnabled = properties?["isCloseButtonEnabled"] as? Bool,
-           isCloseButtonEnabled {
+        let isCloseButtonEnabled = properties?["isCloseButtonEnabled"] as? Bool
+        
+        if  isCloseButtonEnabled ?? true == true {
             
             let closeButtonWrapper = UIView()
             ssWebView.addSubview(closeButtonWrapper)
@@ -166,8 +167,9 @@ import WebKit
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         loader.stopAnimating()
         
-        if let isCloseButtonEnabled = properties?["isCloseButtonEnabled"] as? Bool,
-           isCloseButtonEnabled {
+        let isCloseButtonEnabled = properties?["isCloseButtonEnabled"] as? Bool
+        
+        if  isCloseButtonEnabled ?? true == true {
             let jsCode = """
                 const styleTag = document.createElement("style");
                 styleTag.innerHTML = `.ss-language-selector--wrapper { margin-right: 45px; }`;

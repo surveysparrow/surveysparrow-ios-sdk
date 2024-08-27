@@ -34,7 +34,6 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
             let ssSurveyView = SsSurveyView(properties: properties)
             ssSurveyView.surveyDelegate = self
             ssSurveyView.params = params
-            SsSurveyView.widgetContactId = widgetContactId
             ssSurveyView.getSurveyLoadedResponse = getSurveyLoadedResponse
             
             ssSurveyView.frame = view.bounds
