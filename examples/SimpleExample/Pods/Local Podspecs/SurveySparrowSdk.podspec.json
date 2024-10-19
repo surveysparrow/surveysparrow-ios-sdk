@@ -1,6 +1,6 @@
 {
   "name": "SurveySparrowSdk",
-  "version": "0.4.7",
+  "version": "0.5.1",
   "summary": "SurveySparrow Feedback SDK for iOS",
   "description": "SurveySparrow iOS SDK enables you to collect feedback from your mobile app. Embed the Classic & Chat surveys in your iOS application seamlessly with few lines of code.",
   "homepage": "https://surveysparrow.com",
@@ -16,7 +16,7 @@
   },
   "source": {
     "git": "https://github.com/surveysparrow/surveysparrow-ios-sdk.git",
-    "tag": "0.4.7"
+    "tag": "0.5.1"
   },
   "source_files": "SurveySparrowSdk/**/*.swift",
   "swift_versions": "5.0",
