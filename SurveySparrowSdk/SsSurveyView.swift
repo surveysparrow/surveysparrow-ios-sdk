@@ -75,8 +75,8 @@ import WebKit
 
         NSLayoutConstraint.activate([
             
-            closeButtonWrapper.topAnchor.constraint(equalTo: ssWebView.topAnchor, constant: 16),
-            closeButtonWrapper.trailingAnchor.constraint(equalTo: ssWebView.trailingAnchor, constant: -16),
+            closeButtonWrapper.topAnchor.constraint(equalTo: ssWebView.safeAreaLayoutGuide.topAnchor, constant: 16),
+            closeButtonWrapper.trailingAnchor.constraint(equalTo: ssWebView.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             closeButtonWrapper.widthAnchor.constraint(equalToConstant: 35),
             closeButtonWrapper.heightAnchor.constraint(equalToConstant: 35),
 
