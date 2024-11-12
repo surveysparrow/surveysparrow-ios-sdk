@@ -18,8 +18,8 @@ class ViewController: UIViewController, SsSurveyDelegate {
         // Do any additional setup after loading the view.
     }
     
-    var domain: String = "<account-domain>"
-    var token: String = "<sdk-token>"
+    var domain: String = "feedback.cenomirewards.com"
+    var token: String = "tt-cBkMU"
     var sparrowLang: String = "<your-preferred-language-code>"
     
     override func viewDidAppear(_ animated: Bool) {

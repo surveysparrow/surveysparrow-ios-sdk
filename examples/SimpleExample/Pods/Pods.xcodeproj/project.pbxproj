@@ -9,44 +9,44 @@
 /* Begin PBXBuildFile section */
 		1192733758D7F6A528DAA0AF88D02854 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		150A18AB06B9638A006B077FBEA2994C /* Pods-SimpleExampleTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 2E25AD76872D30929BD1DAB1BBB55889 /* Pods-SimpleExampleTests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		204B3BC74FCFBBD04ADDD1EA7445629A /* SsSurveyDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C38BD920178921E989AD70C704B6E6AC /* SsSurveyDelegate.swift */; };
-		4CEF51B947D6116B6A1B56320226F642 /* SsSurveyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88C0FCE3934ACA59E713F78FB962081A /* SsSurveyView.swift */; };
+		204B3BC74FCFBBD04ADDD1EA7445629A /* SsSurveyDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBD081CB1CC50E5CF72499905DD366A /* SsSurveyDelegate.swift */; };
+		4CEF51B947D6116B6A1B56320226F642 /* SsSurveyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9877EF6833EFD1C8384C98D37E273AB1 /* SsSurveyView.swift */; };
 		54ECBFB4AF096AA99021CA2EF055C88F /* Pods-SimpleExample-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A3C52F156774FB9CA5BD6AD3D985388F /* Pods-SimpleExample-dummy.m */; };
 		58C5F82462409D9ED2A17B0828D7EC00 /* Pods-SimpleExampleTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B5F1BF514CC73C328970FEAEA318DCD /* Pods-SimpleExampleTests-dummy.m */; };
 		6A5D6CA90C64599546FC6B71D0AFC8BD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
-		790B7FE6F868E47D52C6A5C0CF971F92 /* SsSurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF4120071AB7262BCE917389E964214 /* SsSurveyViewController.swift */; };
+		790B7FE6F868E47D52C6A5C0CF971F92 /* SsSurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA5540FD8AE8894329AB45B36CD603E /* SsSurveyViewController.swift */; };
 		82AC6A3C08F605B5059F5C500A8A5476 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		96D67B3ACBB8531F8D41A4F47BDC07F2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		A1AF73CAADA308E564057A2650FD5EDA /* Pods-SimpleExample-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 6AF95F76EE6234D264B0F9EAA94D4396 /* Pods-SimpleExample-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B14B4ADDD16C642EF21F39B3A5EF633A /* Pods-SimpleExample-SimpleExampleUITests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E525838483870095EFD72677E5F01D3 /* Pods-SimpleExample-SimpleExampleUITests-dummy.m */; };
-		B6E5EBC41C1FD956C67E9A7412EE2F16 /* SurveySparrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F4BFB00A09716BBAAABF76E90C6721A /* SurveySparrow.swift */; };
-		D380B98B61DA904A014496C75767FBEA /* SurveySparrowSdk-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 25E3729FB3D8B8629119F657FF2A8AE1 /* SurveySparrowSdk-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6E5EBC41C1FD956C67E9A7412EE2F16 /* SurveySparrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F800F3D89ACDD8D0B07AFC0A1B33C66 /* SurveySparrow.swift */; };
+		D380B98B61DA904A014496C75767FBEA /* SurveySparrowSdk-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0DB7D03F2182AF59B73C59F8D3AAE470 /* SurveySparrowSdk-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EAF4336F37EE5E6D69B24183B18CBE42 /* Pods-SimpleExample-SimpleExampleUITests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 208EFE0653E8E1F6B6EA555048043B9C /* Pods-SimpleExample-SimpleExampleUITests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		ED8578BC7E14C62A0495D42350E50DB2 /* SurveySparrowSdk-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = B187AD4EA238DC3DA6C857E5DEEE2219 /* SurveySparrowSdk-dummy.m */; };
-		F1A0CB2FE051CDE61347FF4B4A83D32A /* Sshelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6D26F07E1D84199A575965A27413A2 /* Sshelper.swift */; };
+		ED8578BC7E14C62A0495D42350E50DB2 /* SurveySparrowSdk-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6662766E448BAAA8671FC363E4EAC67D /* SurveySparrowSdk-dummy.m */; };
+		F1A0CB2FE051CDE61347FF4B4A83D32A /* Sshelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B559221162006208894DB8AA357B5C8 /* Sshelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		5B755422378F40E3516757DD2B3CF307 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 065770EB33FF2DDC55A8A215225503E9;
-			remoteInfo = SurveySparrowSdk;
-		};
-		B2EA62FC13D057CFD71C55E5671FCFE1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 065770EB33FF2DDC55A8A215225503E9;
-			remoteInfo = SurveySparrowSdk;
-		};
-		CEFE1A9E4E27C5E1061DEF4CB0A552FA /* PBXContainerItemProxy */ = {
+		23936A3850FF2F8B5963D61024A02BBD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = EAE0F8A4384601CDE45690312DEB287C;
 			remoteInfo = "Pods-SimpleExample";
+		};
+		4315AB8B3AD957EC6C6BD9009BC457AB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 065770EB33FF2DDC55A8A215225503E9;
+			remoteInfo = SurveySparrowSdk;
+		};
+		9BB838324E3BE2CAA2D51F4E0BF97D89 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 065770EB33FF2DDC55A8A215225503E9;
+			remoteInfo = SurveySparrowSdk;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -54,50 +54,47 @@
 		02E53ED145A0D7A2234C02DF4600920A /* Pods-SimpleExampleTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-SimpleExampleTests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		052431CC936A571B583501031B7D7795 /* Pods-SimpleExample-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SimpleExample-Info.plist"; sourceTree = "<group>"; };
 		0AB78F09ADD4CE08566839B932854C4A /* Pods-SimpleExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SimpleExample.debug.xcconfig"; sourceTree = "<group>"; };
-		0DA70B36C3FACB3965CD8DE5ABFBACD6 /* SurveySparrowSdk.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = SurveySparrowSdk.modulemap; sourceTree = "<group>"; };
+		0DB7D03F2182AF59B73C59F8D3AAE470 /* SurveySparrowSdk-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SurveySparrowSdk-umbrella.h"; sourceTree = "<group>"; };
+		0F800F3D89ACDD8D0B07AFC0A1B33C66 /* SurveySparrow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SurveySparrow.swift; path = SurveySparrowSdk/SurveySparrow.swift; sourceTree = "<group>"; };
+		13CD0776B82B89E3FCAD63100AD9D0C2 /* SurveySparrowSdk-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SurveySparrowSdk-prefix.pch"; sourceTree = "<group>"; };
 		19317300CA4ED8DBDB4B5102C76BB17B /* Pods-SimpleExample-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-SimpleExample-frameworks.sh"; sourceTree = "<group>"; };
 		1AADF9FEB96E31FF75F2D3AAED2B936A /* Pods-SimpleExampleTests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-SimpleExampleTests"; path = Pods_SimpleExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F9F122350CB1E9564889ECB96014E00 /* Pods-SimpleExampleTests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SimpleExampleTests-Info.plist"; sourceTree = "<group>"; };
 		208EFE0653E8E1F6B6EA555048043B9C /* Pods-SimpleExample-SimpleExampleUITests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-SimpleExample-SimpleExampleUITests-umbrella.h"; sourceTree = "<group>"; };
 		22E3DB345C21FD0C672F606D08654BC4 /* Pods-SimpleExample-SimpleExampleUITests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-SimpleExample-SimpleExampleUITests-acknowledgements.markdown"; sourceTree = "<group>"; };
-		25E3729FB3D8B8629119F657FF2A8AE1 /* SurveySparrowSdk-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SurveySparrowSdk-umbrella.h"; sourceTree = "<group>"; };
-		28D2639F9901997220E21D214BA14F6E /* SurveySparrowSdk.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SurveySparrowSdk.release.xcconfig; sourceTree = "<group>"; };
 		2C0E55C56A401D44B1061B3AA6872D8C /* Pods-SimpleExample */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-SimpleExample"; path = Pods_SimpleExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DBC970F3952DC2C557C0F99EDEFF18A /* Pods-SimpleExampleTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-SimpleExampleTests.modulemap"; sourceTree = "<group>"; };
 		2E25AD76872D30929BD1DAB1BBB55889 /* Pods-SimpleExampleTests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-SimpleExampleTests-umbrella.h"; sourceTree = "<group>"; };
-		2F4BFB00A09716BBAAABF76E90C6721A /* SurveySparrow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SurveySparrow.swift; path = SurveySparrowSdk/SurveySparrow.swift; sourceTree = "<group>"; };
 		31AEAF727B5F37A29FA3D31FDCABC918 /* Pods-SimpleExample-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-SimpleExample-acknowledgements.markdown"; sourceTree = "<group>"; };
 		3B4096ACE9F3E46AC4E6CE4FCE665C66 /* SurveySparrowSdk */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = SurveySparrowSdk; path = SurveySparrowSdk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B5F1BF514CC73C328970FEAEA318DCD /* Pods-SimpleExampleTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-SimpleExampleTests-dummy.m"; sourceTree = "<group>"; };
-		3CF4120071AB7262BCE917389E964214 /* SsSurveyViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SsSurveyViewController.swift; path = SurveySparrowSdk/SsSurveyViewController.swift; sourceTree = "<group>"; };
-		3D6D26F07E1D84199A575965A27413A2 /* Sshelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Sshelper.swift; path = SurveySparrowSdk/Sshelper.swift; sourceTree = "<group>"; };
-		44934755B5C2899578CEB9F82194F04A /* SurveySparrowSdk.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SurveySparrowSdk.debug.xcconfig; sourceTree = "<group>"; };
 		47AC73A5591522A0406527ABE3EBB66D /* Pods-SimpleExample-SimpleExampleUITests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-SimpleExample-SimpleExampleUITests"; path = Pods_SimpleExample_SimpleExampleUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		494C396AA8417A94AC03DBC45602125F /* SurveySparrowSdk.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SurveySparrowSdk.debug.xcconfig; sourceTree = "<group>"; };
 		4AC877636CE7A85E76B039D5D6D5F22F /* Pods-SimpleExample-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SimpleExample-acknowledgements.plist"; sourceTree = "<group>"; };
-		574FAF9495DC18D868864973765425A5 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
+		4D23A3CBE98042B90E9D9812D777DF4A /* SurveySparrowSdk-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "SurveySparrowSdk-Info.plist"; sourceTree = "<group>"; };
 		5E525838483870095EFD72677E5F01D3 /* Pods-SimpleExample-SimpleExampleUITests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-SimpleExample-SimpleExampleUITests-dummy.m"; sourceTree = "<group>"; };
 		616157903E0EE819FB88CA449BF4CC13 /* Pods-SimpleExample-SimpleExampleUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SimpleExample-SimpleExampleUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		6662766E448BAAA8671FC363E4EAC67D /* SurveySparrowSdk-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SurveySparrowSdk-dummy.m"; sourceTree = "<group>"; };
 		6828EAFDA0E8CAC1917603F09FCF748C /* Pods-SimpleExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SimpleExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6AF95F76EE6234D264B0F9EAA94D4396 /* Pods-SimpleExample-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-SimpleExample-umbrella.h"; sourceTree = "<group>"; };
 		73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		74AE63EEBB066BF59A7E3D785D7C5971 /* SurveySparrowSdk.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = SurveySparrowSdk.modulemap; sourceTree = "<group>"; };
 		7A66DF7CB6503EF09F1725F152DA1788 /* Pods-SimpleExampleTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SimpleExampleTests-acknowledgements.plist"; sourceTree = "<group>"; };
-		88C0FCE3934ACA59E713F78FB962081A /* SsSurveyView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SsSurveyView.swift; path = SurveySparrowSdk/SsSurveyView.swift; sourceTree = "<group>"; };
+		8B559221162006208894DB8AA357B5C8 /* Sshelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Sshelper.swift; path = SurveySparrowSdk/Sshelper.swift; sourceTree = "<group>"; };
 		96FA1B927A1386CFE246C618F25162ED /* Pods-SimpleExample.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-SimpleExample.modulemap"; sourceTree = "<group>"; };
+		9877EF6833EFD1C8384C98D37E273AB1 /* SsSurveyView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SsSurveyView.swift; path = SurveySparrowSdk/SsSurveyView.swift; sourceTree = "<group>"; };
 		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		A2000E15B2F7EC6A93DFDCA02D7A1AD4 /* Pods-SimpleExample-SimpleExampleUITests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-SimpleExample-SimpleExampleUITests.modulemap"; sourceTree = "<group>"; };
 		A3C52F156774FB9CA5BD6AD3D985388F /* Pods-SimpleExample-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-SimpleExample-dummy.m"; sourceTree = "<group>"; };
 		A7887BCEDDA9ED4527BDE3BD9B04C65C /* Pods-SimpleExample-SimpleExampleUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SimpleExample-SimpleExampleUITests.release.xcconfig"; sourceTree = "<group>"; };
-		B187AD4EA238DC3DA6C857E5DEEE2219 /* SurveySparrowSdk-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SurveySparrowSdk-dummy.m"; sourceTree = "<group>"; };
-		B344CCA2E4F4584A910FF7AD14D3E1D1 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE; sourceTree = "<group>"; };
 		B55BFC2BB64B0E8D7FFC1946CD4E2008 /* Pods-SimpleExample-SimpleExampleUITests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SimpleExample-SimpleExampleUITests-acknowledgements.plist"; sourceTree = "<group>"; };
 		B9885DEDF3F662936B82DB005927FA06 /* Pods-SimpleExample-SimpleExampleUITests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-SimpleExample-SimpleExampleUITests-frameworks.sh"; sourceTree = "<group>"; };
-		C22B8E131344EC3C8897EC2B9E55130F /* SurveySparrowSdk.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = SurveySparrowSdk.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		C38BD920178921E989AD70C704B6E6AC /* SsSurveyDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SsSurveyDelegate.swift; path = SurveySparrowSdk/SsSurveyDelegate.swift; sourceTree = "<group>"; };
 		CB6E5879464649D2DEFE49FD2195301B /* Pods-SimpleExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SimpleExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+		CDA5540FD8AE8894329AB45B36CD603E /* SsSurveyViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SsSurveyViewController.swift; path = SurveySparrowSdk/SsSurveyViewController.swift; sourceTree = "<group>"; };
+		D43075D3B22DED10CFC6ECF3A781BB09 /* SurveySparrowSdk.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SurveySparrowSdk.release.xcconfig; sourceTree = "<group>"; };
 		D5CF0DCB7A8DF3F7D4D44203903738F7 /* Pods-SimpleExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SimpleExample.release.xcconfig"; sourceTree = "<group>"; };
 		D609465BC8C86B27BEEA5D5BA1751194 /* Pods-SimpleExample-SimpleExampleUITests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SimpleExample-SimpleExampleUITests-Info.plist"; sourceTree = "<group>"; };
-		D658795A3B81847EC2812D6C8411B0B6 /* SurveySparrowSdk-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SurveySparrowSdk-prefix.pch"; sourceTree = "<group>"; };
-		E132AFC64A754169E4F7022EFEFB1F3D /* SurveySparrowSdk-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "SurveySparrowSdk-Info.plist"; sourceTree = "<group>"; };
+		DBBD081CB1CC50E5CF72499905DD366A /* SsSurveyDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SsSurveyDelegate.swift; path = SurveySparrowSdk/SsSurveyDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,16 +133,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		025621F7F339BE3FF32A0D8327473296 /* Pod */ = {
-			isa = PBXGroup;
-			children = (
-				B344CCA2E4F4584A910FF7AD14D3E1D1 /* LICENSE */,
-				574FAF9495DC18D868864973765425A5 /* README.md */,
-				C22B8E131344EC3C8897EC2B9E55130F /* SurveySparrowSdk.podspec */,
-			);
-			name = Pod;
-			sourceTree = "<group>";
-		};
 		3D7131C71A0A500301179BF4E84AFE8A /* Pods-SimpleExample */ = {
 			isa = PBXGroup;
 			children = (
@@ -161,29 +148,6 @@
 			);
 			name = "Pods-SimpleExample";
 			path = "Target Support Files/Pods-SimpleExample";
-			sourceTree = "<group>";
-		};
-		44DB1AC1A79093BAD436C5CD76992BBA /* Development Pods */ = {
-			isa = PBXGroup;
-			children = (
-				EB6A055D236860273340DD2636A3CD6B /* SurveySparrowSdk */,
-			);
-			name = "Development Pods";
-			sourceTree = "<group>";
-		};
-		52CBF910D697C1C8B3B8EF60FCC51383 /* Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				0DA70B36C3FACB3965CD8DE5ABFBACD6 /* SurveySparrowSdk.modulemap */,
-				B187AD4EA238DC3DA6C857E5DEEE2219 /* SurveySparrowSdk-dummy.m */,
-				E132AFC64A754169E4F7022EFEFB1F3D /* SurveySparrowSdk-Info.plist */,
-				D658795A3B81847EC2812D6C8411B0B6 /* SurveySparrowSdk-prefix.pch */,
-				25E3729FB3D8B8629119F657FF2A8AE1 /* SurveySparrowSdk-umbrella.h */,
-				44934755B5C2899578CEB9F82194F04A /* SurveySparrowSdk.debug.xcconfig */,
-				28D2639F9901997220E21D214BA14F6E /* SurveySparrowSdk.release.xcconfig */,
-			);
-			name = "Support Files";
-			path = "examples/SimpleExample/Pods/Target Support Files/SurveySparrowSdk";
 			sourceTree = "<group>";
 		};
 		578452D2E740E91742655AC8F1636D1F /* iOS */ = {
@@ -221,6 +185,21 @@
 			path = "Target Support Files/Pods-SimpleExample-SimpleExampleUITests";
 			sourceTree = "<group>";
 		};
+		7F65195CF15DEF6E78F7D3527E5478C6 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				74AE63EEBB066BF59A7E3D785D7C5971 /* SurveySparrowSdk.modulemap */,
+				6662766E448BAAA8671FC363E4EAC67D /* SurveySparrowSdk-dummy.m */,
+				4D23A3CBE98042B90E9D9812D777DF4A /* SurveySparrowSdk-Info.plist */,
+				13CD0776B82B89E3FCAD63100AD9D0C2 /* SurveySparrowSdk-prefix.pch */,
+				0DB7D03F2182AF59B73C59F8D3AAE470 /* SurveySparrowSdk-umbrella.h */,
+				494C396AA8417A94AC03DBC45602125F /* SurveySparrowSdk.debug.xcconfig */,
+				D43075D3B22DED10CFC6ECF3A781BB09 /* SurveySparrowSdk.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/SurveySparrowSdk";
+			sourceTree = "<group>";
+		};
 		833D59EDD08634F982591645381EFDD0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -248,12 +227,34 @@
 			path = "Target Support Files/Pods-SimpleExampleTests";
 			sourceTree = "<group>";
 		};
+		A916115A2F6F8B7901DC9B1F8CFC535E /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				B09B4BED631BF9BC049A56A864857278 /* SurveySparrowSdk */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		B09B4BED631BF9BC049A56A864857278 /* SurveySparrowSdk */ = {
+			isa = PBXGroup;
+			children = (
+				8B559221162006208894DB8AA357B5C8 /* Sshelper.swift */,
+				DBBD081CB1CC50E5CF72499905DD366A /* SsSurveyDelegate.swift */,
+				9877EF6833EFD1C8384C98D37E273AB1 /* SsSurveyView.swift */,
+				CDA5540FD8AE8894329AB45B36CD603E /* SsSurveyViewController.swift */,
+				0F800F3D89ACDD8D0B07AFC0A1B33C66 /* SurveySparrow.swift */,
+				7F65195CF15DEF6E78F7D3527E5478C6 /* Support Files */,
+			);
+			name = SurveySparrowSdk;
+			path = SurveySparrowSdk;
+			sourceTree = "<group>";
+		};
 		CF1408CF629C7361332E53B88F7BD30C = {
 			isa = PBXGroup;
 			children = (
 				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
-				44DB1AC1A79093BAD436C5CD76992BBA /* Development Pods */,
 				D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */,
+				A916115A2F6F8B7901DC9B1F8CFC535E /* Pods */,
 				833D59EDD08634F982591645381EFDD0 /* Products */,
 				5CBBA4D3DA5BEB3570FDEAF169BA0A43 /* Targets Support Files */,
 			);
@@ -266,21 +267,6 @@
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
-		};
-		EB6A055D236860273340DD2636A3CD6B /* SurveySparrowSdk */ = {
-			isa = PBXGroup;
-			children = (
-				3D6D26F07E1D84199A575965A27413A2 /* Sshelper.swift */,
-				C38BD920178921E989AD70C704B6E6AC /* SsSurveyDelegate.swift */,
-				88C0FCE3934ACA59E713F78FB962081A /* SsSurveyView.swift */,
-				3CF4120071AB7262BCE917389E964214 /* SsSurveyViewController.swift */,
-				2F4BFB00A09716BBAAABF76E90C6721A /* SurveySparrow.swift */,
-				025621F7F339BE3FF32A0D8327473296 /* Pod */,
-				52CBF910D697C1C8B3B8EF60FCC51383 /* Support Files */,
-			);
-			name = SurveySparrowSdk;
-			path = "/Users/gokulkrishnaraju/Gk/SurveySparrow/surveysparrow-ios-sdk";
-			sourceTree = "<absolute>";
 		};
 /* End PBXGroup section */
 
@@ -350,7 +336,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				3830423C8C748DB850E759973528343D /* PBXTargetDependency */,
+				6FF72F183B860BE334451212C1AE6854 /* PBXTargetDependency */,
 			);
 			name = "Pods-SimpleExampleTests";
 			productName = Pods_SimpleExampleTests;
@@ -369,7 +355,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				B83C393C91E09C775DFFC2CD6189F5C4 /* PBXTargetDependency */,
+				6596629FB2FE501528F9A49C9B3C6D9D /* PBXTargetDependency */,
 			);
 			name = "Pods-SimpleExample-SimpleExampleUITests";
 			productName = Pods_SimpleExample_SimpleExampleUITests;
@@ -388,7 +374,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				FDD3D71B2B87234A3D3F32484F6FF765 /* PBXTargetDependency */,
+				07957776B7DBDFBBEB5C15132447BBE1 /* PBXTargetDependency */,
 			);
 			name = "Pods-SimpleExample";
 			productName = Pods_SimpleExample;
@@ -497,23 +483,23 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		3830423C8C748DB850E759973528343D /* PBXTargetDependency */ = {
+		07957776B7DBDFBBEB5C15132447BBE1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SurveySparrowSdk;
+			target = 065770EB33FF2DDC55A8A215225503E9 /* SurveySparrowSdk */;
+			targetProxy = 9BB838324E3BE2CAA2D51F4E0BF97D89 /* PBXContainerItemProxy */;
+		};
+		6596629FB2FE501528F9A49C9B3C6D9D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SurveySparrowSdk;
+			target = 065770EB33FF2DDC55A8A215225503E9 /* SurveySparrowSdk */;
+			targetProxy = 4315AB8B3AD957EC6C6BD9009BC457AB /* PBXContainerItemProxy */;
+		};
+		6FF72F183B860BE334451212C1AE6854 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "Pods-SimpleExample";
 			target = EAE0F8A4384601CDE45690312DEB287C /* Pods-SimpleExample */;
-			targetProxy = CEFE1A9E4E27C5E1061DEF4CB0A552FA /* PBXContainerItemProxy */;
-		};
-		B83C393C91E09C775DFFC2CD6189F5C4 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = SurveySparrowSdk;
-			target = 065770EB33FF2DDC55A8A215225503E9 /* SurveySparrowSdk */;
-			targetProxy = 5B755422378F40E3516757DD2B3CF307 /* PBXContainerItemProxy */;
-		};
-		FDD3D71B2B87234A3D3F32484F6FF765 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = SurveySparrowSdk;
-			target = 065770EB33FF2DDC55A8A215225503E9 /* SurveySparrowSdk */;
-			targetProxy = B2EA62FC13D057CFD71C55E5671FCFE1 /* PBXContainerItemProxy */;
+			targetProxy = 23936A3850FF2F8B5963D61024A02BBD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -798,7 +784,7 @@
 		};
 		7629CB2A96D0A3B395D45D73652B09EE /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 44934755B5C2899578CEB9F82194F04A /* SurveySparrowSdk.debug.xcconfig */;
+			baseConfigurationReference = 494C396AA8417A94AC03DBC45602125F /* SurveySparrowSdk.debug.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -832,7 +818,7 @@
 		};
 		A066437C0B3CE0C95B60BBF757263756 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 28D2639F9901997220E21D214BA14F6E /* SurveySparrowSdk.release.xcconfig */;
+			baseConfigurationReference = D43075D3B22DED10CFC6ECF3A781BB09 /* SurveySparrowSdk.release.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";

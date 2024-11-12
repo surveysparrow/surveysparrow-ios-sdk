@@ -6,7 +6,7 @@ target 'SimpleExample' do
   use_frameworks!
 
   # Pods for SimpleExample
-  pod 'SurveySparrowSdk', :git => 'https://github.com/surveysparrow/surveysparrow-ios-sdk.git', :tag => '0.5.1'
+  pod 'SurveySparrowSdk', :git => 'https://github.com/surveysparrow/surveysparrow-ios-sdk.git', :tag => '0.5.2'
 
   target 'SimpleExampleTests' do
     inherit! :search_paths
