@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "SurveySparrowSdk"
-  spec.version      = "0.5.2-beta.1"
+  spec.version      = "0.5.2"
   spec.summary      = "SurveySparrow Feedback SDK for iOS"
   spec.description  = "SurveySparrow iOS SDK enables you to collect feedback from your mobile app. Embed the Classic & Chat surveys in your iOS application seamlessly with few lines of code."
   spec.homepage     = "https://surveysparrow.com"
