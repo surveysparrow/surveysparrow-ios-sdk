@@ -618,7 +618,7 @@
 			repositoryURL = "https://github.com/surveysparrow/surveysparrow-ios-sdk.git";
 			requirement = {
 				kind = exactVersion;
-				version = 1.0.1;
+				version = 1.2.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
