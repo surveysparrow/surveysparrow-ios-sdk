@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="9Zk-km-WHL">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="9Zk-km-WHL">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -17,25 +17,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="4ge-gP-KT5">
-                                <rect key="frame" x="129" y="103" width="134.33333333333326" height="34.666666666666686"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Embed Survey"/>
-                                <connections>
-                                    <action selector="showEmbedSurvey:" destination="BYZ-38-t0r" eventType="touchUpInside" id="VKe-th-9Be"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j9z-xz-JfK">
-                                <rect key="frame" x="93" y="143" width="207" height="35"/>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j9z-xz-JfK">
+                                <rect key="frame" x="92" y="103" width="207" height="35"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="Show FullScreen Survey"/>
                                 <connections>
                                     <action selector="showFullScreenSurvey:" destination="BYZ-38-t0r" eventType="touchUpInside" id="hoZ-Ty-byy"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Zn-eW-XZg">
-                                <rect key="frame" x="33" y="177" width="326" height="35"/>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Zn-eW-XZg">
+                                <rect key="frame" x="32" y="137" width="326" height="35"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="Show FullScreen Survey With Validation"/>
                                 <connections>
@@ -46,6 +37,14 @@
                                 <rect key="frame" x="0.0" y="431" width="393" height="374"/>
                                 <color key="backgroundColor" systemColor="systemGray2Color"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QuF-Ph-24h">
+                                <rect key="frame" x="108" y="297" width="174" height="35"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="SpotCheckScreen 1"/>
+                                <connections>
+                                    <segue destination="vsj-vg-Bzc" kind="show" identifier="showSpotCheck" id="CeG-wQ-0fv"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uHc-kY-Afg">
                                 <rect key="frame" x="124" y="340" width="144" height="35"/>
                                 <state key="normal" title="Button"/>
@@ -54,39 +53,37 @@
                                     <action selector="showSpotCheck2:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ji8-10-QmU"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QuF-Ph-24h">
-                                <rect key="frame" x="115" y="297" width="162" height="35"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="SpotCheckScreen"/>
-                                <connections>
-                                    <segue destination="vsj-vg-Bzc" kind="show" identifier="showSpotCheck" id="CeG-wQ-0fv"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="jth-i7-Zwo" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="328" id="5fe-ec-rkq"/>
-                            <constraint firstItem="jth-i7-Zwo" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="7U0-Dw-lIC"/>
-                            <constraint firstItem="0Zn-eW-XZg" firstAttribute="top" secondItem="4ge-gP-KT5" secondAttribute="bottom" constant="39.329999999999998" id="A1i-oT-Jvk"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="QuF-Ph-24h" secondAttribute="trailing" constant="116" id="AwX-5r-y1Y"/>
-                            <constraint firstItem="QuF-Ph-24h" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="115" id="CBU-8h-9cf"/>
-                            <constraint firstItem="j9z-xz-JfK" firstAttribute="top" secondItem="4ge-gP-KT5" secondAttribute="bottom" constant="5.3300000000000001" id="EVe-8S-BbV"/>
-                            <constraint firstItem="uHc-kY-Afg" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="124" id="Fbt-lD-9ZA"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="0Zn-eW-XZg" secondAttribute="trailing" constant="34" id="Hdw-Ej-DGL"/>
-                            <constraint firstItem="uHc-kY-Afg" firstAttribute="top" secondItem="QuF-Ph-24h" secondAttribute="bottom" constant="8" symbolic="YES" id="SeK-pY-1Si"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="uHc-kY-Afg" secondAttribute="trailing" constant="125" id="Z1Q-KG-OXt"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="uHc-kY-Afg" secondAttribute="bottom" constant="443" id="bnB-tx-hmY"/>
-                            <constraint firstItem="j9z-xz-JfK" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="93" id="dRo-Ae-IOB"/>
-                            <constraint firstItem="jth-i7-Zwo" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="eko-Jh-Thk"/>
-                            <constraint firstItem="0Zn-eW-XZg" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="33" id="gM3-wE-IYP"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="j9z-xz-JfK" secondAttribute="trailing" constant="93" id="rUK-8E-IXi"/>
-                            <constraint firstItem="uHc-kY-Afg" firstAttribute="top" secondItem="QuF-Ph-24h" secondAttribute="bottom" constant="8" symbolic="YES" id="u9q-vQ-w1u"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="jth-i7-Zwo" secondAttribute="bottom" constant="13" id="yCT-nM-FAq"/>
+                            <constraint firstItem="jth-i7-Zwo" firstAttribute="top" secondItem="uHc-kY-Afg" secondAttribute="bottom" constant="56" id="7lv-mg-fQw"/>
+                            <constraint firstItem="QuF-Ph-24h" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="108" id="Fqg-sb-5bj"/>
+                            <constraint firstItem="j9z-xz-JfK" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="47" id="GbN-Wh-q3c"/>
+                            <constraint firstItem="jth-i7-Zwo" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="HYC-EP-x8L"/>
+                            <constraint firstItem="0Zn-eW-XZg" firstAttribute="top" secondItem="j9z-xz-JfK" secondAttribute="bottom" constant="20" id="ISx-r4-K2J"/>
+                            <constraint firstItem="jth-i7-Zwo" firstAttribute="centerX" secondItem="0Zn-eW-XZg" secondAttribute="centerX" id="Lqd-WJ-kBl"/>
+                            <constraint firstItem="uHc-kY-Afg" firstAttribute="top" secondItem="QuF-Ph-24h" secondAttribute="bottom" constant="8" id="MwV-gl-IlW"/>
+                            <constraint firstItem="jth-i7-Zwo" firstAttribute="centerX" secondItem="j9z-xz-JfK" secondAttribute="centerX" id="Rwt-Tg-X30"/>
+                            <constraint firstItem="uHc-kY-Afg" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="124" id="cfp-h4-Euz"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="QuF-Ph-24h" secondAttribute="trailing" constant="111" id="i0n-MW-Qdc"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="jth-i7-Zwo" secondAttribute="bottom" constant="13" id="lDW-W1-BE6"/>
+                            <constraint firstItem="jth-i7-Zwo" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="431" id="rLc-kV-i4W"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="uHc-kY-Afg" secondAttribute="trailing" constant="125" id="sLI-SL-cQ7"/>
+                            <constraint firstItem="jth-i7-Zwo" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="y3Y-0G-XDr"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="3sv-KA-BGv">
                         <nil key="title"/>
+                        <button key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="4ge-gP-KT5">
+                            <rect key="frame" x="129.33333333333331" y="4.6666666666666679" width="134.33333333333331" height="34.666666666666657"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Button"/>
+                            <buttonConfiguration key="configuration" style="plain" title="Embed Survey"/>
+                            <connections>
+                                <action selector="showEmbedSurvey:" destination="BYZ-38-t0r" eventType="touchUpInside" id="VKe-th-9Be"/>
+                            </connections>
+                        </button>
                     </navigationItem>
                     <connections>
                         <outlet property="ssSurveyView" destination="jth-i7-Zwo" id="eNA-Og-awZ"/>
