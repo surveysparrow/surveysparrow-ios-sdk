@@ -3,11 +3,10 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		702BB4EE2B7B970800B5C4AA /* SurveySparrowSdk in Frameworks */ = {isa = PBXBuildFile; productRef = 702BB4ED2B7B970800B5C4AA /* SurveySparrowSdk */; };
 		705369002B6A4FA8004ED2B7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705368FF2B6A4FA8004ED2B7 /* AppDelegate.swift */; };
 		705369022B6A4FA8004ED2B7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705369012B6A4FA8004ED2B7 /* SceneDelegate.swift */; };
 		705369042B6A4FA8004ED2B7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705369032B6A4FA8004ED2B7 /* ViewController.swift */; };
@@ -16,6 +15,7 @@
 		705369172B6A4FA9004ED2B7 /* StoryBoard_ExampleAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705369162B6A4FA9004ED2B7 /* StoryBoard_ExampleAppTests.swift */; };
 		705369212B6A4FA9004ED2B7 /* StoryBoard_ExampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705369202B6A4FA9004ED2B7 /* StoryBoard_ExampleAppUITests.swift */; };
 		705369232B6A4FA9004ED2B7 /* StoryBoard_ExampleAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705369222B6A4FA9004ED2B7 /* StoryBoard_ExampleAppUITestsLaunchTests.swift */; };
+		70FEB5172D08233C003B719B /* SurveySparrowSdk in Frameworks */ = {isa = PBXBuildFile; productRef = 70FEB5162D08233C003B719B /* SurveySparrowSdk */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,7 +55,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				702BB4EE2B7B970800B5C4AA /* SurveySparrowSdk in Frameworks */,
+				70FEB5172D08233C003B719B /* SurveySparrowSdk in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,7 +151,7 @@
 			);
 			name = "StoryBoard-ExampleApp";
 			packageProductDependencies = (
-				702BB4ED2B7B970800B5C4AA /* SurveySparrowSdk */,
+				70FEB5162D08233C003B719B /* SurveySparrowSdk */,
 			);
 			productName = "StoryBoard-ExampleApp";
 			productReference = 705368FC2B6A4FA8004ED2B7 /* StoryBoard-ExampleApp.app */;
@@ -226,7 +226,7 @@
 			);
 			mainGroup = 705368F32B6A4FA7004ED2B7;
 			packageReferences = (
-				702BB4EC2B7B970800B5C4AA /* XCRemoteSwiftPackageReference "surveysparrow-ios-sdk" */,
+				70FEB5152D08233C003B719B /* XCLocalSwiftPackageReference ".." */,
 			);
 			productRefGroup = 705368FD2B6A4FA8004ED2B7 /* Products */;
 			projectDirPath = "";
@@ -612,21 +612,16 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		702BB4EC2B7B970800B5C4AA /* XCRemoteSwiftPackageReference "surveysparrow-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/surveysparrow/surveysparrow-ios-sdk.git";
-			requirement = {
-				kind = exactVersion;
-				version = 1.2.0;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		70FEB5152D08233C003B719B /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
 		};
-/* End XCRemoteSwiftPackageReference section */
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		702BB4ED2B7B970800B5C4AA /* SurveySparrowSdk */ = {
+		70FEB5162D08233C003B719B /* SurveySparrowSdk */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 702BB4EC2B7B970800B5C4AA /* XCRemoteSwiftPackageReference "surveysparrow-ios-sdk" */;
 			productName = SurveySparrowSdk;
 		};
 /* End XCSwiftPackageProductDependency section */

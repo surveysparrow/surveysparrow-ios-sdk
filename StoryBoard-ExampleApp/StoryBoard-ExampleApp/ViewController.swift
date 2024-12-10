@@ -16,12 +16,10 @@ class ViewController: UIViewController, SsSurveyDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
-        spotCheck.TrackScreen(screen: "PaymentScreen")
         let hostingController = UIHostingController(rootView: spotCheck)
         self.hostingController = UIHostingController(rootView: spotCheck)
         hostingController.modalPresentationStyle = .overFullScreen
         hostingController.view.backgroundColor = UIColor.clear
-        present(hostingController, animated: true, completion: nil)
     }
 
     // Action to trigger SpotCheck navigation
@@ -89,12 +87,6 @@ class ViewController: UIViewController, SsSurveyDelegate {
     }
 }
 
-
-
-
-
-
-
 @available(iOS 15.0, *)
 struct SpotCheckView: View {
     var body: some View {
@@ -107,55 +99,50 @@ struct SpotCheckView: View {
 @available(iOS 16.0, *)
 class SpotCheckScreen: UIViewController {
     var hostingController: UIHostingController<Spotcheck>?
-
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
         spotCheck.TrackScreen(screen: "PaymentScreen")
-       
+        
         let hostingController = UIHostingController(rootView: spotCheck)
         self.hostingController = UIHostingController(rootView: spotCheck)
         hostingController.modalPresentationStyle = .overFullScreen
         hostingController.view.backgroundColor = UIColor.clear
         present(hostingController, animated: true, completion: nil)
     }
-
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-
+        
         // Force the hosting controller to update its layout
         hostingController?.view.setNeedsLayout()
         hostingController?.view.layoutIfNeeded()
     }
     
     
-
-        @IBAction func click(_ sender: Any) {
-            spotCheck.TrackEvent(onScreen: "PaymentScreen", event: ["MobileClick": []])
-            
-            let hostingController = UIHostingController(rootView: spotCheck)
-            self.hostingController = UIHostingController(rootView: spotCheck)
-            hostingController.modalPresentationStyle = .overFullScreen
-            hostingController.view.backgroundColor = UIColor.clear
-            present(hostingController, animated: true, completion: nil)
-        }
+    
+    @IBAction func click(_ sender: Any) {
+        spotCheck.TrackEvent(onScreen: "PaymentScreen", event: ["MobileClick": []])
         
+        let hostingController = UIHostingController(rootView: spotCheck)
+        self.hostingController = UIHostingController(rootView: spotCheck)
+        hostingController.modalPresentationStyle = .overFullScreen
+        hostingController.view.backgroundColor = UIColor.clear
+        present(hostingController, animated: true, completion: nil)
+    }
+    
 }
-
-
-
 
 
 @available(iOS 15.0, *)
 class PaymentScreen: UIViewController {
 
-    // Action to trigger payment tracking
     @IBAction func paymentDone(_ sender: UIButton) {
         spotCheck.TrackEvent(onScreen: "PaymentScreen", event: ["MobileClick": []])
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        // Track the PaymentScreen when it appears
         spotCheck.TrackScreen(screen: "PaymentScreen")
     }
     
