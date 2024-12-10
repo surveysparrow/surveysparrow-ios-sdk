@@ -8,9 +8,10 @@
 import SwiftUI
 import CoreLocation
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 public class SpotcheckState: ObservableObject {
     
+    @Published public var hostingController: UIHostingController<Spotcheck>?
     @Published public var isVisible = false
     @Published public var spotcheckPosition: String = "bottom"
     @Published public var spotcheckURL: String = ""

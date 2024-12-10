@@ -17,62 +17,141 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j9z-xz-JfK">
-                                <rect key="frame" x="93" y="106" width="207" height="35"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Ie-cH-3Yo">
+                                <rect key="frame" x="133" y="52" width="128" height="35"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Show FullScreen Survey"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Home Screen"/>
                                 <connections>
-                                    <action selector="showFullScreenSurvey:" destination="BYZ-38-t0r" eventType="touchUpInside" id="hoZ-Ty-byy"/>
+                                    <segue destination="2Fm-o7-cwh" kind="presentation" animates="NO" modalPresentationStyle="fullScreen" modalTransitionStyle="crossDissolve" id="nnh-X1-2FM"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Zn-eW-XZg">
-                                <rect key="frame" x="33.666666666666657" y="161" width="326" height="35"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9QF-FR-yGV">
+                                <rect key="frame" x="128" y="108" width="137" height="35"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Show FullScreen Survey With Validation"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Setting Screen"/>
                                 <connections>
-                                    <action selector="startSurvey:" destination="BYZ-38-t0r" eventType="touchUpInside" id="r6l-st-UbK"/>
+                                    <segue destination="fzA-Bt-U8s" kind="presentation" animates="NO" modalPresentationStyle="fullScreen" modalTransitionStyle="crossDissolve" id="fCD-zx-Ej5"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4ge-gP-KT5">
-                                <rect key="frame" x="129" y="219" width="135" height="35"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Embed Survey"/>
-                                <connections>
-                                    <action selector="showEmbedSurvey:" destination="BYZ-38-t0r" eventType="touchUpInside" id="VKe-th-9Be"/>
-                                </connections>
-                            </button>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jth-i7-Zwo" customClass="SsSurveyView" customModule="SurveySparrowSdk">
-                                <rect key="frame" x="0.0" y="431" width="393" height="374"/>
-                                <color key="backgroundColor" systemColor="systemGray2Color"/>
-                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="j9z-xz-JfK" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="47" id="GbN-Wh-q3c"/>
-                            <constraint firstItem="jth-i7-Zwo" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="HYC-EP-x8L"/>
-                            <constraint firstItem="0Zn-eW-XZg" firstAttribute="top" secondItem="j9z-xz-JfK" secondAttribute="bottom" constant="20" id="ISx-r4-K2J"/>
-                            <constraint firstItem="jth-i7-Zwo" firstAttribute="centerX" secondItem="0Zn-eW-XZg" secondAttribute="centerX" id="Lqd-WJ-kBl"/>
-                            <constraint firstItem="4ge-gP-KT5" firstAttribute="top" secondItem="0Zn-eW-XZg" secondAttribute="bottom" constant="23" id="Oet-Nl-KNw"/>
-                            <constraint firstItem="jth-i7-Zwo" firstAttribute="centerX" secondItem="4ge-gP-KT5" secondAttribute="centerX" id="Pmk-ia-mZf"/>
-                            <constraint firstItem="jth-i7-Zwo" firstAttribute="centerX" secondItem="j9z-xz-JfK" secondAttribute="centerX" id="Rwt-Tg-X30"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="jth-i7-Zwo" secondAttribute="bottom" constant="13" id="lDW-W1-BE6"/>
-                            <constraint firstItem="jth-i7-Zwo" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="431" id="rLc-kV-i4W"/>
-                            <constraint firstItem="jth-i7-Zwo" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="y3Y-0G-XDr"/>
+                            <constraint firstItem="9QF-FR-yGV" firstAttribute="top" secondItem="6Ie-cH-3Yo" secondAttribute="bottom" constant="21" id="7ZC-8Q-Jfw"/>
+                            <constraint firstItem="6Ie-cH-3Yo" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="133" id="R4m-n3-qjC"/>
+                            <constraint firstItem="9QF-FR-yGV" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="128" id="Utc-IT-ZjS"/>
+                            <constraint firstItem="6Ie-cH-3Yo" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="52" id="fnS-Ys-EoU"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="9QF-FR-yGV" secondAttribute="trailing" constant="128" id="fsG-dj-0pB"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="6Ie-cH-3Yo" secondAttribute="trailing" constant="132" id="uSs-ru-rVr"/>
                         </constraints>
                     </view>
-                    <connections>
-                        <outlet property="ssSurveyView" destination="jth-i7-Zwo" id="eNA-Og-awZ"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-324.4274809160305" y="-306.33802816901408"/>
+            <point key="canvasLocation" x="-311" y="-744"/>
+        </scene>
+        <!--Home Screen-->
+        <scene sceneID="hDD-NB-krE">
+            <objects>
+                <viewController id="2Fm-o7-cwh" customClass="HomeScreen" customModule="StoryBoard_ExampleApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Ix4-Qf-WDw">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="HOME SCREEN" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="z4N-UO-OBO">
+                                <rect key="frame" x="137" y="114" width="118" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uhv-bD-gel">
+                                <rect key="frame" x="0.0" y="53" width="393" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <items>
+                                    <navigationItem id="RKv-Zj-XiN">
+                                        <barButtonItem key="leftBarButtonItem" style="plain" id="3AO-NN-5jD">
+                                            <button key="customView" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="TlX-xL-Jou">
+                                                <rect key="frame" x="16" y="4.6666666666666679" width="87" height="35"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="gray" title="Back"/>
+                                                <connections>
+                                                    <segue destination="BYZ-38-t0r" kind="presentation" animates="NO" modalPresentationStyle="overFullScreen" modalTransitionStyle="crossDissolve" id="Qc4-3h-agl"/>
+                                                </connections>
+                                            </button>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                            </navigationBar>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="BPl-Cx-Las"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="z4N-UO-OBO" firstAttribute="top" secondItem="BPl-Cx-Las" secondAttribute="top" constant="114" id="1db-o9-oJm"/>
+                            <constraint firstItem="z4N-UO-OBO" firstAttribute="leading" secondItem="BPl-Cx-Las" secondAttribute="leading" constant="137" id="3qP-gk-K17"/>
+                            <constraint firstItem="BPl-Cx-Las" firstAttribute="trailing" secondItem="z4N-UO-OBO" secondAttribute="trailing" constant="138" id="gLh-Zu-tmI"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Nc1-AZ-jbM" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="604" y="-744"/>
+        </scene>
+        <!--Setting Screen-->
+        <scene sceneID="YTx-Cn-fk6">
+            <objects>
+                <viewController id="fzA-Bt-U8s" customClass="SettingScreen" customModule="StoryBoard_ExampleApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="DOe-Bd-Lpg">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="SETTING SCREEN" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FXZ-BJ-d2T">
+                                <rect key="frame" x="127" y="117" width="139" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QJN-3t-zfQ">
+                                <rect key="frame" x="0.0" y="53" width="393" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <items>
+                                    <navigationItem id="woO-Mw-183">
+                                        <barButtonItem key="leftBarButtonItem" style="plain" id="BOv-cj-d57">
+                                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="orx-0f-Vdr">
+                                                <rect key="frame" x="16" y="4.6666666666666679" width="87" height="35"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="gray" title="Back"/>
+                                                <connections>
+                                                    <segue destination="BYZ-38-t0r" kind="presentation" animates="NO" modalPresentationStyle="overFullScreen" modalTransitionStyle="crossDissolve" id="uQ6-ey-fpQ"/>
+                                                </connections>
+                                            </button>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                            </navigationBar>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="fdm-d2-u1A"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="FXZ-BJ-d2T" firstAttribute="top" secondItem="fdm-d2-u1A" secondAttribute="top" constant="117" id="KBx-kh-iFb"/>
+                            <constraint firstItem="fdm-d2-u1A" firstAttribute="trailing" secondItem="FXZ-BJ-d2T" secondAttribute="trailing" constant="127" id="QCf-2n-419"/>
+                            <constraint firstItem="FXZ-BJ-d2T" firstAttribute="leading" secondItem="fdm-d2-u1A" secondAttribute="leading" constant="127" id="uNa-Ki-z5I"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="TyO-uF-555"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7AQ-MX-O1E" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1305" y="-744"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="Qc4-3h-agl"/>
+    </inferredMetricsTieBreakers>
     <resources>
-        <systemColor name="systemGray2Color">
-            <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>
 </document>

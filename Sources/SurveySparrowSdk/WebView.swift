@@ -26,7 +26,7 @@ public struct WebView: View {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 struct WebViewRepresentable: UIViewRepresentable {
     let urlString: String
     let delegate: SsSurveyDelegate

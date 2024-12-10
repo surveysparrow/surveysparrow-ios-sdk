@@ -1,10 +1,12 @@
 import SwiftUI
+import UIKit
 
 @available(iOS 15.0, *)
 public struct Spotcheck: View {
     
     @ObservedObject var state: SpotcheckState
-    
+    public var hostingController: UIHostingController<Self>?
+
     public init(
                  domainName:String,
                  targetToken: String,
@@ -34,6 +36,20 @@ public struct Spotcheck: View {
             } else {
                 if valid {
                     DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
+                        guard let hostingController = hostingController else {
+                            print("Error: hostingController is nil")
+                            return
+                        }
+
+                        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                           let rootViewController = scene.windows.first?.rootViewController {
+                            hostingController.modalPresentationStyle = .overFullScreen
+                            hostingController.view.backgroundColor = UIColor.clear
+                            rootViewController.present(hostingController, animated: true, completion: nil)
+                        } else {
+                            print("Error: Root view controller not found")
+                        }
+
                         state.start()
                         print("TrackScreen Passed. Delay: \(state.afterDelay) Seconds")
                     }
@@ -41,9 +57,9 @@ public struct Spotcheck: View {
                     print("TrackScreen Failed")
                 }
             }
-            
         }
     }
+
     
     public func TrackEvent(onScreen screen: String, event: [String: Any]) {
         state.sendTrackEventRequest(screen: screen, event: event) { valid in

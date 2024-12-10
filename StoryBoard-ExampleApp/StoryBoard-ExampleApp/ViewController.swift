@@ -7,41 +7,87 @@
 
 import UIKit
 import SurveySparrowSdk
+import SwiftUI
 
+@available(iOS 15.0, *)
+var spotCheck: Spotcheck = {
+    let spotCheck = Spotcheck(
+        domainName: "gokulkrishnaraju1183.surveysparrow.com",
+        targetToken: "tar-fkwYzrxBCD4yBzdkFfCmVW",
+        userDetails: [:]
+    )
+    return spotCheck
+}()
+
+@available(iOS 15.0, *)
 class ViewController: UIViewController, SsSurveyDelegate {
+    var hostingController: UIHostingController<Spotcheck>?
 
-    var domain: String = "mobile-sdk.surveysparrow.com"
-    var token: String = "ntt-aMYx9J89WmrV46pvbGEJNz"
-    
-    @IBOutlet weak var ssSurveyView: SsSurveyView!
-   
-    @IBAction func showFullScreenSurvey(_ sender: UIButton) {
-        let ssSurveyViewController = SsSurveyViewController()
-        ssSurveyViewController.domain = domain
-        ssSurveyViewController.token = token
-        ssSurveyViewController.params = ["emailaddress":"email@email.com","email":"email@email.com"]
-        ssSurveyViewController.getSurveyLoadedResponse = true
-        ssSurveyViewController.surveyDelegate = self
-        present(ssSurveyViewController, animated: true, completion: nil)    }
-    
-    @IBAction func startSurvey(_ sender: UIButton) {
-        ssSurveyView.loadFullscreenSurvey(parent: self,delegate: self, domain:domain,
-        token:token, params:["emailaddress":"email@email.com","email":"email@email.com"])
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        // Only present the hostingController when the view has appeared
+        if hostingController == nil {
+            let hostingController = UIHostingController(rootView: spotCheck)
+            self.hostingController = hostingController
+            hostingController.modalPresentationStyle = .overFullScreen
+            hostingController.view.backgroundColor = UIColor.clear
+            spotCheck.hostingController = hostingController
+            
+            // Ensure presentation occurs when the view is ready
+            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let rootViewController = scene.windows.first?.rootViewController {
+                rootViewController.present(hostingController, animated: true, completion: {print("Presented")})
+                hostingController.dismiss(animated: true, completion: {print("Dismissed")})
+            } else {
+                print("Error: Root view controller not found")
+            }
+        }
     }
-    
-    @IBAction func showEmbedSurvey(_ sender: UIButton) {
-        ssSurveyView.loadEmbedSurvey(domain:domain,token:token, params:["emailaddress":"email@email.com","email":"email@email.com"])
-    }
-    
-    func handleSurveyResponse(response: [String : AnyObject]) {
+
+    func handleSurveyResponse(response: [String: AnyObject]) {
         print(response)
     }
     
-    func handleSurveyLoaded(response: [String : AnyObject]){
+    func handleSurveyLoaded(response: [String: AnyObject]) {
         print(response)
     }
     
-    func handleSurveyValidation(response: [String : AnyObject]) {
+    func handleSurveyValidation(response: [String: AnyObject]) {
         print(response)
+    }
+    
+    func handleCloseButtonTap() {
+        print("Close Button Tapped")
     }
 }
+
+
+@available(iOS 15.0, *)
+class HomeScreen: UIViewController {
+
+    @IBAction func homeScreenAction(_ sender: UIButton) {
+        spotCheck.TrackEvent(onScreen: "HomeScreen", event: ["HomeScreenAction": []])
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        spotCheck.TrackScreen(screen: "HomeScreen")
+    }
+    
+}
+
+@available(iOS 15.0, *)
+class SettingScreen: UIViewController {
+
+    @IBAction func settingScreenAction(_ sender: UIButton) {
+        spotCheck.TrackEvent(onScreen: "SettingScreen", event: ["SettingScreenAction": []])
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        spotCheck.TrackScreen(screen: "SettingScreen")
+    }
+    
+}
+
