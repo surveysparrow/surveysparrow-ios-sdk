@@ -29,6 +29,14 @@ public struct Spotcheck: View {
                 if valid {
                     print("MultiShow Passed")
                 } else {
+                    //Storyboard Implementation
+                    DispatchQueue.main.async {
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                        let keyWindow = windowScene.windows.first(where: { $0.isKeyWindow }),
+                        let presentingViewController = keyWindow.rootViewController?.presentedViewController {
+                            presentingViewController.dismiss(animated: true, completion: nil)
+                        }
+                    }
                     print("TrackScreen Failed")
                 }
             } else {
@@ -38,6 +46,14 @@ public struct Spotcheck: View {
                         print("TrackScreen Passed. Delay: \(state.afterDelay) Seconds")
                     }
                 } else {
+                    //Storyboard Implementation
+                    DispatchQueue.main.async {
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                        let keyWindow = windowScene.windows.first(where: { $0.isKeyWindow }),
+                        let presentingViewController = keyWindow.rootViewController?.presentedViewController {
+                            presentingViewController.dismiss(animated: true, completion: nil)
+                        }
+                    }
                     print("TrackScreen Failed")
                 }
             }
@@ -53,6 +69,14 @@ public struct Spotcheck: View {
                     print("TrackEvent Passed. Delay: \(state.afterDelay) Seconds")
                 }
             } else {
+                //Storyboard Implementation
+                    DispatchQueue.main.async {
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                        let keyWindow = windowScene.windows.first(where: { $0.isKeyWindow }),
+                        let presentingViewController = keyWindow.rootViewController?.presentedViewController {
+                            presentingViewController.dismiss(animated: true, completion: nil)
+                        }
+                    }
                 print("TrackEvent Failed")
             }
         }
@@ -139,6 +163,14 @@ struct WebViewContainer: View, SsSurveyDelegate {
     }
     
     public func handleSurveyResponse(response: [String : AnyObject]) {
+        //Storyboard Implementation
+                    DispatchQueue.main.async {
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                        let keyWindow = windowScene.windows.first(where: { $0.isKeyWindow }),
+                        let presentingViewController = keyWindow.rootViewController?.presentedViewController {
+                            presentingViewController.dismiss(animated: true, completion: nil)
+                        }
+                    }
         print("Submit Response",response)
     }
     

@@ -525,6 +525,14 @@ public class SpotcheckState: ObservableObject {
             do {
                 let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
                 if(((json?["success"]) != nil) == true){
+                    //Storyboard Implementation
+                    DispatchQueue.main.async {
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                        let keyWindow = windowScene.windows.first(where: { $0.isKeyWindow }),
+                        let presentingViewController = keyWindow.rootViewController?.presentedViewController {
+                            presentingViewController.dismiss(animated: true, completion: nil)
+                        }
+                    }
                     print("SpotCheck Closed")
                 }
             }catch {

@@ -1,36 +1,40 @@
 //
-//  ViewController.swift
+//  TabViewController.swift
 //  StoryBoard-ExampleApp
 //
-//  Created by Gokulkrishna raju on 31/01/24.
+//  Created by Gokulkrishna Raju on 11/12/24.
 //
+
+import Foundation
+
 
 import UIKit
 import SurveySparrowSdk
 import SwiftUI
 
 @available(iOS 15.0, *)
-var spotCheck = Spotcheck(
+var tabSpotCheck = Spotcheck(
     domainName: "gokulkrishnaraju1183.surveysparrow.com",
     targetToken: "tar-fkwYzrxBCD4yBzdkFfCmVW",
     userDetails: [:]
 )
 
 @available(iOS 15.0, *)
-class ViewController: UIViewController {}
+class TabViewController: UIViewController {}
 
 
 @available(iOS 15.0, *)
-class HomeScreen: UIViewController {
+class TabHomeScreen: UIViewController {
     
     var hostingController: UIHostingController<Spotcheck>?
     
     override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(true)
-        spotCheck.TrackScreen(screen: "PaymentScreen")
+        super.viewDidAppear(animated)
+        tabSpotCheck.TrackScreen(screen: "TabHomeScreen")
+        print("TrackScreen-TabHomeScreen")
         
-        let hostingController = UIHostingController(rootView: spotCheck)
-        self.hostingController = UIHostingController(rootView: spotCheck)
+        let hostingController = UIHostingController(rootView: tabSpotCheck)
+        self.hostingController = UIHostingController(rootView: tabSpotCheck)
         hostingController.modalPresentationStyle = .overFullScreen
         hostingController.view.backgroundColor = UIColor.clear
         present(hostingController, animated: true, completion: nil)
@@ -38,10 +42,10 @@ class HomeScreen: UIViewController {
     
     
     @IBAction func Click(_ sender: UIButton) {
-        spotCheck.TrackEvent(onScreen: "PaymentScreen", event: ["MobileClick": []])
+        tabSpotCheck.TrackEvent(onScreen: "TabHomeScreen", event: ["TabHomeScreenAction": []])
         
-        let hostingController = UIHostingController(rootView: spotCheck)
-        self.hostingController = UIHostingController(rootView: spotCheck)
+        let hostingController = UIHostingController(rootView: tabSpotCheck)
+        self.hostingController = UIHostingController(rootView: tabSpotCheck)
         hostingController.modalPresentationStyle = .overFullScreen
         hostingController.view.backgroundColor = UIColor.clear
         present(hostingController, animated: true, completion: nil)
@@ -50,15 +54,15 @@ class HomeScreen: UIViewController {
 }
 
 @available(iOS 15.0, *)
-class SettingScreen: UIViewController {
+class TabSettingScreen: UIViewController {
     
     var hostingController: UIHostingController<Spotcheck>?
-    
+
     @IBAction func settingScreenAction(_ sender: UIButton) {
-        spotCheck.TrackEvent(onScreen: "SettingScreen", event: ["SettingScreenAction": []])
+        tabSpotCheck.TrackEvent(onScreen: "TabSettingScreen", event: ["TabSettingScreenAction": []])
         
-        let hostingController = UIHostingController(rootView: spotCheck)
-        self.hostingController = UIHostingController(rootView: spotCheck)
+        let hostingController = UIHostingController(rootView: tabSpotCheck)
+        self.hostingController = UIHostingController(rootView: tabSpotCheck)
         hostingController.modalPresentationStyle = .overFullScreen
         hostingController.view.backgroundColor = UIColor.clear
         present(hostingController, animated: true, completion: nil)
@@ -66,10 +70,10 @@ class SettingScreen: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        spotCheck.TrackScreen(screen: "SettingScreen")
+        tabSpotCheck.TrackScreen(screen: "TabSettingScreen")
         
-        let hostingController = UIHostingController(rootView: spotCheck)
-        self.hostingController = UIHostingController(rootView: spotCheck)
+        let hostingController = UIHostingController(rootView: tabSpotCheck)
+        self.hostingController = UIHostingController(rootView: tabSpotCheck)
         hostingController.modalPresentationStyle = .overFullScreen
         hostingController.view.backgroundColor = UIColor.clear
         present(hostingController, animated: true, completion: nil)
