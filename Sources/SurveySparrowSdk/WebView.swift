@@ -64,7 +64,6 @@ struct WebViewRepresentable: UIViewRepresentable {
 
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         
-        private var surveyLoaded: String = "surveyLoadStarted"
         private var surveyCompleted: String = "surveyCompleted"
         private var spotCheckData: String = "spotCheckData"
         private var closeModel: String = "closeModal"
@@ -73,25 +72,17 @@ struct WebViewRepresentable: UIViewRepresentable {
             if self.parent.delegate != nil {
                 let response = message.body as! [String: AnyObject]
                 let responseType = response["type"] as! String
-                if responseType == surveyLoaded {
-                    if self.parent.delegate != nil {
-                        self.parent.delegate.handleSurveyLoaded(response: response)
-                    }
-                } else if responseType == surveyCompleted {
-                    if self.parent.delegate != nil {
-                        self.parent.state.end()
-                        self.parent.delegate.handleSurveyResponse(response: response)
-                    }
+                if responseType == surveyCompleted {
+                    self.parent.state.end()
+                    self.parent.delegate.handleSurveyResponse(response: response)
                 } else if responseType == spotCheckData {
-                    if self.parent.delegate != nil {
-                        if let currentQuestionSize = response["data"]?["currentQuestionSize"] as? [String: Any],
-                           let height = currentQuestionSize["height"] as? Double {
-                            self.parent.state.currentQuestionHeight = height
-                        }
+                    self.parent.delegate.handleSurveyLoaded(response: [:])
+                    if let currentQuestionSize = response["data"]?["currentQuestionSize"] as? [String: Any],
+                       let height = currentQuestionSize["height"] as? Double {
+                        self.parent.state.currentQuestionHeight = height
                     }
                 }
             }
-
         }
         
         var parent: WebViewRepresentable

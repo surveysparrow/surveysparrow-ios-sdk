@@ -11,9 +11,11 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 var spotCheck = Spotcheck(
-    domainName: "gokulkrishnaraju1183.surveysparrow.com",
-    targetToken: "tar-fkwYzrxBCD4yBzdkFfCmVW",
-    userDetails: [:]
+    domainName: "",
+    targetToken: "",
+    userDetails: [:],
+    surveyDelegate: SsDelegate(),
+    isUIKitApp: true
 )
 
 @available(iOS 15.0, *)
@@ -23,30 +25,31 @@ class ViewController: UIViewController {}
 @available(iOS 15.0, *)
 class HomeScreen: UIViewController {
     
-    var hostingController: UIHostingController<Spotcheck>?
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
-        spotCheck.TrackScreen(screen: "PaymentScreen")
         
-        let hostingController = UIHostingController(rootView: spotCheck)
-        self.hostingController = UIHostingController(rootView: spotCheck)
-        hostingController.modalPresentationStyle = .overFullScreen
-        hostingController.view.backgroundColor = UIColor.clear
-        present(hostingController, animated: true, completion: nil)
+        spotCheck.TrackScreen(screen: "PaymentScreen") {
+            trackScreenPassed in
+            if trackScreenPassed {
+                let hostingController = UIHostingController(rootView: spotCheck)
+                hostingController.modalPresentationStyle = .overFullScreen
+                hostingController.view.backgroundColor = UIColor.clear
+                self.present(hostingController, animated: true, completion: {})
+            }
+        }
     }
-    
     
     @IBAction func Click(_ sender: UIButton) {
-        spotCheck.TrackEvent(onScreen: "PaymentScreen", event: ["MobileClick": []])
-        
-        let hostingController = UIHostingController(rootView: spotCheck)
-        self.hostingController = UIHostingController(rootView: spotCheck)
-        hostingController.modalPresentationStyle = .overFullScreen
-        hostingController.view.backgroundColor = UIColor.clear
-        present(hostingController, animated: true, completion: nil)
+        spotCheck.TrackEvent(onScreen: "PaymentScreen", event: ["MobileClick": []]){
+            trackScreenPassed in
+            if trackScreenPassed {
+                let hostingController = UIHostingController(rootView: spotCheck)
+                hostingController.modalPresentationStyle = .overFullScreen
+                hostingController.view.backgroundColor = UIColor.clear
+                self.present(hostingController, animated: true, completion: {})
+            }
+        }
     }
-    
 }
 
 @available(iOS 15.0, *)
@@ -55,24 +58,41 @@ class SettingScreen: UIViewController {
     var hostingController: UIHostingController<Spotcheck>?
     
     @IBAction func settingScreenAction(_ sender: UIButton) {
-        spotCheck.TrackEvent(onScreen: "SettingScreen", event: ["SettingScreenAction": []])
-        
-        let hostingController = UIHostingController(rootView: spotCheck)
-        self.hostingController = UIHostingController(rootView: spotCheck)
-        hostingController.modalPresentationStyle = .overFullScreen
-        hostingController.view.backgroundColor = UIColor.clear
-        present(hostingController, animated: true, completion: nil)
+        spotCheck.TrackEvent(onScreen: "SettingScreen", event: ["SettingScreenAction": []]){
+            trackScreenPassed in
+            if trackScreenPassed {
+                let hostingController = UIHostingController(rootView: spotCheck)
+                hostingController.modalPresentationStyle = .overFullScreen
+                hostingController.view.backgroundColor = UIColor.clear
+                self.present(hostingController, animated: true, completion: {})
+            }
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        spotCheck.TrackScreen(screen: "SettingScreen")
-        
-        let hostingController = UIHostingController(rootView: spotCheck)
-        self.hostingController = UIHostingController(rootView: spotCheck)
-        hostingController.modalPresentationStyle = .overFullScreen
-        hostingController.view.backgroundColor = UIColor.clear
-        present(hostingController, animated: true, completion: nil)
+        spotCheck.TrackScreen(screen: "SettingScreen"){
+            trackScreenPassed in
+            if trackScreenPassed {
+                let hostingController = UIHostingController(rootView: spotCheck)
+                hostingController.modalPresentationStyle = .overFullScreen
+                hostingController.view.backgroundColor = UIColor.clear
+                self.present(hostingController, animated: true, completion: {})
+            }
+        }
     }
     
+}
+
+@available(iOS 15.0, *)
+class SsDelegate: UIViewController, SsSurveyDelegate {
+    func handleSurveyResponse(response: [String : AnyObject]) {}
+    
+    func handleSurveyLoaded(response: [String : AnyObject]) {
+        print("handleSurveyLoaded handleSurveyLoaded")
+    }
+    
+    func handleSurveyValidation(response: [String : AnyObject]) {}
+    
+    func handleCloseButtonTap() {}
 }
