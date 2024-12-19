@@ -14,8 +14,8 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 var tabSpotCheck = Spotcheck(
-    domainName: "gokulkrishnaraju1183.surveysparrow.com",
-    targetToken: "tar-fkwYzrxBCD4yBzdkFfCmVW",
+    domainName: "",
+    targetToken: "",
     userDetails: [:],
     surveyDelegate: SsDelegate(),
     isUIKitApp: true
@@ -33,7 +33,7 @@ class TabHomeScreen: UIViewController {
         tabSpotCheck.TrackScreen(screen: "TabHomeScreen"){
             trackScreenPassed in
             if trackScreenPassed {
-                let hostingController = UIHostingController(rootView: spotCheck)
+                let hostingController = UIHostingController(rootView: tabSpotCheck)
                 hostingController.modalPresentationStyle = .overFullScreen
                 hostingController.view.backgroundColor = UIColor.clear
                 self.present(hostingController, animated: true, completion: {})
@@ -47,7 +47,7 @@ class TabHomeScreen: UIViewController {
         tabSpotCheck.TrackEvent(onScreen: "TabHomeScreen", event: ["TabHomeScreenAction": []]){
             trackScreenPassed in
             if trackScreenPassed {
-                let hostingController = UIHostingController(rootView: spotCheck)
+                let hostingController = UIHostingController(rootView: tabSpotCheck)
                 hostingController.modalPresentationStyle = .overFullScreen
                 hostingController.view.backgroundColor = UIColor.clear
                 self.present(hostingController, animated: true, completion: {})
@@ -64,7 +64,7 @@ class TabSettingScreen: UIViewController {
         tabSpotCheck.TrackEvent(onScreen: "TabSettingScreen", event: ["TabSettingScreenAction": []]){
             trackScreenPassed in
             if trackScreenPassed {
-                let hostingController = UIHostingController(rootView: spotCheck)
+                let hostingController = UIHostingController(rootView: tabSpotCheck)
                 hostingController.modalPresentationStyle = .overFullScreen
                 hostingController.view.backgroundColor = UIColor.clear
                 self.present(hostingController, animated: true, completion: {})
@@ -77,7 +77,7 @@ class TabSettingScreen: UIViewController {
         tabSpotCheck.TrackScreen(screen: "TabSettingScreen"){
             trackScreenPassed in
             if trackScreenPassed {
-                let hostingController = UIHostingController(rootView: spotCheck)
+                let hostingController = UIHostingController(rootView: tabSpotCheck)
                 hostingController.modalPresentationStyle = .overFullScreen
                 hostingController.view.backgroundColor = UIColor.clear
                 self.present(hostingController, animated: true, completion: {})
