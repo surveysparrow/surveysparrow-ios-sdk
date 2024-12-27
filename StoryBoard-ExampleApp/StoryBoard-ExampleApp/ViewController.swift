@@ -88,9 +88,7 @@ class SettingScreen: UIViewController {
 class SsDelegate: UIViewController, SsSurveyDelegate {
     func handleSurveyResponse(response: [String : AnyObject]) {}
     
-    func handleSurveyLoaded(response: [String : AnyObject]) {
-        print("handleSurveyLoaded handleSurveyLoaded")
-    }
+    func handleSurveyLoaded(response: [String : AnyObject]) {}
     
     func handleSurveyValidation(response: [String : AnyObject]) {}
     
