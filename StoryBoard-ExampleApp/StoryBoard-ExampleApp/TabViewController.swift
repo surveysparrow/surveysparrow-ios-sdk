@@ -1,16 +1,19 @@
 //
-//  ViewController.swift
+//  TabViewController.swift
 //  StoryBoard-ExampleApp
 //
-//  Created by Gokulkrishna raju on 31/01/24.
+//  Created by Gokulkrishna Raju on 11/12/24.
 //
+
+import Foundation
+
 
 import UIKit
 import SurveySparrowSdk
 import SwiftUI
 
 @available(iOS 15.0, *)
-var spotCheck = Spotcheck(
+var tabSpotCheck = Spotcheck(
     domainName: "",
     targetToken: "",
     userDetails: [:],
@@ -19,19 +22,18 @@ var spotCheck = Spotcheck(
 )
 
 @available(iOS 15.0, *)
-class ViewController: UIViewController {}
+class TabViewController: UIViewController {}
 
 
 @available(iOS 15.0, *)
-class HomeScreen: UIViewController {
+class TabHomeScreen: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(true)
-        
-        spotCheck.TrackScreen(screen: "PaymentScreen") {
+        super.viewDidAppear(animated)
+        tabSpotCheck.TrackScreen(screen: "TabHomeScreen"){
             trackScreenPassed in
             if trackScreenPassed {
-                let hostingController = UIHostingController(rootView: spotCheck)
+                let hostingController = UIHostingController(rootView: tabSpotCheck)
                 hostingController.modalPresentationStyle = .overFullScreen
                 hostingController.view.backgroundColor = UIColor.clear
                 self.present(hostingController, animated: true, completion: {})
@@ -39,29 +41,30 @@ class HomeScreen: UIViewController {
         }
     }
     
+    
     @IBAction func Click(_ sender: UIButton) {
-        spotCheck.TrackEvent(onScreen: "PaymentScreen", event: ["MobileClick": []]){
+        
+        tabSpotCheck.TrackEvent(onScreen: "TabHomeScreen", event: ["TabHomeScreenAction": []]){
             trackScreenPassed in
             if trackScreenPassed {
-                let hostingController = UIHostingController(rootView: spotCheck)
+                let hostingController = UIHostingController(rootView: tabSpotCheck)
                 hostingController.modalPresentationStyle = .overFullScreen
                 hostingController.view.backgroundColor = UIColor.clear
                 self.present(hostingController, animated: true, completion: {})
             }
         }
     }
+    
 }
 
 @available(iOS 15.0, *)
-class SettingScreen: UIViewController {
-    
-    var hostingController: UIHostingController<Spotcheck>?
+class TabSettingScreen: UIViewController {
     
     @IBAction func settingScreenAction(_ sender: UIButton) {
-        spotCheck.TrackEvent(onScreen: "SettingScreen", event: ["SettingScreenAction": []]){
+        tabSpotCheck.TrackEvent(onScreen: "TabSettingScreen", event: ["TabSettingScreenAction": []]){
             trackScreenPassed in
             if trackScreenPassed {
-                let hostingController = UIHostingController(rootView: spotCheck)
+                let hostingController = UIHostingController(rootView: tabSpotCheck)
                 hostingController.modalPresentationStyle = .overFullScreen
                 hostingController.view.backgroundColor = UIColor.clear
                 self.present(hostingController, animated: true, completion: {})
@@ -71,10 +74,10 @@ class SettingScreen: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        spotCheck.TrackScreen(screen: "SettingScreen"){
+        tabSpotCheck.TrackScreen(screen: "TabSettingScreen"){
             trackScreenPassed in
             if trackScreenPassed {
-                let hostingController = UIHostingController(rootView: spotCheck)
+                let hostingController = UIHostingController(rootView: tabSpotCheck)
                 hostingController.modalPresentationStyle = .overFullScreen
                 hostingController.view.backgroundColor = UIColor.clear
                 self.present(hostingController, animated: true, completion: {})
@@ -82,15 +85,4 @@ class SettingScreen: UIViewController {
         }
     }
     
-}
-
-@available(iOS 15.0, *)
-class SsDelegate: UIViewController, SsSurveyDelegate {
-    func handleSurveyResponse(response: [String : AnyObject]) {}
-    
-    func handleSurveyLoaded(response: [String : AnyObject]) {}
-    
-    func handleSurveyValidation(response: [String : AnyObject]) {}
-    
-    func handleCloseButtonTap() {}
 }

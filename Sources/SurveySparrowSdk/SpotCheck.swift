@@ -11,7 +11,9 @@ public struct Spotcheck: View {
                  userDetails: [String: Any] = [:],
                  variables: [String: Any] = [:],
                  customProperties: [String: Any] = [:],
-                 sparrowLang: String = ""
+                 sparrowLang: String = "",
+                 surveyDelegate: SsSurveyDelegate = ssSurveyDelegate(),
+                 isUIKitApp: Bool = false
     ) {
         self.state = SpotcheckState(
             targetToken: targetToken,
@@ -19,41 +21,47 @@ public struct Spotcheck: View {
             userDetails: userDetails,
             variables: variables,
             customProperties: customProperties,
-            sparrowLang: sparrowLang
+            sparrowLang: sparrowLang,
+            surveyDelegate: surveyDelegate,
+            isUIKitApp: isUIKitApp
         )
     }
     
-    public func TrackScreen(screen: String) {
+    public func TrackScreen(screen: String, completion: @escaping (Bool) -> Void) {
         state.sendTrackScreenRequest(screen: screen) { valid, multiShow in
             if multiShow {
                 if valid {
                     print("MultiShow Passed")
                 } else {
                     print("TrackScreen Failed")
+                    completion(false)
                 }
             } else {
                 if valid {
                     DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
                         state.start()
                         print("TrackScreen Passed. Delay: \(state.afterDelay) Seconds")
+                        completion(true)
                     }
                 } else {
                     print("TrackScreen Failed")
+                    completion(false)
                 }
             }
-            
         }
     }
     
-    public func TrackEvent(onScreen screen: String, event: [String: Any]) {
+    public func TrackEvent(onScreen screen: String, event: [String: Any], completion: @escaping (Bool) -> Void) {
         state.sendTrackEventRequest(screen: screen, event: event) { valid in
             if valid {
                 DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
                     state.start()
                     print("TrackEvent Passed. Delay: \(state.afterDelay) Seconds")
+                    completion(true)
                 }
             } else {
                 print("TrackEvent Failed")
+                completion(false)
             }
         }
     }
@@ -99,7 +107,7 @@ public struct Spotcheck: View {
 }
 
 @available(iOS 15.0, *)
-struct WebViewContainer: View, SsSurveyDelegate {
+struct WebViewContainer: View {
     var state: SpotcheckState
     
     init(state: SpotcheckState) {
@@ -108,7 +116,7 @@ struct WebViewContainer: View, SsSurveyDelegate {
     
     var body: some View {
         GeometryReader { geometry in
-            WebView(delegate: self, state: state)
+            WebView(delegate: state.surveyDelegate , state: state)
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .fixedSize(horizontal: true, vertical: false)
                 .clipShape(RoundedRectangle(cornerRadius: 0))
@@ -132,22 +140,6 @@ struct WebViewContainer: View, SsSurveyDelegate {
                     }
                 }
         }
-    }
-    
-    public func handleCloseButtonTap() {
-        print("CloseButton Tapped")
-    }
-    
-    public func handleSurveyResponse(response: [String : AnyObject]) {
-        print("Submit Response",response)
-    }
-    
-    public func handleSurveyLoaded(response: [String : AnyObject]) {
-        print("Survey Loaded", response)
-    }
-    
-    public func handleSurveyValidation(response: [String : AnyObject]) {
-        print(response)
     }
 }
 
@@ -209,5 +201,26 @@ struct Loader: View {
                 }
         }
         .frame(width: 60.0, height: 60.0)
+    }
+}
+
+public class ssSurveyDelegate: SsSurveyDelegate {
+    
+    public init() {}
+    
+    public func handleSurveyResponse(response: [String : AnyObject]) {
+        print("handleSurveyResponse", response)
+    }
+    
+    public func handleSurveyLoaded(response: [String : AnyObject]) {
+        print("handleSurveyLoaded", response)
+    }
+    
+    public func handleSurveyValidation(response: [String : AnyObject]) {
+        print("handleSurveyValidation", response)
+    }
+    
+    public func handleCloseButtonTap() {
+        print("CloseButtonTapped")
     }
 }
