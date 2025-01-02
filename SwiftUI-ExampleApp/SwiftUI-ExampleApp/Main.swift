@@ -17,7 +17,8 @@ var spotCheck = Spotcheck(
     domainName: "",
     targetToken: "",
     userDetails: [:],
-    sparrowLang: ""
+    sparrowLang: "",
+    surveyDelegate: SsDelegate()
 )
 
 @main
@@ -109,4 +110,15 @@ struct CustomTextField: View {
             .disableAutocorrection(true)
             .padding(.horizontal)
     }
+}
+
+@available(iOS 15.0, *)
+class SsDelegate: UIViewController, SsSurveyDelegate {
+    func handleSurveyResponse(response: [String : AnyObject]) {}
+
+    func handleSurveyLoaded(response: [String : AnyObject]) {}
+
+    func handleSurveyValidation(response: [String : AnyObject]) {}
+
+    func handleCloseButtonTap() {}
 }

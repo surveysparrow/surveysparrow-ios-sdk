@@ -24,7 +24,8 @@ public class SpotcheckState: ObservableObject {
     @Published public var triggerToken: String = ""
     @Published public var closeButtonStyle: [String: String] = [:]
     @Published public var isCloseButtonEnabled: Bool = false
-    
+    @Published public var surveyDelegate: SsSurveyDelegate
+
     @Published private var isSpotPassed: Bool = false
     @Published private var isChecksPassed: Bool = false
     @Published private var customEventsSpotChecks: [[String: Any]] = []
@@ -38,13 +39,14 @@ public class SpotcheckState: ObservableObject {
     var sparrowLang: String = ""
     let defaults = UserDefaults.standard
     
-    public init(targetToken:String, domainName: String, userDetails: [String: Any], variables: [String: Any], customProperties: [String: Any], sparrowLang: String) {
+    public init(targetToken:String, domainName: String, userDetails: [String: Any], variables: [String: Any], customProperties: [String: Any], sparrowLang: String, surveyDelegate: SsSurveyDelegate) {
         self.targetToken = targetToken
         self.domainName = domainName
         self.userDetails = userDetails
         self.variables = variables
         self.customProperties = customProperties
         self.sparrowLang = sparrowLang
+        self.surveyDelegate = surveyDelegate
         if self.traceId.isEmpty {
             self.traceId = generateTraceId()
             if defaults.string(forKey: "SurveySparrowUUID") == nil {
