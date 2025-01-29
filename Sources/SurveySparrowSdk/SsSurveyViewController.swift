@@ -9,6 +9,7 @@
 #if canImport(UIKit)
 import UIKit
 
+@available(iOS 13.0, *)
 @IBDesignable
 public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
     // MARK: Properties
@@ -21,6 +22,7 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
     
     @IBInspectable public var domain: String?
     @IBInspectable public var token: String?
+    @IBInspectable public var properties: [String: Any] = [:]
     @IBInspectable public var thankyouTimeout: Double = 3.0
     
     // MARK: Initialize
@@ -29,10 +31,9 @@ public class SsSurveyViewController: UIViewController, SsSurveyDelegate {
         
         view.backgroundColor = view.backgroundColor == nil ? .white : view.backgroundColor
         if domain != nil && token != nil {
-            let ssSurveyView = SsSurveyView()
+            let ssSurveyView = SsSurveyView(properties: properties)
             ssSurveyView.surveyDelegate = self
             ssSurveyView.params = params
-            SsSurveyView.widgetContactId = widgetContactId
             ssSurveyView.getSurveyLoadedResponse = getSurveyLoadedResponse
             
             ssSurveyView.frame = view.bounds

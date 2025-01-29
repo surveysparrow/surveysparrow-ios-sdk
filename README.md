@@ -1,10 +1,33 @@
-# Survey Sparrow iOS SDK
+# SurveySparrow
+
+SurveySparrow provides various SDKs and maintaining these under different version series.
+
+| SDK                                | Latest Version | Branch 
+|------------------------------------|---------------|---------------------------------|
+| SpotChecks for UIKit Apps         | [v3.0.0](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/3.0.0) | [spotchecks-for-uikit-app](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/spotchecks-for-uikit-app) |  |
+| SpotChecks for SwiftUI Apps       | [v1.2.1](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/1.2.1) | [master]() |  |
+| SurveySparrow iOS SDK for UIKit Apps | [v0.5.2](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/0.5.2) | [framework-master](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/framework-master) |  |
+| SurveySparrow iOS SDK for SwiftUI Apps | [v1.0.7](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/1.0.7) | [master]() |  |
+
+
+## Survey Sparrow iOS SDK
 
 [SurveySparrow](https://surveysparrow.com) iOS SDK enables you to collect feedback from your mobile app. Embed the Classic, Chat & NPS surveys in your iOS application seamlessly with few lines of code.
 
-> Mobile SDK share channel is only available from SurveySparrow **Premium** plan onwards.
+<br>
+<br>
 
-## Features
+## SpotChecks
+
+### SpotCheck Documentation is available here
+### [SpotCheck-iOS-Docs](https://surveysparrow.gitbook.io/spotchecks/how-to-use-spotchecks/mobile-spotcheck/ios)
+
+<br>
+<br>
+
+## Full Screen & Embedded Surveys
+
+### Features
 1. Integration with both [SwiftUI](#swiftui-interface) & [StoryBoard](#storyboard-interface) Interface
 2. [Full-screen feedback whenever & wherever you want.](#Full-screen-Surveys)
 3. [Integrate the feedback experience anywhere in your app.](#Embed-survey)
@@ -19,9 +42,9 @@
 
 <br>
 
-## SDK integration
+### SDK integration
 
-### Add SurveySparrowSdk Package
+#### Add SurveySparrowSdk Package
 
 Add SurveySparrowSdk Package to your either StoryBoard or SwiftUI project 
  - Select File 
@@ -36,15 +59,15 @@ Or You can also navigate to your target's General pane -> in the “Frameworks, 
 | <img width="340"  alt="SurveySparrow Android SDK full-screen view" src="https://user-images.githubusercontent.com/61273614/85126008-37b2a500-b24a-11ea-8b7d-1edd55ecc668.png"> | <img width="375" alt="SurveySparrow Android SDK embed view" src="https://user-images.githubusercontent.com/61273614/85125981-2e293d00-b24a-11ea-8468-d56f1035dccb.png"> |
 
 
-### Import framework
+#### Import framework
 ```swift
 import SurveySparrowSdk
 ```
 
 
-## SwiftUI Interface
+### SwiftUI Interface
 
-### Full-screen Surveys
+#### Full-screen Surveys
 
 1. #### Create a Struct with implementing `UIViewControllerRepresentable`.
    

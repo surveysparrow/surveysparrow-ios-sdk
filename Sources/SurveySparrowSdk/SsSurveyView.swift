@@ -10,6 +10,7 @@
 import UIKit
 import WebKit
 
+@available(iOS 13.0, *)
 @IBDesignable public class SsSurveyView: UIView, WKScriptMessageHandler, WKNavigationDelegate {
     
     // MARK: Properties
@@ -37,9 +38,12 @@ import WebKit
     
     public var surveyDelegate: SsSurveyDelegate!
     
+    var properties: [String: Any]?
+    
     // MARK: Initialization
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    public init(properties: [String: Any]) {
+        super.init(frame: .zero)
+        self.properties = properties
         addFeedbackView()
     }
     
@@ -59,26 +63,37 @@ import WebKit
         ssWebView.backgroundColor = .gray
         ssWebView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         addSubview(ssWebView)
-        closeButton.setTitle("X", for: .normal)
-        closeButton.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        closeButton.tintColor = .black
-        closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-        ssWebView.addSubview(closeButton)
-        NSLayoutConstraint.activate([
-            NSLayoutConstraint(
-                item: closeButton, attribute: .top, relatedBy: .equal, toItem: ssWebView,
-                attribute: .top, multiplier: 1, constant: 16),
-            NSLayoutConstraint(
-                item: closeButton, attribute: .trailing, relatedBy: .equal, toItem: ssWebView,
-                attribute: .trailing, multiplier: 1, constant: -16),
-            NSLayoutConstraint(
-                item: closeButton, attribute: .width, relatedBy: .equal, toItem: nil,
-                attribute: .notAnAttribute, multiplier: 1, constant: 24),
-            NSLayoutConstraint(
-                item: closeButton, attribute: .height, relatedBy: .equal, toItem: nil,
-                attribute: .notAnAttribute, multiplier: 1, constant: 24),
-        ])
         
+        let isCloseButtonEnabled = properties?["isCloseButtonEnabled"] as? Bool
+        
+        if  isCloseButtonEnabled ?? true == true {
+            
+            let closeButtonWrapper = UIView()
+            ssWebView.addSubview(closeButtonWrapper)
+            
+            closeButton.setImage(UIImage(systemName: "xmark"), for: .normal)
+            closeButton.tintColor = .black
+            closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+            
+            closeButtonWrapper.addSubview(closeButton)
+            closeButtonWrapper.translatesAutoresizingMaskIntoConstraints = false
+            closeButtonWrapper.backgroundColor = .white
+            closeButtonWrapper.layer.cornerRadius = 4
+            closeButtonWrapper.clipsToBounds = true
+            
+            NSLayoutConstraint.activate([
+                
+                closeButtonWrapper.topAnchor.constraint(equalTo: ssWebView.safeAreaLayoutGuide.topAnchor, constant: 16),
+                closeButtonWrapper.trailingAnchor.constraint(equalTo: ssWebView.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+                closeButtonWrapper.widthAnchor.constraint(equalToConstant: 35),
+                closeButtonWrapper.heightAnchor.constraint(equalToConstant: 35),
+                
+                closeButton.centerXAnchor.constraint(equalTo: closeButtonWrapper.centerXAnchor),
+                closeButton.centerYAnchor.constraint(equalTo: closeButtonWrapper.centerYAnchor),
+                closeButton.widthAnchor.constraint(equalToConstant: 14),
+                closeButton.heightAnchor.constraint(equalToConstant: 14)
+            ])
+        }
         ssWebView.addSubview(loader)
         ssWebView.navigationDelegate = self
         loader.translatesAutoresizingMaskIntoConstraints = false
@@ -134,24 +149,39 @@ import WebKit
     }
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        // Check if this is a navigation action caused by a hyperlink click.
         if navigationAction.navigationType == .linkActivated {
-            // Handle the URL navigation here, for example:
             if let url = navigationAction.request.url {
                 UIApplication.shared.open(url)
-                decisionHandler(.cancel) // Prevent WKWebView from loading the URL.
+                decisionHandler(.cancel)
                 return
             }
         }
-        decisionHandler(.allow) // Allow other navigation actions.
+        decisionHandler(.allow)
     }
-    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error){
         print("Failed to load web page: \(error.localizedDescription)")
     }
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         loader.stopAnimating()
+        
+        let isCloseButtonEnabled = properties?["isCloseButtonEnabled"] as? Bool
+        
+        if  isCloseButtonEnabled ?? true == true {
+            let jsCode = """
+                const styleTag = document.createElement("style");
+                styleTag.innerHTML = `.ss-language-selector--wrapper { margin-right: 45px; }`;
+                document.body.appendChild(styleTag);
+                """
+            
+            webView.evaluateJavaScript(jsCode, completionHandler: { (result, error) in
+                if let error = error {
+                    // print(error)
+                }
+            })
+        }
     }
     
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -159,26 +189,23 @@ import WebKit
     }
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if surveyDelegate != nil {
-            let response = message.body as! [String: AnyObject]
-            let responseType = response["type"] as! String
-            if(responseType == surveyLoaded){
-                if surveyDelegate != nil {
-                    surveyDelegate.handleSurveyLoaded(response: response)
-                }
-            }
-            if(responseType == surveyCompleted){
-                if surveyDelegate != nil {
-                    surveyDelegate.handleSurveyResponse(response: response)
-                }
+        if let surveyDelegate = surveyDelegate,
+           let response = message.body as? [String: AnyObject],
+           let responseType = response["type"] as? String {
+
+            if responseType == surveyLoaded {
+                surveyDelegate.handleSurveyLoaded(response: response)
+            } else if responseType == surveyCompleted {
+                surveyDelegate.handleSurveyResponse(response: response)
             }
         }
     }
     
-    public func loadFullscreenSurvey(parent: UIViewController,delegate:SsSurveyDelegate, domain: String? = nil, token: String? = nil, params: [String: String]? = [:]) {
+    public func loadFullscreenSurvey(parent: UIViewController,delegate:SsSurveyDelegate, domain: String? = nil, token: String? = nil, params: [String: String]? = [:] ) {
         let ssSurveyViewController = SsSurveyViewController()
         ssSurveyViewController.domain = domain
         ssSurveyViewController.token = token
+        ssSurveyViewController.properties = self.properties ?? [:]
         if(params != nil){
             ssSurveyViewController.params = params ?? [:]
         }
@@ -265,6 +292,7 @@ import WebKit
             urlComponent.queryItems = params.map {
                 URLQueryItem(name: $0.key, value: $0.value)
             }
+            urlComponent.queryItems?.append(URLQueryItem(name: "sparrowLang", value: properties?["sparrowLang"] as? String))
             if let url = urlComponent.url {
                 let request = URLRequest(url: url)
                 ssWebView.load(request)

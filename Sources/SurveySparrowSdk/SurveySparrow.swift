@@ -9,11 +9,13 @@
 #if canImport(UIKit)
 import UIKit
 
+@available(iOS 13.0, *)
 public class SurveySparrow: SsSurveyDelegate {
     // MARK: Properties
     private var dataStore = NSUbiquitousKeyValueStore()
     private var domain: String
     private var token: String
+    private var properties: [String: String] = [:]
     
     public var surveyType: SurveyType = .CLASSIC
     public var params: [String: String] = [:]
@@ -35,9 +37,10 @@ public class SurveySparrow: SsSurveyDelegate {
     private var incrementMultiplierKey = "incrementMultiplier_"
     
     // MARK: Initialization
-    public init(domain: String, token: String) {
+    public init(domain: String, token: String, properties: [String: String]) {
         self.domain = domain
         self.token = token
+        self.properties = properties
         
         isAlreadyTakenKey += token
         promptTimeKey += token
@@ -93,6 +96,7 @@ public class SurveySparrow: SsSurveyDelegate {
                         ssSurveyViewController.domain = self.domain
                         ssSurveyViewController.token = self.token
                         ssSurveyViewController.params = self.params
+                        ssSurveyViewController.properties = self.properties
                         ssSurveyViewController.widgetContactId = widgetContactId
                         ssSurveyViewController.getSurveyLoadedResponse = self.getSurveyLoadedResponse
                         ssSurveyViewController.thankyouTimeout = self.thankyouTimout
