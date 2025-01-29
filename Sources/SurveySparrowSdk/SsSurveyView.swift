@@ -189,18 +189,14 @@ import WebKit
     }
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if surveyDelegate != nil {
-            let response = message.body as! [String: AnyObject]
-            let responseType = response["type"] as! String
-            if(responseType == surveyLoaded){
-                if surveyDelegate != nil {
-                    surveyDelegate.handleSurveyLoaded(response: response)
-                }
-            }
-            if(responseType == surveyCompleted){
-                if surveyDelegate != nil {
-                    surveyDelegate.handleSurveyResponse(response: response)
-                }
+        if let surveyDelegate = surveyDelegate,
+           let response = message.body as? [String: AnyObject],
+           let responseType = response["type"] as? String {
+
+            if responseType == surveyLoaded {
+                surveyDelegate.handleSurveyLoaded(response: response)
+            } else if responseType == surveyCompleted {
+                surveyDelegate.handleSurveyResponse(response: response)
             }
         }
     }
