@@ -118,7 +118,9 @@ public class SpotcheckState: ObservableObject {
             do {
                 if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
                    let filtered = json["filteredSpotChecks"] as? [[String: Any]] {
-
+                    DispatchQueue.main.async {
+                        self.filteredSpotChecks = filtered
+                    }
                     var classicIframe = false
                     var chatIframe = false
 
@@ -133,12 +135,9 @@ public class SpotcheckState: ObservableObject {
                                    let surveyType = survey["surveyType"] as? String {
                                     
                                     if self.isChatSurvey(surveyType) {
-                                      
                                         chatIframe = true
                                     } else {
-                                     
                                         classicIframe = true
-                                        
                                     }
                                 }
                             }
@@ -146,7 +145,6 @@ public class SpotcheckState: ObservableObject {
                     }
 
                     DispatchQueue.main.async {
-                        self.filteredSpotChecks = filtered
                         self.chatUrl = chatIframe ? "https://\(self.domainName)/eui-template/chat" : ""
                         self.classicUrl = classicIframe ? "https://\(self.domainName)/eui-template/classic" : ""
                     }
@@ -171,7 +169,7 @@ public class SpotcheckState: ObservableObject {
     }
     
     public func start() {
-        DispatchQueue.main.asyncAfter(deadline: .now()) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + Double(self.afterDelay)) {
             self.isVisible = true
         }
     }
@@ -379,9 +377,7 @@ public class SpotcheckState: ObservableObject {
                                             self.afterDelay = aftrDelay
                                     }
                                     self.setAppearance(json: selectedSpotCheck, screen: screen)
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + Double(self.afterDelay)) {
-                                        self.start()
-                                    }
+                                    
                                     completion(true , true)
                                 } else {
                                     completion(false , true)
@@ -583,9 +579,7 @@ public class SpotcheckState: ObservableObject {
         var isChat: Bool = false
         let matchingSpotcheckId = "\(json["spotCheckId"] ?? json["id"] ?? 0)"
         
-        while(self.filteredSpotChecks.isEmpty){
-            
-        }
+        
         
         if let currentSpotcheck = self.filteredSpotChecks.first(where: {
             if let id = $0["id"] as? NSNumber {
@@ -631,7 +625,6 @@ public class SpotcheckState: ObservableObject {
         }
         
         self.spotcheckURL = baseURL
-        print(baseURL)
         
         guard let url = URL(string: baseURL) else { return }
         
@@ -703,7 +696,6 @@ public class SpotcheckState: ObservableObject {
                 
                 
                 if isChat {
-                    
                     if !self.isChatLoading {
                         self.chatBool = true
                         self.chatWebView?.evaluateJavaScript(self.injectionJS)

@@ -35,10 +35,9 @@ public struct Spotcheck: View {
                 }
             } else {
                 if valid {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
-                        state.start()
+                   
                         print("TrackScreen Passed. Delay: \(state.afterDelay) Seconds")
-                    }
+                   
                 } else {
                     print("TrackScreen Failed")
                 }
@@ -50,10 +49,7 @@ public struct Spotcheck: View {
     public func TrackEvent(onScreen screen: String, event: [String: Any]) {
         state.sendTrackEventRequest(screen: screen, event: event) { valid in
             if valid {
-                DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
-                    state.start()
                     print("TrackEvent Passed. Delay: \(state.afterDelay) Seconds")
-                }
             } else {
                 print("TrackEvent Failed")
             }
