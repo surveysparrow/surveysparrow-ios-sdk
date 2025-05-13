@@ -158,7 +158,24 @@ public class SpotcheckState: ObservableObject {
 
 
 
+        func getUserAgent(completion: @escaping (String) -> Void) {
+        var userAgent = "Mozilla/5.0 "
 
+        let device = UIDevice.current
+        let deviceName = device.name
+        let model = device.model
+        let iosVersion = device.systemVersion.replacingOccurrences(of: ".", with: "_")
+
+        let isTablet = UIDevice.current.userInterfaceIdiom == .pad
+
+        if isTablet {
+            userAgent += "(iPad; CPU iOS \(iosVersion) like Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Version/16.0 Safari/537.36"
+        } else {
+            userAgent += "(\(deviceName) - \(model) CPU iOS \(iosVersion) like Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/537.36"
+        }
+
+        completion(userAgent)
+        }
 
 
     private func isChatSurvey(_ type: String) -> Bool {
@@ -628,7 +645,16 @@ public class SpotcheckState: ObservableObject {
         
         guard let url = URL(string: baseURL) else { return }
         
-        URLSession.shared.dataTask(with: url) { data, response, error in
+        var userAgentString: String = ""
+
+        getUserAgent { userAgent in
+            userAgentString = userAgent
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue(userAgentString, forHTTPHeaderField: "User-Agent")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
             
             guard error == nil else {
                 return
