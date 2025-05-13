@@ -128,6 +128,10 @@ struct WebViewRepresentable: UIViewRepresentable {
                                 self.parent.state.currentQuestionHeight -= 56;
                             }
                         }
+                        
+                        if let isCloseButtonEnabled = response["data"]?["isCloseButtonEnabled"] as? Bool{
+                            self.parent.state.isCloseButtonEnabled = isCloseButtonEnabled
+                        }
                     }
               
                 } else if responseType == "slideInFrame" {
