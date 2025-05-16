@@ -32,6 +32,7 @@ public struct Spotcheck: View {
             if multiShow {
                 if valid {
                     print("MultiShow Passed")
+                    completion(true)
                 } else {
                     print("TrackScreen Failed")
                     completion(false)
