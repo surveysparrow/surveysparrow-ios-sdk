@@ -682,7 +682,6 @@ public class SpotcheckState: ObservableObject {
         }
         
         self.spotcheckURL = baseURL
-        print(baseURL)
         
         guard let url = URL(string: baseURL) else { return }
         
