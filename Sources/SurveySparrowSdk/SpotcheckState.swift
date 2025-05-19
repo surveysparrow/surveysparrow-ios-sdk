@@ -103,8 +103,7 @@ public class SpotcheckState: ObservableObject {
     private func initializeWidget() {
         guard !targetToken.isEmpty, !domainName.isEmpty else { return }
 
-        let SDK = "IOS"
-        let urlString = "https://\(domainName)/api/internal/spotcheck/widget/\(targetToken)/init?sdk=\(SDK)"
+        let urlString = "https://\(domainName)/api/internal/spotcheck/widget/\(targetToken)/init"
 
         guard let url = URL(string: urlString) else { return }
 
@@ -282,7 +281,7 @@ public class SpotcheckState: ObservableObject {
             ]
         ]
         
-        guard let baseURL = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/properties") else {
+        guard let baseURL = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/properties?isSpotCheck=true&sdk=IOS") else {
             print("Invalid URL")
             completion(false, false)
             return
@@ -500,7 +499,7 @@ public class SpotcheckState: ObservableObject {
                                     ]
                                 ]
                                 
-                                guard let baseURL = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/eventTrigger") else {
+                                guard let baseURL = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/eventTrigger?isSpotCheck=true") else {
                                     print("Invalid URL")
                                     completion(false)
                                     return
