@@ -11,7 +11,7 @@ import WebKit
 @available(iOS 15.0, *)
 public struct WebView: View {
     
-    let delegate: SsSurveyDelegate
+    let delegate: SsSpotcheckDelegate
     let state: SpotcheckState
     @State private var isLoading: Bool = true
 
@@ -29,7 +29,7 @@ public struct WebView: View {
 @available(iOS 13.0, *)
 struct WebViewRepresentable: UIViewRepresentable {
     let urlString: String
-    let delegate: SsSurveyDelegate
+    let delegate: SsSpotcheckDelegate
     let state: SpotcheckState
     @Binding var isLoading: Bool
     private let surveyResponseHandler = WKUserContentController()
@@ -68,21 +68,35 @@ struct WebViewRepresentable: UIViewRepresentable {
         private var surveyCompleted: String = "surveyCompleted"
         private var spotCheckData: String = "spotCheckData"
         private var closeModel: String = "closeModal"
-        
+        private var partialSubmission: String = "partialSubmission"
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if self.parent.delegate != nil {
                 let response = message.body as! [String: AnyObject]
                 let responseType = response["type"] as! String
                 if responseType == surveyLoaded {
                     if self.parent.delegate != nil {
-                        self.parent.delegate.handleSurveyLoaded(response: response)
+                        Task{
+                            await self.parent.delegate.handleSurveyLoaded(response: response)
+                        }
                     }
                 } else if responseType == surveyCompleted {
                     if self.parent.delegate != nil {
                         self.parent.state.end()
-                        self.parent.delegate.handleSurveyResponse(response: response)
+                        Task{
+                            await self.parent.delegate.handleSurveyResponse(response: response)
+                        }
+                    
                     }
-                } else if responseType == spotCheckData {
+                } else if responseType == partialSubmission {
+                    if self.parent.delegate != nil {
+                       
+                        Task {
+                            await self.parent.delegate.handlePartialSubmission(response: response)
+                        }
+                       
+                    }
+                }
+                else if responseType == spotCheckData {
                     if self.parent.delegate != nil {
                         if let currentQuestionSize = response["data"]?["currentQuestionSize"] as? [String: Any],
                            let height = currentQuestionSize["height"] as? Double {

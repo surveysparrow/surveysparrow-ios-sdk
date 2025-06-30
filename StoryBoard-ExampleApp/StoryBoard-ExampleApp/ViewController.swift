@@ -85,12 +85,20 @@ class SettingScreen: UIViewController {
 }
 
 @available(iOS 15.0, *)
-class SsDelegate: UIViewController, SsSurveyDelegate {
-    func handleSurveyResponse(response: [String : AnyObject]) {}
+class SsDelegate: UIViewController, SsSpotcheckDelegate {
+    func handleSurveyResponse(response: [String : AnyObject]) async{
+        print(response);
+    }
     
-    func handleSurveyLoaded(response: [String : AnyObject]) {}
+    func handleSurveyLoaded(response: [String : AnyObject]) async{
+        print(response);
+    }
     
-    func handleSurveyValidation(response: [String : AnyObject]) {}
+    func handleCloseButtonTap() async{
+        print("closetapped");
+    }
     
-    func handleCloseButtonTap() {}
+    func handlePartialSubmission(response: [String : AnyObject]) async {
+            print(response)
+    }
 }
