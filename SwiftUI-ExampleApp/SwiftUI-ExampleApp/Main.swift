@@ -113,12 +113,30 @@ struct CustomTextField: View {
 }
 
 @available(iOS 15.0, *)
-class SsDelegate: UIViewController, SsSurveyDelegate {
-    func handleSurveyResponse(response: [String : AnyObject]) {}
+class SsDelegate: UIViewController, SsSpotcheckDelegate {
+    func handlePartialSubmission(response: [String : AnyObject]) async {
+        print("Received partial. Simulating async work...")
+        try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
+        print("Finished async work with response:", response)
+    }
+    
 
-    func handleSurveyLoaded(response: [String : AnyObject]) {}
+    func handleSurveyResponse(response: [String : AnyObject]) async {
+        print("Received survey response. Simulating async work...")
+        try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
+        print("Finished async work with response:", response)
+    }
 
-    func handleSurveyValidation(response: [String : AnyObject]) {}
+    func handleSurveyLoaded(response: [String : AnyObject]) async {
+        print("Survey loaded. Simulating async setup...")
+        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+        print("Survey is now ready:", response)
+    }
 
-    func handleCloseButtonTap() {}
+    func handleCloseButtonTap() async {
+        print("Close button tapped. Cleaning up...")
+        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+        print("Cleanup done.")
+    }
 }
+
