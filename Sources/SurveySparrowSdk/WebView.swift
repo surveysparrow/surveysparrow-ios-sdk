@@ -70,7 +70,6 @@ struct WebViewRepresentable: UIViewRepresentable {
         private var surveyCompleted: String = "surveyCompleted"
         private var spotCheckData: String = "spotCheckData"
         private var closeModel: String = "closeModal"
-        private var partialSubmission: String = "partialSubmission"
         
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if self.parent.delegate != nil {
@@ -92,14 +91,6 @@ struct WebViewRepresentable: UIViewRepresentable {
                        
                     }
                     
-                } else if responseType == partialSubmission {
-                    if self.parent.delegate != nil {
-                       
-                        Task {
-                            await self.parent.delegate.handlePartialSubmission(response: response)
-                        }
-                       
-                    }
                 }
                 else if responseType == spotCheckData {
                     if self.parent.delegate != nil {
