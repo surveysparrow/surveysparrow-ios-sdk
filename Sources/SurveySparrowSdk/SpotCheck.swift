@@ -221,8 +221,4 @@ public class ssSurveyDelegate: SsSpotcheckDelegate {
     public func handleCloseButtonTap() async{
         print("CloseButtonTapped")
     }
-    
-    public func handlePartialSubmission(response: [String : AnyObject]) async{
-        print("handlePartialSubmission")
-    }
 }
