@@ -71,18 +71,17 @@ struct WebViewRepresentable: UIViewRepresentable {
         private var closeModel: String = "closeModal"
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if self.parent.delegate != nil {
-                var response: [String: AnyObject] = [:]
-
-                                if let bodyString = message.body as? String,
-                                   let bodyData = bodyString.data(using: .utf8),
-                                   let parsed = try? JSONSerialization.jsonObject(with: bodyData, options: []) as? [String: AnyObject] {
-                                    response = parsed
-                                } else if let bodyDict = message.body as? [String: AnyObject] {
-                                    response = bodyDict
-                                } else {
-                                    print("Unable to parse message.body")
-                                    return
-                                }
+                var response: [String: AnyObject] = [:]              
+                if let bodyString = message.body as? String,
+                   let bodyData = bodyString.data(using: .utf8),
+                   let parsed = try? JSONSerialization.jsonObject(with: bodyData, options: []) as? [String: AnyObject] {
+                    response = parsed
+                } else if let bodyDict = message.body as? [String: AnyObject] {
+                    response = bodyDict
+                } else {
+                    print("Unable to parse message.body")
+                    return
+                }
                 let responseType = response["type"] as! String
                 if responseType == surveyLoaded {
                     if self.parent.delegate != nil {
@@ -108,7 +107,7 @@ struct WebViewRepresentable: UIViewRepresentable {
                     }
                     
                     if let isCloseButtonEnabled = response["data"]?["isCloseButtonEnabled"] as? Bool{
-                                                self.parent.state.isCloseButtonEnabled = isCloseButtonEnabled
+                        self.parent.state.isCloseButtonEnabled = isCloseButtonEnabled
                         
                         if self.parent.delegate != nil {
                           
@@ -123,7 +122,7 @@ struct WebViewRepresentable: UIViewRepresentable {
                         }
                         
                         
-                                            }
+                    }
                 }
             }
 
