@@ -11,7 +11,7 @@ import WebKit
 @available(iOS 15.0, *)
 public struct WebView: View {
     
-    let delegate: SsSurveyDelegate
+    let delegate: SsSpotcheckDelegate
     let state: SpotcheckState
     @State private var isLoading: Bool = true
 
@@ -29,7 +29,7 @@ public struct WebView: View {
 @available(iOS 13.0, *)
 struct WebViewRepresentable: UIViewRepresentable {
     let urlString: String
-    let delegate: SsSurveyDelegate
+    let delegate: SsSpotcheckDelegate
     let state: SpotcheckState
     @Binding var isLoading: Bool
     private let surveyResponseHandler = WKUserContentController()
@@ -48,6 +48,7 @@ struct WebViewRepresentable: UIViewRepresentable {
         webView.navigationDelegate = context.coordinator
         surveyResponseHandler.add(context.coordinator, name: "surveyResponse")
         surveyResponseHandler.add(context.coordinator, name: "spotCheckData")
+        surveyResponseHandler.add(context.coordinator, name: "flutterSpotCheckData")
         return webView
     }
 
@@ -63,6 +64,8 @@ struct WebViewRepresentable: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
+
+        
         
         private var surveyLoaded: String = "surveyLoadStarted"
         private var surveyCompleted: String = "surveyCompleted"
@@ -71,23 +74,59 @@ struct WebViewRepresentable: UIViewRepresentable {
         
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if self.parent.delegate != nil {
-                let response = message.body as! [String: AnyObject]
+                var response: [String: AnyObject] = [:]
+                if let bodyString = message.body as? String,
+                   let bodyData = bodyString.data(using: .utf8),
+                   let parsed = try? JSONSerialization.jsonObject(with: bodyData, options: []) as? [String: AnyObject] {
+                    response = parsed
+                } else if let bodyDict = message.body as? [String: AnyObject] {
+                    response = bodyDict
+                } else {
+                    print("Unable to parse message.body")
+                    return
+                }
                 let responseType = response["type"] as! String
                 if responseType == surveyLoaded {
                     if self.parent.delegate != nil {
-                        self.parent.delegate.handleSurveyLoaded(response: response)
+                        Task {
+                            await self.parent.delegate.handleSurveyLoaded(response: response)
+                        }
+                        
                     }
                 } else if responseType == surveyCompleted {
                     if self.parent.delegate != nil {
                         self.parent.state.end()
-                        self.parent.delegate.handleSurveyResponse(response: response)
+                        Task {
+                            await self.parent.delegate.handleSurveyResponse(response: response)
+                        }
+                       
                     }
-                } else if responseType == spotCheckData {
+                    
+                }
+                else if responseType == spotCheckData {
                     if self.parent.delegate != nil {
                         if let currentQuestionSize = response["data"]?["currentQuestionSize"] as? [String: Any],
                            let height = currentQuestionSize["height"] as? Double {
                             self.parent.state.currentQuestionHeight = height
                         }
+                    }
+                    
+                    if let isCloseButtonEnabled = response["data"]?["isCloseButtonEnabled"] as? Bool{
+                        self.parent.state.isCloseButtonEnabled = isCloseButtonEnabled
+                        
+                        if self.parent.delegate != nil {
+                          
+                            Task {
+                                await self.parent.delegate.handleSurveyResponse(response: [
+                                    "type": "surveySubmitted",
+                                    "data": "{}"
+                                ] as [String: AnyObject])
+
+                            }
+                           
+                        }
+                        
+                        
                     }
                 }
             }
