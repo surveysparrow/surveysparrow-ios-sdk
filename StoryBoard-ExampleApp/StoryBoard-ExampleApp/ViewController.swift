@@ -85,12 +85,17 @@ class SettingScreen: UIViewController {
 }
 
 @available(iOS 15.0, *)
-class SsDelegate: UIViewController, SsSurveyDelegate {
-    func handleSurveyResponse(response: [String : AnyObject]) {}
-    
-    func handleSurveyLoaded(response: [String : AnyObject]) {}
-    
-    func handleSurveyValidation(response: [String : AnyObject]) {}
-    
-    func handleCloseButtonTap() {}
+class SsDelegate: UIViewController, SsSpotcheckDelegate {
+
+    func handleSurveyResponse(response: [String : AnyObject]) async {
+        print("Received survey response: ", response)
+    }
+
+    func handleSurveyLoaded(response: [String : AnyObject]) async {
+        print("Survey Loaded: ", response)
+    }
+
+    func handleCloseButtonTap() async {
+        print("Survey closed by the User.")
+    }
 }

@@ -24,7 +24,7 @@ public class SpotcheckState: ObservableObject {
     @Published public var triggerToken: String = ""
     @Published public var closeButtonStyle: [String: String] = [:]
     @Published public var isCloseButtonEnabled: Bool = false
-    @Published public var surveyDelegate: SsSurveyDelegate
+    @Published public var surveyDelegate: SsSpotcheckDelegate
     
     @Published private var isSpotPassed: Bool = false
     @Published private var isChecksPassed: Bool = false
@@ -40,7 +40,7 @@ public class SpotcheckState: ObservableObject {
     var isUIKitApp: Bool
     let defaults = UserDefaults.standard
     
-    public init(targetToken:String, domainName: String, userDetails: [String: Any], variables: [String: Any], customProperties: [String: Any], sparrowLang: String, surveyDelegate: SsSurveyDelegate, isUIKitApp: Bool) {
+    public init(targetToken:String, domainName: String, userDetails: [String: Any], variables: [String: Any], customProperties: [String: Any], sparrowLang: String, surveyDelegate: SsSpotcheckDelegate, isUIKitApp: Bool) {
         self.targetToken = targetToken
         self.domainName = domainName
         self.userDetails = userDetails
@@ -73,6 +73,15 @@ public class SpotcheckState: ObservableObject {
         self.spotcheckURL = ""
         self.isCloseButtonEnabled = false
         self.closeButtonStyle = [:]
+        if(self.isUIKitApp) {
+            DispatchQueue.main.async {
+                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                   let keyWindow = windowScene.windows.first(where: { $0.isKeyWindow }),
+                   let presentingViewController = keyWindow.rootViewController?.presentedViewController {
+                    presentingViewController.dismiss(animated: true, completion: nil)
+                }
+            }
+        }
     }
     
     public func sendTrackScreenRequest(screen: String, completion: @escaping (Bool, Bool) -> Void) {
@@ -470,7 +479,7 @@ public class SpotcheckState: ObservableObject {
         }
         
         self.triggerToken = json["triggerToken"] as! String
-        self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.triggerToken)?spotcheckContactId=\(self.spotcheckContactID)&traceId=\(self.traceId)&spotcheckUrl=\(screen)"
+        self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.triggerToken)?spotcheckContactId=\(self.spotcheckContactID)&traceId=\(self.traceId)&spotcheckUrl=\(screen)&isSpotCheck=true"
         
         self.variables.forEach { key, value in
             self.spotcheckURL = self.spotcheckURL + "&\(key)=\(value)"
@@ -529,14 +538,8 @@ public class SpotcheckState: ObservableObject {
             do {
                 let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
                 if(((json?["success"]) != nil) == true){
-                    if(self.isUIKitApp) {
-                        DispatchQueue.main.async {
-                            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                               let keyWindow = windowScene.windows.first(where: { $0.isKeyWindow }),
-                               let presentingViewController = keyWindow.rootViewController?.presentedViewController {
-                                presentingViewController.dismiss(animated: true, completion: nil)
-                            }
-                        }
+                    Task{
+                        await self.surveyDelegate.handleCloseButtonTap()
                     }
                     print("SpotCheck Closed")
                 }
