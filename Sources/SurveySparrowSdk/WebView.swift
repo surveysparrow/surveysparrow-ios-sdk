@@ -48,6 +48,7 @@ struct WebViewRepresentable: UIViewRepresentable {
         webView.navigationDelegate = context.coordinator
         surveyResponseHandler.add(context.coordinator, name: "surveyResponse")
         surveyResponseHandler.add(context.coordinator, name: "spotCheckData")
+        surveyResponseHandler.add(context.coordinator, name: "flutterSpotCheckData")
         return webView
     }
 
@@ -73,7 +74,18 @@ struct WebViewRepresentable: UIViewRepresentable {
         
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if self.parent.delegate != nil {
-                let response = message.body as! [String: AnyObject]
+                var response: [String: AnyObject] = [:]
+
+                                if let bodyString = message.body as? String,
+                                   let bodyData = bodyString.data(using: .utf8),
+                                   let parsed = try? JSONSerialization.jsonObject(with: bodyData, options: []) as? [String: AnyObject] {
+                                    response = parsed
+                                } else if let bodyDict = message.body as? [String: AnyObject] {
+                                    response = bodyDict
+                                } else {
+                                    print("Unable to parse message.body")
+                                    return
+                                }
                 let responseType = response["type"] as! String
                 if responseType == surveyLoaded {
                     if self.parent.delegate != nil {
@@ -99,6 +111,24 @@ struct WebViewRepresentable: UIViewRepresentable {
                             self.parent.state.currentQuestionHeight = height
                         }
                     }
+                    
+                    if let isCloseButtonEnabled = response["data"]?["isCloseButtonEnabled"] as? Bool{
+                                                self.parent.state.isCloseButtonEnabled = isCloseButtonEnabled
+                        
+                        if self.parent.delegate != nil {
+                          
+                            Task {
+                                await self.parent.delegate.handleSurveyResponse(response: [
+                                    "type": "surveySubmitted",
+                                    "data": "{}"
+                                ] as [String: AnyObject])
+
+                            }
+                           
+                        }
+                        
+                        
+                                            }
                 }
             }
 
