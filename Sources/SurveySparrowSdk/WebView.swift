@@ -88,18 +88,20 @@ struct WebViewRepresentable: UIViewRepresentable {
                 let responseType = response["type"] as! String
                 if responseType == surveyLoaded {
                     if self.parent.delegate != nil {
+                        let capturedResponse = response
                         Task {
-                            await self.parent.delegate.handleSurveyLoaded(response: response)
+                            await self.parent.delegate.handleSurveyLoaded(response: capturedResponse)
                         }
                         
                     }
                 } else if responseType == surveyCompleted {
                     if self.parent.delegate != nil {
                         self.parent.state.end()
+                        let capturedResponse = response
                         Task {
-                            await self.parent.delegate.handleSurveyResponse(response: response)
+                            await self.parent.delegate.handleSurveyResponse(response: capturedResponse)
                         }
-                       
+                        
                     }
                     
                 }
