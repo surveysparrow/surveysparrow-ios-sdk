@@ -89,7 +89,6 @@ struct WebViewRepresentable: UIViewRepresentable {
                         Task {
                             await self.parent.delegate.handleSurveyLoaded(response: capturedResponse)
                         }
-                        
                     }
                 } else if responseType == surveyCompleted {
                     if self.parent.delegate != nil {
@@ -98,9 +97,7 @@ struct WebViewRepresentable: UIViewRepresentable {
                         Task {
                             await self.parent.delegate.handleSurveyResponse(response: capturedResponse)
                         }
-                        
                     }
-                    
                 }
                 else if responseType == spotCheckData {
                     if self.parent.delegate != nil {
