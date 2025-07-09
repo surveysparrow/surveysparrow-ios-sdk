@@ -69,6 +69,8 @@ struct WebViewRepresentable: UIViewRepresentable {
         private var surveyCompleted: String = "surveyCompleted"
         private var spotCheckData: String = "spotCheckData"
         private var closeModel: String = "closeModal"
+        private var partialSubmission: String = "partialSubmission"
+        private var thankYouPageSubmission: String = "thankYouPageSubmission"  
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if self.parent.delegate != nil {
                 var response: [String: AnyObject] = [:]              
@@ -99,30 +101,32 @@ struct WebViewRepresentable: UIViewRepresentable {
                         }
                     }
                 }
+                else if responseType == partialSubmission
+                {
+                    if self.parent.delegate != nil {
+                        let capturedResponse = response
+                        Task {
+                            await self.parent.delegate.handlePartialSubmission(response: capturedResponse)
+                        }
+                    }
+                }
+                else if responseType == thankYouPageSubmission
+                {
+                    self.parent.state.isCloseButtonEnabled = true
+                    if self.parent.delegate != nil {
+                        let capturedResponse = response
+                        Task {
+                            await self.parent.delegate.handleSurveyResponse(response: capturedResponse)
+                        }
+                    }
+                }
+                
                 else if responseType == spotCheckData {
                     if self.parent.delegate != nil {
                         if let currentQuestionSize = response["data"]?["currentQuestionSize"] as? [String: Any],
                            let height = currentQuestionSize["height"] as? Double {
                             self.parent.state.currentQuestionHeight = height
                         }
-                    }
-                    
-                    if let isCloseButtonEnabled = response["data"]?["isCloseButtonEnabled"] as? Bool{
-                        self.parent.state.isCloseButtonEnabled = isCloseButtonEnabled
-                        
-                        if self.parent.delegate != nil {
-                          
-                            Task {
-                                await self.parent.delegate.handleSurveyResponse(response: [
-                                    "type": "surveySubmitted",
-                                    "data": "{}"
-                                ] as [String: AnyObject])
-
-                            }
-                           
-                        }
-                        
-                        
                     }
                 }
             }
