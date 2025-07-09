@@ -14,8 +14,8 @@ import SurveySparrowSdk
 
 
 var spotCheck = Spotcheck(
-    domainName: "",
-    targetToken: "",
+    domainName: "frontline2.marketsparrow.com",
+    targetToken: "tar-2aVEYLxrBnfRdpKMuRTs9W",
     userDetails: [:],
     sparrowLang: "",
     surveyDelegate: SsDelegate()
@@ -117,6 +117,10 @@ class SsDelegate: UIViewController, SsSpotcheckDelegate {
 
     func handleSurveyResponse(response: [String : AnyObject]) async {
         print("Received survey response: ", response)
+    }
+
+    func handlePartialSubmission(response: [String : AnyObject]) async {
+        print("Received partial Submission: ", response)
     }
 
     func handleSurveyLoaded(response: [String : AnyObject]) async {
