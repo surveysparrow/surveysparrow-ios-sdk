@@ -198,21 +198,17 @@ struct Loader: View {
     }
 }
 
+@available(iOS 13.0, *)
 public class ssSurveyDelegate: SsSpotcheckDelegate {
 
     public init() {}
 
-    public func handleSurveyResponse(response: [String : AnyObject]) async{
-        print("handleSurveyResponse", response)
-    }
+    public func handleSurveyResponse(response: [String : AnyObject]) async{}
 
-    public func handleSurveyLoaded(response: [String : AnyObject]) async{
-        print("handleSurveyLoaded", response)
-    }
+    public func handleSurveyLoaded(response: [String : AnyObject]) async{}
+    
+    public func handlePartialSubmission(response: [String : AnyObject]) async {}
 
-
-    public func handleCloseButtonTap() async{
-        print("CloseButtonTapped")
-    }
+    public func handleCloseButtonTap() async{}
 
 }

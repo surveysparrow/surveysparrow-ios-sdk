@@ -119,6 +119,10 @@ class SsDelegate: UIViewController, SsSpotcheckDelegate {
         print("Received survey response: ", response)
     }
 
+    func handlePartialSubmission(response: [String : AnyObject]) async {
+        print("Received partial Submission: ", response)
+    }
+
     func handleSurveyLoaded(response: [String : AnyObject]) async {
         print("Survey Loaded: ", response)
     }
