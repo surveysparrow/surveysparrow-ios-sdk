@@ -14,8 +14,8 @@ import SurveySparrowSdk
 
 
 var spotCheck = Spotcheck(
-    domainName: "frontline2.marketsparrow.com",
-    targetToken: "tar-2aVEYLxrBnfRdpKMuRTs9W",
+    domainName: "",
+    targetToken: "",
     userDetails: [:],
     sparrowLang: "",
     surveyDelegate: SsDelegate()
