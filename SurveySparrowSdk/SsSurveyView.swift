@@ -196,6 +196,7 @@ import WebKit
             do {
                 response = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
             }
+            catch {}
         }
         
         if let surveyDelegate = surveyDelegate,
