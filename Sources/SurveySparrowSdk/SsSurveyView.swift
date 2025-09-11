@@ -197,7 +197,9 @@ import WebKit
             do {
                 response = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
             }
-            catch {}
+            catch {
+                print("Error in parsing response body.")
+            }
         }
         if let surveyDelegate = surveyDelegate,
            let response = response,
