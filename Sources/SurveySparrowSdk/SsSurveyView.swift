@@ -198,7 +198,7 @@ import WebKit
                 response = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
             }
             catch {
-                print("Error in parsing response body.")
+                print("Error in Surveysparrow SDK, while parsing response body in message handler")
             }
         }
         if let surveyDelegate = surveyDelegate,
