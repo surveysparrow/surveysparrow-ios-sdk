@@ -189,8 +189,20 @@ import WebKit
     }
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        var response: [String: AnyObject]?
+        if let dict = message.body as? [String: AnyObject] {
+            response = dict
+        } else if let bodyString = message.body as? String,
+                  let data = bodyString.data(using: .utf8) {
+            do {
+                response = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
+            }
+            catch {
+                print("Error in Surveysparrow SDK, while parsing response body in message handler")
+            }
+        }
         if let surveyDelegate = surveyDelegate,
-           let response = message.body as? [String: AnyObject],
+           let response = response,
            let responseType = response["type"] as? String {
 
             if responseType == surveyLoaded {
