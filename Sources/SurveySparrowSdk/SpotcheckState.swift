@@ -77,7 +77,7 @@ public class SpotcheckState: ObservableObject {
     var sparrowLang: String = ""
     let defaults = UserDefaults.standard
     
-    public init(targetToken:String, domainName: String, userDetails: [String: Any], variables: [String: Any], customProperties: [String: Any], sparrowLang: String, surveyDelegate: SsSurveyDelegate) {
+    public init(targetToken:String, domainName: String, userDetails: [String: Any], variables: [String: Any], customProperties: [String: Any], sparrowLang: String, surveyDelegate: SsSpotcheckDelegate) {
         self.targetToken = targetToken
         self.domainName = domainName
         self.userDetails = userDetails
@@ -799,6 +799,9 @@ public class SpotcheckState: ObservableObject {
             do {
                 let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
                 if(((json?["success"]) != nil) == true){
+                    Task{
+                        await self.surveyDelegate.handleCloseButtonTap();
+                    }
                     print("SpotCheck Closed")
                 }
             }catch {

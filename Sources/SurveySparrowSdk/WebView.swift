@@ -10,7 +10,8 @@ import WebKit
 
 @available(iOS 15.0, *)
 public struct WebView: View {
-    let delegate: SsSurveyDelegate
+    
+    let delegate: SsSpotcheckDelegate
     let state: SpotcheckState
     @State public var urlType: String
 
@@ -33,7 +34,7 @@ public struct WebView: View {
 @available(iOS 13.0, *)
 struct WebViewRepresentable: UIViewRepresentable {
     let urlString: String
-    let delegate: SsSurveyDelegate
+    let delegate: SsSpotcheckDelegate
     let state: SpotcheckState
     @Binding var urlType: String
     private let surveyResponseHandler = WKUserContentController()
@@ -80,18 +81,19 @@ struct WebViewRepresentable: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
+
+        
         
         private var surveyLoaded: String = "surveyLoadStarted"
         private var surveyCompleted: String = "surveyCompleted"
         private var spotCheckData: String = "spotCheckData"
         private var closeModel: String = "closeModal"
+        private var partialSubmission: String = "partialSubmission"
+        private var thankYouPageSubmission: String = "thankYouPageSubmission"
         
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if self.parent.delegate != nil {
-               
-
                 var response: [String: AnyObject] = [:]
-
                 if let bodyString = message.body as? String,
                    let bodyData = bodyString.data(using: .utf8),
                    let parsed = try? JSONSerialization.jsonObject(with: bodyData, options: []) as? [String: AnyObject] {
@@ -102,19 +104,45 @@ struct WebViewRepresentable: UIViewRepresentable {
                     print("Unable to parse message.body")
                     return
                 }
-
                 let responseType = response["type"] as! String
                 if responseType == surveyLoaded {
                     if self.parent.delegate != nil {
-                        self.parent.delegate.handleSurveyLoaded(response: response)
+                        let capturedResponse = response
+                        Task {
+                            await self.parent.delegate.handleSurveyLoaded(response: capturedResponse)
+                        }
+                        
                     }
                 } else if responseType == surveyCompleted {
                     if self.parent.delegate != nil {
                         self.parent.state.end()
-                        self.parent.delegate.handleSurveyResponse(response: response)
+                        let capturedResponse = response
+                        Task {
+                            await self.parent.delegate.handleSurveyResponse(response: capturedResponse)
+                        }
                     }
-                } else if responseType == spotCheckData {
-                    
+                }
+                else if responseType == partialSubmission
+                {
+                    if self.parent.delegate != nil {
+                        let capturedResponse = response
+                        Task {
+                            await self.parent.delegate.handlePartialSubmission(response: capturedResponse)
+                        }
+                    }
+                }
+                else if responseType == thankYouPageSubmission
+                {
+                    self.parent.state.isCloseButtonEnabled = true
+                    if self.parent.delegate != nil {
+                        let capturedResponse = response
+                        Task {
+                            await self.parent.delegate.handleSurveyResponse(response: capturedResponse)
+                        }
+                    }
+                }
+                
+                else if responseType == spotCheckData {
                     if self.parent.delegate != nil {
                         if let currentQuestionSize = response["data"]?["currentQuestionSize"] as? [String: Any],
                            let height = currentQuestionSize["height"] as? Double {

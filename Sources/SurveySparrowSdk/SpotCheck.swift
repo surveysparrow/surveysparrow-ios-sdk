@@ -12,7 +12,7 @@ public struct Spotcheck: View {
                  variables: [String: Any] = [:],
                  customProperties: [String: Any] = [:],
                  sparrowLang: String = "",
-                 surveyDelegate: SsSurveyDelegate = ssSurveyDelegate()
+                 surveyDelegate: SsSpotcheckDelegate = ssSurveyDelegate()
     ) {
         self.state = SpotcheckState(
             targetToken: targetToken,
@@ -295,23 +295,17 @@ struct Loader: View {
     }
 }
 
-public class ssSurveyDelegate: SsSurveyDelegate {
+@available(iOS 13.0, *)
+public class ssSurveyDelegate: SsSpotcheckDelegate {
 
     public init() {}
 
-    public func handleSurveyResponse(response: [String : AnyObject]) {
-        print("handleSurveyResponse", response)
-    }
+    public func handleSurveyResponse(response: [String : AnyObject]) async{}
 
-    public func handleSurveyLoaded(response: [String : AnyObject]) {
-        print("handleSurveyLoaded", response)
-    }
+    public func handleSurveyLoaded(response: [String : AnyObject]) async{}
+    
+    public func handlePartialSubmission(response: [String : AnyObject]) async {}
 
-    public func handleSurveyValidation(response: [String : AnyObject]) {
-        print("handleSurveyValidation", response)
-    }
+    public func handleCloseButtonTap() async{}
 
-    public func handleCloseButtonTap() {
-        print("CloseButtonTapped")
-    }
 }

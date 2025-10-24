@@ -113,12 +113,22 @@ struct CustomTextField: View {
 }
 
 @available(iOS 15.0, *)
-class SsDelegate: UIViewController, SsSurveyDelegate {
-    func handleSurveyResponse(response: [String : AnyObject]) {}
+class SsDelegate: UIViewController, SsSpotcheckDelegate {
 
-    func handleSurveyLoaded(response: [String : AnyObject]) {}
+    func handleSurveyResponse(response: [String : AnyObject]) async {
+        print("Received survey response: ", response)
+    }
 
-    func handleSurveyValidation(response: [String : AnyObject]) {}
+    func handlePartialSubmission(response: [String : AnyObject]) async {
+        print("Received partial Submission: ", response)
+    }
 
-    func handleCloseButtonTap() {}
+    func handleSurveyLoaded(response: [String : AnyObject]) async {
+        print("Survey Loaded: ", response)
+    }
+
+    func handleCloseButtonTap() async {
+        print("Survey closed by the User.")
+    }
 }
+
