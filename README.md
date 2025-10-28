@@ -40,7 +40,7 @@ Add SurveySparrowSdk Package to your either StoryBoard or SwiftUI project
  - Enter https://github.com/surveysparrow/surveysparrow-ios-sdk.git 
  - Finally, Click Copy Dependency.
 
-Or You can also navigate to your target's General pane -> in the “Frameworks, Libraries, and Embedded Content” section, click the + button -> select Add Other -> and choose Add Package Dependency and repeat the above steps.
+Or You can also navigate to your target's General pane -> in the "Frameworks, Libraries, and Embedded Content" section, click the + button -> select Add Other -> and choose Add Package Dependency and repeat the above steps.
 
 | <p style="text-align: center;">Full-screen Survey</p> | <p style="text-align: center;">Embed survey</p> |
 | --- | --- |
@@ -125,7 +125,7 @@ Passing the `parentViewController` in which the Survey Should be poped is requir
 
 
 ### Full-screen Surveys
-Take feedback using our pre-build `SsSurveyViewController` and get the response after submission by implementing the `SsSurveyDelegate`'s `handleSurveyResponse` protocol.
+Take feedback using our pre-build `SsSurveyViewController` and get the response after submission by implementing the `SsSpotcheckDelegate`'s `handleSurveyResponse` protocol.
 
 1. #### Create a `SsSurveyViewController` and set `domain` and `token`
 ```swift
@@ -185,9 +185,9 @@ ssSurveyView.loadFullscreenSurvey(domain:"<account-domain>", token: "<survey-tok
 > For further guidance, Refer StoryBoard-ExampleApp.
 
 ## Handle the initial question load and the response from the survey
-Implement the `SsSurveyDelegate` protocol to handle survey responses and Add these in all the places required.
+Implement the `SsSpotcheckDelegate` protocol to handle survey responses and Add these in all the places required.
 ```swift
-class SurveyDelegate: SsSurveyDelegate {
+class SurveyDelegate: SsSpotcheckDelegate {
   //...
   func handleSurveyLoaded(response: [String : AnyObject]) {
     // This will be executed after the initial question in the survey is loaded
@@ -225,7 +225,7 @@ override func viewDidAppear(_ animated: Bool) {
 Refer [SurveySparrow](#SurveySparrow) class for configuration options.
 
 #### Handle response
-Implement `SsSurveyDelegate` protocol to handle responses.
+Implement `SsSpotcheckDelegate` protocol to handle responses.
 
 #### Clear a schedule
 You can clear a schedule by calling the `surveySparrow.clearSchedule()` method.
@@ -251,7 +251,7 @@ View to display embedded surveys
 |`surveyType: SurveySparrow.SurveyType`|Type of the survey|`.CLASSIC`|
 |`params: [String: String]`|Custom params for the survey| - |
 |`getSurveyLoadedResponse: Bool`|Set to true to get handleSurveyLoaded response (available in version >= 0.3.0)|false|
-|`surveyDelegate: SsSurveyDelegate`|Protocol to handle survey response| - |
+|`surveyDelegate: SsSpotcheckDelegate`|Protocol to handle survey response| - |
 
 #### Public methods
 |Method|Description|
@@ -269,14 +269,14 @@ ViewController to take full-screen feedback
 |`getSurveyLoadedResponse: Bool`|Set to true to get handleSurveyLoaded response (available in version >= 0.3.0)|false|
 |`params: [String: String]`|Custom params for the survey| - |
 |`thankyouTimeout: Double`|Duration to display thankyou screen in seconds| 3.0 |
-|`surveyDelegate: SsSurveyDelegate`|Protocol to handle survey response| - |
+|`surveyDelegate: SsSpotcheckDelegate`|Protocol to handle survey response| - |
 
 #### Public methods
 |Method|Description|
 |-----------|------|
 |`loadSurvey(domain: String?, token: String?)`|: Load survey in SsSurveyView|
 
-### SsSurveyDelegate
+### SsSpotcheckDelegate
 Protocol to get survey responses
 |Method|Description|
 |-----------|------|
@@ -304,7 +304,7 @@ Class to handle survey scheduling
 |`surveyType: SurveySparrow.SurveyType`|Type of the survey|`.CLASSIC`|
 |`params: [String: String]`|Custom params for the survey| - |
 |`thankyouTimeout: Double`|Duration to display thankyou screen in seconds| 3.0 |
-|`surveyDelegate: SsSurveyDelegate`|Protocol to handle survey response| - |
+|`surveyDelegate: SsSpotcheckDelegate`|Protocol to handle survey response| - |
 |`getSurveyLoadedResponse: Bool`|Set to true to get handleSurveyLoaded response (available from version >= 0.3.0)|false|
 |`alertTitle: String`| Alert title | Rate us |
 |`alertMessage: String`| Alert message | Share your feedback and let us know how we are doing |
