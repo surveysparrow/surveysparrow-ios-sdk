@@ -25,7 +25,7 @@ public class SpotcheckState: ObservableObject {
     @Published public var triggerToken: String = ""
     @Published public var closeButtonStyle: [String: String] = [:]
     @Published public var isCloseButtonEnabled: Bool = false
-    @Published public var surveyDelegate: SsSurveyDelegate
+    @Published public var surveyDelegate: SsSpotcheckDelegate
     @Published public var  chatUrl: String = ""
     @Published public var  spotChecksMode: String = ""
     @Published public var avatarEnabled: Bool = false
@@ -37,6 +37,9 @@ public class SpotcheckState: ObservableObject {
     @Published public var isMounted: Bool = false
     @Published public var chatBool: Bool = false
     @Published public var classicBool: Bool = false
+    @Published public var isSpotCheckButton: Bool = false
+    @Published public var spotCheckButtonConfig: [String: Any] = [:]
+    @Published public var showSurveyContent: Bool = true
     @Published public var isChatLoading: Bool = true {
         
         didSet {
@@ -144,8 +147,8 @@ public class SpotcheckState: ObservableObject {
                     }
 
                     DispatchQueue.main.async {
-                        self.chatUrl = chatIframe ? "https://\(self.domainName)/eui-template/chat" : ""
-                        self.classicUrl = classicIframe ? "https://\(self.domainName)/eui-template/classic" : ""
+                        self.chatUrl = chatIframe ? "https://\(self.domainName)/eui-template/chat?isSpotCheck=true" : ""
+                        self.classicUrl = classicIframe ? "https://\(self.domainName)/eui-template/classic?isSpotCheck=true" : ""
                     }
                 }
 
@@ -219,6 +222,10 @@ public class SpotcheckState: ObservableObject {
             self.avatarUrl = ""
             self.injectionJS = ""
             self.spotCheckType = ""
+            if (self.isSpotCheckButton) {
+            self.showSurveyContent = true
+            }
+            self.isSpotCheckButton = false
 
     }
     
@@ -595,16 +602,16 @@ public class SpotcheckState: ObservableObject {
         var isChat: Bool = false
         let matchingSpotcheckId = "\(json["spotCheckId"] ?? json["id"] ?? 0)"
         
-        
-        
-        if let currentSpotcheck = self.filteredSpotChecks.first(where: {
+        let currentSpotCheck = self.filteredSpotChecks.first(where: {
             if let id = $0["id"] as? NSNumber {
                 return id.stringValue == matchingSpotcheckId
             }
             return false
-        }),
-        let survey = currentSpotcheck["survey"] as? [String: Any],
-        let surveyType = survey["surveyType"] as? String {
+        })
+        
+        if let currentSpotCheck = currentSpotCheck,
+           let survey = currentSpotCheck["survey"] as? [String: Any],
+           let surveyType = survey["surveyType"] as? String {
             isChat = self.isChatSurvey(surveyType) && appearance["mode"] as? String == "fullScreen"
         }
 
@@ -629,7 +636,24 @@ public class SpotcheckState: ObservableObject {
         self.avatarUrl = (appearance["avatar"] as? [String: Any])?["avatarUrl"] as? String ?? ""
 
         self.spotCheckType = isChat ? "chat" : "classic"
-       
+        
+        self.isSpotCheckButton = (appearance["type"] as? String) == "spotcheckButton"
+        
+        
+        if self.isSpotCheckButton {
+            if let current = currentSpotCheck,
+               let appearance = current["appearance"] as? [String: Any],
+               let buttonConfig = appearance["buttonConfig"] as? [String: Any] {
+                self.spotCheckButtonConfig = buttonConfig
+            } else {
+                self.spotCheckButtonConfig = [:]
+            }
+        } else {
+            self.spotCheckButtonConfig = [:]
+        }
+        
+        self.showSurveyContent = !self.isSpotCheckButton
+        
         
         self.spotcheckID = (json["spotCheckId"] as? Int64) ?? (json["id"] as? Int64) ?? 0
         self.spotcheckContactID = (json["spotCheckContactId"] as? Int64) ?? (json["spotCheckContact"] as? [String: Any])?["id"] as? Int64 ?? 0
