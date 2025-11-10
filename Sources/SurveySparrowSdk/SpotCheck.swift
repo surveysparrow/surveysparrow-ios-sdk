@@ -60,6 +60,11 @@ public struct Spotcheck: View {
         }
     }
     
+    public func CloseSpotchecks () {
+        state.closeSpotCheck()
+        state.end()
+    }
+    
     public var body: some View {
         if  state.isVisible {
             ZStack {
