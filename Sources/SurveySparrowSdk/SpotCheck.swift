@@ -61,114 +61,142 @@ public struct Spotcheck: View {
         }
     }
     
+    public func CloseSpotchecks () {
+        state.closeSpotCheck()
+        state.end()
+    }
+    
     public var body: some View {
         
-        if (!state.classicUrl.isEmpty)
-        {
-            ZStack {
-             
+        ZStack {
+            
+            if !state.classicUrl.isEmpty {
+                ZStack {
                     Spacer()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.black.opacity(0.4))
-                
-                VStack(){
-                    if state.spotcheckPosition == "bottom" {
-                        Spacer()
-                    }
-                    VStack{
+                    
+                    VStack {
+                        if state.spotcheckPosition == "bottom" { Spacer() }
                         
-                        if state.spotChecksMode == "miniCard" && state.isCloseButtonEnabled {
-                            HStack {
-                                Spacer()
-                                
-                                Button(action: {
-                                    state.end()
-                                }) {
-                                    ZStack {
-                                        Circle()
-                                            .fill(Color.white)
-                                            .frame(width: 32, height: 32)
-                                            .shadow(color: Color.white.opacity(0.26), radius: 4, x: 0, y: 0)
-                                        
-                                        Image(systemName: "xmark")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 12, height: 12)
-                                            .foregroundColor(.black)
+                        VStack {
+                            if state.spotChecksMode == "miniCard" && state.isCloseButtonEnabled {
+                                HStack {
+                                    Spacer()
+                                    Button(action: { state.end() }) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.white)
+                                                .frame(width: 32, height: 32)
+                                                .shadow(color: Color.white.opacity(0.26), radius: 4)
+                                            
+                                            Image(systemName: "xmark")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 12, height: 12)
+                                                .foregroundColor(.black)
+                                        }
                                     }
                                 }
+                                .padding(.vertical, 8)
                             }
-                            .padding(.vertical, 8)
-                        }
-
-                        WebViewContainer(state: state, urlType: "classic")
-                            .clipShape(RoundedRectangle(cornerRadius: (state.spotChecksMode == "miniCard") ? 12: 0))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: (state.spotChecksMode == "miniCard") ? 12: 0)
-                                    .stroke(Color.clear, lineWidth: (state.spotChecksMode == "miniCard") ? 2: 0)
-                            )
-                            .frame(
-                                height: (!state.isVisible) ? 200 : self.state.isFullScreenMode
+                            
+                            WebViewContainer(state: state, urlType: "classic")
+                                .clipShape(RoundedRectangle(cornerRadius: (state.spotChecksMode == "miniCard") ? 12 : 0))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: (state.spotChecksMode == "miniCard") ? 12 : 0)
+                                        .stroke(Color.clear, lineWidth: (state.spotChecksMode == "miniCard") ? 2 : 0)
+                                )
+                                .frame(
+                                    height: (!state.isVisible) ? 200 :
+                                        self.state.isFullScreenMode
                                     ? (UIScreen.main.bounds.height - 100)
                                     : min(
                                         (UIScreen.main.bounds.height - 100),
-                                        min(
-                                            state.currentQuestionHeight,
-                                            (state.maxHeight * UIScreen.main.bounds.height)
+                                        min(state.currentQuestionHeight,
+                                            (state.maxHeight * UIScreen.main.bounds.height))
+                                    )
+                                )
+                            
+                            if state.spotChecksMode == "miniCard" && state.avatarEnabled && !state.avatarUrl.description.isEmpty {
+                                HStack(alignment: .center) {
+                                    ImageView(url: state.avatarUrl)
+                                        .frame(width: 48, height: 48)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 24)
+                                                .fill(Color.white)
+                                                .shadow(radius: 4)
                                         )
-                                    )
-                            )
-                        if state.spotChecksMode == "miniCard" && state.avatarEnabled && !state.avatarUrl.description.isEmpty {
-                            HStack(alignment: .center) {
-                                ImageView(url: state.avatarUrl)
-                                    .frame(width: 48, height: 48)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 24)
-                                            .fill(Color.white)
-                                            .shadow(radius: 4)
-                                    )
-                                    .clipShape(RoundedRectangle(cornerRadius: 24))
-                                    .padding(.vertical, 8)
+                                        .clipShape(RoundedRectangle(cornerRadius: 24))
+                                        .padding(.vertical, 8)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
-
+                        .padding(.horizontal, (state.spotChecksMode == "miniCard") ? 8 : 0)
                         
-                    }.padding(.horizontal, (state.spotChecksMode == "miniCard") ? 8: 0)
-                    if state.spotcheckPosition == "top" {
-                        Spacer()
+                        if state.spotcheckPosition == "top" { Spacer() }
                     }
                 }
-                
-            }.opacity((state.isVisible && state.spotCheckType=="classic" && !state.isClassicLoading && (state.isMounted || state.isFullScreenMode))  ? 1 : 0).disabled((state.isVisible && state.spotCheckType=="classic" && !state.isClassicLoading && (state.isMounted || state.isFullScreenMode)) ? false : true)
-        }
-        
-        if (!state.chatUrl.isEmpty)
-        {
-            ZStack {
-             
-                Spacer()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background((state.isVisible && state.spotCheckType == "chat" && !state.isChatLoading)
-                                ? Color.black.opacity(0.4)
-                                : Color.clear)
-                
-                VStack(){
-                    if state.spotcheckPosition == "bottom" {
-                        Spacer()
-                    }
-                    WebViewContainer(state: state, urlType:"chat")
-                        .frame(
-                            height:(UIScreen.main.bounds.height - 100)
-                        )
-                    if state.spotcheckPosition == "top" {
-                        Spacer()
+                .opacity((state.isVisible && state.showSurveyContent && state.spotCheckType == "classic" && !state.isClassicLoading && (state.isMounted || state.isFullScreenMode)) ? 1 : 0)
+                .disabled(!(state.isVisible && state.spotCheckType == "classic" && state.showSurveyContent && !state.isClassicLoading && (state.isMounted || state.isFullScreenMode)))
+            }
+            
+            
+            if !state.chatUrl.isEmpty {
+                ZStack {
+                    Spacer()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background((state.isVisible && state.spotCheckType == "chat" && !state.isChatLoading)
+                                    ? Color.black.opacity(0.4)
+                                    : Color.clear)
+                    
+                    VStack {
+                        if state.spotcheckPosition == "bottom" { Spacer() }
+                        WebViewContainer(state: state, urlType: "chat")
+                            .frame(height: (UIScreen.main.bounds.height - 100))
+                        if state.spotcheckPosition == "top" { Spacer() }
                     }
                 }
-                
-            }.opacity((state.isVisible && state.spotCheckType=="chat" && !state.isChatLoading && state.isFullScreenMode) ? 1 : 0).disabled((state.isVisible && state.spotCheckType=="chat" && !state.isChatLoading && state.isFullScreenMode) ? false : true)
+                .opacity((state.isVisible && state.showSurveyContent && state.spotCheckType == "chat" && !state.isChatLoading && state.isFullScreenMode) ? 1 : 0)
+                .disabled(!(state.isVisible && state.showSurveyContent && state.spotCheckType == "chat" && !state.isChatLoading && state.isFullScreenMode))
+            }
+            
+            
+            if state.isSpotCheckButton && !state.showSurveyContent {
+                let buttonConfigMap = state.spotCheckButtonConfig
+                if !buttonConfigMap.isEmpty {
+                    let buttonConfig = SpotCheckButtonConfig(
+                        type: buttonConfigMap["type"] as? String ?? "floatingButton",
+                        position: buttonConfigMap["position"] as? String ?? "bottom_right",
+                        buttonSize: buttonConfigMap["buttonSize"] as? String ?? "medium",
+                        backgroundColor: buttonConfigMap["backgroundColor"] as? String ?? "",
+                        textColor: buttonConfigMap["textColor"] as? String ?? "#FFFFFF",
+                        buttonText: buttonConfigMap["buttonText"] as? String ?? "",
+                        icon: buttonConfigMap["icon"] as? String ?? "",
+                        generatedIcon: buttonConfigMap["generatedIcon"] as? String ?? "",
+                        cornerRadius: buttonConfigMap["cornerRadius"] as? String ?? "sharp",
+                        onPress: {
+                            state.showSurveyContent = true
+                        }
+                    )
+                    
+                    VStack {
+                        Spacer()
+                        HStack {
+                            if buttonConfig.position.contains("left") {
+                                SpotCheckButton(config: buttonConfig)
+                                Spacer()
+                            } else {
+                                Spacer()
+                                SpotCheckButton(config: buttonConfig)
+                            }
+                        }
+                        
+                    }
+                }
+            }
         }
-
     }
 }
 
@@ -220,8 +248,13 @@ struct WebViewContainer: View {
                         self.state.spotChecksMode != "miniCard"
                     ) {
                         Button {
-                            state.closeSpotCheck()
-                            state.end()
+                            if(!self.state.isSpotCheckButton){
+                                state.closeSpotCheck()
+                                state.end()
+                            }
+                            else{
+                                state.showSurveyContent = false
+                            }
                         } label: {
                             Image(systemName: "xmark")
                         }
