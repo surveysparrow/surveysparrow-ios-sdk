@@ -41,6 +41,7 @@ public class SpotcheckState: ObservableObject {
     @Published public var isSpotCheckButton: Bool = false
     @Published public var spotCheckButtonConfig: [String: Any] = [:]
     @Published public var showSurveyContent: Bool = true
+    @Published public var isThankyouPageSubmission: Bool = false
     @Published public var isChatLoading: Bool = true {
         
         didSet {
@@ -241,6 +242,7 @@ public class SpotcheckState: ObservableObject {
                     self.showSurveyContent = true
                 }
                 self.isSpotCheckButton = false
+                self.isThankyouPageSubmission = false
             }
           
             
