@@ -365,7 +365,6 @@ struct SpotCheckButton: View {
     var config: SpotCheckButtonConfig
 
     @available(iOS 13.0, *)
-    @available(iOS 13.0, *)
     var body: some View {
         switch config.type {
         case "floatingButton": FloatingButton(config: config)

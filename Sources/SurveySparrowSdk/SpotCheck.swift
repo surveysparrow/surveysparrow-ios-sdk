@@ -83,7 +83,16 @@ public struct Spotcheck: View {
                             if state.spotChecksMode == "miniCard" && state.isCloseButtonEnabled {
                                 HStack {
                                     Spacer()
-                                    Button(action: { state.end() }) {
+                                    Button(action: {
+                                        
+                                        if(!self.state.isSpotCheckButton){
+                                            state.closeSpotCheck()
+                                            state.end()
+                                        }
+                                        else{
+                                            state.showSurveyContent = false
+                                        }
+                                    }) {
                                         ZStack {
                                             Circle()
                                                 .fill(Color.white)
