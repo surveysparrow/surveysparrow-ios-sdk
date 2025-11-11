@@ -83,8 +83,15 @@ public struct Spotcheck: View {
                                             state.closeSpotCheck()
                                             state.end()
                                         }
-                                        else{
-                                            state.showSurveyContent = false
+                                        else {
+                                            if(self.state.isThankyouPageSubmission)
+                                            {
+                                                state.closeSpotCheck()
+                                                state.end()
+                                            }
+                                            else{
+                                                state.showSurveyContent = false
+                                            }
                                         }
                                     }) {
                                         ZStack {
@@ -257,7 +264,14 @@ struct WebViewContainer: View {
                                 state.end()
                             }
                             else{
-                                state.showSurveyContent = false
+                                if(self.state.isThankyouPageSubmission)
+                                {
+                                    state.closeSpotCheck()
+                                    state.end()
+                                }
+                                else{
+                                    state.showSurveyContent = false
+                                }
                             }
                             
                         } label: {

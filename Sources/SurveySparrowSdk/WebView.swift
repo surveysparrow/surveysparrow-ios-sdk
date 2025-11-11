@@ -134,11 +134,15 @@ struct WebViewRepresentable: UIViewRepresentable {
                 else if responseType == thankYouPageSubmission
                 {
                     self.parent.state.isCloseButtonEnabled = true
+                    self.parent.state.isThankyouPageSubmission = true
                     if self.parent.delegate != nil {
                         let capturedResponse = response
                         Task {
                             await self.parent.delegate.handleSurveyResponse(response: capturedResponse)
                         }
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                        self.parent.state.end()
                     }
                 }
                 
