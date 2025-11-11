@@ -39,6 +39,7 @@ struct SpotCheckButtonUtils {
         BORDER_RADIUS[corner]?[size] ?? 6
     }
     
+    @available(iOS 13.0, *)
     static func hexToColor(_ hex: String, opacity: Double = 1.0) -> Color {
         var hexClean = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         if hexClean.hasPrefix("#") { hexClean.removeFirst() }
@@ -60,6 +61,7 @@ struct SpotCheckButtonUtils {
         return Color(red: r, green: g, blue: b).opacity(opacity)
     }
     
+    @available(iOS 13.0, *)
     static func getTextStyle(for size: String) -> Font {
         switch size {
         case "small": return .system(size: 12, weight: .bold)
@@ -73,6 +75,7 @@ struct RoundedCorner: Shape {
     var radius: CGFloat = .infinity
     var corners: UIRectCorner = .allCorners
 
+    @available(iOS 13.0, *)
     func path(in rect: CGRect) -> Path {
         let path = UIBezierPath(
             roundedRect: rect,
@@ -124,6 +127,7 @@ struct SpotCheckIcon: View {
         : SpotCheckButtonUtils.getTextButtonIconSize(buttonSize)
     }
     
+    @available(iOS 13.0, *)
     var body: some View {
         Group {
             if icon.isEmpty {
@@ -172,6 +176,7 @@ struct SpotCheckIcon: View {
 struct FloatingButton: View {
     var config: SpotCheckButtonConfig
     
+    @available(iOS 13.0, *)
     var body: some View {
         let size = SpotCheckButtonUtils.getFloatingButtonSize(config.buttonSize)
         let bgColor = SpotCheckButtonUtils.hexToColor(config.backgroundColor)
@@ -212,6 +217,7 @@ struct FloatingButton: View {
 struct TextButton: View {
     var config: SpotCheckButtonConfig
     
+    @available(iOS 13.0, *)
     var body: some View {
         let radius = SpotCheckButtonUtils.getBorderRadius(config.cornerRadius, config.buttonSize)
         let bgColor = SpotCheckButtonUtils.hexToColor(config.backgroundColor)
@@ -238,6 +244,7 @@ struct TextButton: View {
     }
 }
 
+@available(iOS 13.0, *)
 struct SideTab: View {
     var config: SpotCheckButtonConfig
     
@@ -357,6 +364,7 @@ struct SideTab: View {
 struct SpotCheckButton: View {
     var config: SpotCheckButtonConfig
 
+    @available(iOS 13.0, *)
     var body: some View {
         switch config.type {
         case "floatingButton": FloatingButton(config: config)
