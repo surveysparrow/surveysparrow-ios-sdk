@@ -7,11 +7,13 @@
 
 import SwiftUI
 import CoreLocation
+import WebKit
 
 @available(iOS 13.0, *)
 public class SpotcheckState: ObservableObject {
     
     @Published public var isVisible = false
+    @Published public var savedCompletion: ((Bool) -> Void)?
     @Published public var spotcheckPosition: String = "bottom"
     @Published public var spotcheckURL: String = ""
     @Published public var spotcheckID: Int64 = 0
@@ -25,10 +27,49 @@ public class SpotcheckState: ObservableObject {
     @Published public var closeButtonStyle: [String: String] = [:]
     @Published public var isCloseButtonEnabled: Bool = false
     @Published public var surveyDelegate: SsSpotcheckDelegate
-    
+    @Published public var  chatUrl: String = ""
+    @Published public var  spotChecksMode: String = ""
+    @Published public var avatarEnabled: Bool = false
+    @Published public var avatarUrl: String = ""
+    @Published public var  spotCheckType: String = ""
+    @Published public var  classicUrl: String = ""
+    @Published public var classicWebView: WKWebView?
+    @Published public var chatWebView: WKWebView?
+    @Published public var isMounted: Bool = false
+    @Published public var chatBool: Bool = false
+    @Published public var classicBool: Bool = false
+    @Published public var isSpotCheckButton: Bool = false
+    @Published public var spotCheckButtonConfig: [String: Any] = [:]
+    @Published public var showSurveyContent: Bool = true
+    @Published public var isThankyouPageSubmission: Bool = false
+    @Published public var isChatLoading: Bool = true {
+        
+        didSet {
+            if(!chatBool){
+                chatBool = true
+                self.start()
+            }
+        }
+
+      }
+    @Published public var isClassicLoading: Bool = true {
+        
+        didSet {
+
+            if(!classicBool){
+                classicBool = true
+                    self.start()
+            }
+
+        }
+
+      }
     @Published private var isSpotPassed: Bool = false
+    @Published private var injectionJS: String = ""
     @Published private var isChecksPassed: Bool = false
     @Published private var customEventsSpotChecks: [[String: Any]] = []
+    @Published private var filteredSpotChecks: [[String: Any]] = []
+    
     
     var targetToken: String
     var domainName: String
@@ -55,24 +96,157 @@ public class SpotcheckState: ObservableObject {
                 defaults.set("", forKey: "SurveySparrowUUID")
             }
         }
-    }
-    
-    
-    public func start() {
-        DispatchQueue.main.asyncAfter(deadline: .now()) {
-            self.isVisible = true
+        
+        DispatchQueue.main.async {
+            self.initializeWidget()
         }
     }
     
+    
+    
+    private func initializeWidget() {
+        guard !targetToken.isEmpty, !domainName.isEmpty else { return }
+
+        let urlString = "https://\(domainName)/api/internal/spotcheck/widget/\(targetToken)/init"
+
+        guard let url = URL(string: urlString) else { return }
+
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                print("Error initializing widget: \(error)")
+                return
+            }
+
+            guard let data = data else { return }
+
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let filtered = json["filteredSpotChecks"] as? [[String: Any]] {
+                    DispatchQueue.main.async {
+                        self.filteredSpotChecks = filtered
+                    }
+                    var classicIframe = false
+                    var chatIframe = false
+
+                    for spotcheck in filtered {
+                        if let appearance = spotcheck["appearance"] as? [String: Any],
+                           let mode = appearance["mode"] as? String {
+                        
+                            if mode == "card" || mode == "miniCard" {
+                                classicIframe = true
+                            } else if mode == "fullScreen" {
+                                if let survey = spotcheck["survey"] as? [String: Any],
+                                   let surveyType = survey["surveyType"] as? String {
+                                    
+                                    if self.isChatSurvey(surveyType) {
+                                      
+                                        chatIframe = true
+                                    } else {
+                                     
+                                        classicIframe = true
+                                        
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    DispatchQueue.main.async {
+                        self.chatUrl = chatIframe ? "https://\(self.domainName)/eui-template/chat?isSpotCheck=true" : ""
+                        self.classicUrl = classicIframe ? "https://\(self.domainName)/eui-template/classic?isSpotCheck=true" : ""
+                    }
+                }
+
+            } catch {
+                print("Error decoding response: \(error)")
+            }
+        }.resume()
+    }
+
+
+
+
+
+
+    private func isChatSurvey(_ type: String) -> Bool {
+        return type == "Conversational" ||
+               type == "CESChat" ||
+               type == "NPSChat" ||
+               type == "CSATChat"
+    }
+    
+    public func preStart() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + afterDelay) {
+                self.savedCompletion?(true)
+            }
+            afterDelay = 0
+        
+    }
+    
+    public func start() {
+        let isChat = (self.spotCheckType == "chat")
+        let isClassic = (self.spotCheckType == "classic")
+        
+        guard isChat || isClassic else { return }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + afterDelay) {
+            let isLoading = isChat ? self.isChatLoading : self.isClassicLoading
+            
+            if !isLoading {
+                self.savedCompletion?(true)
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                let webView = isChat ? self.chatWebView : self.classicWebView
+                webView?.evaluateJavaScript(self.injectionJS) { result, error in
+                    if let error = error {
+                        print("JS Injection error: \(error)")
+                    } else {
+                        print("✅ JS injected.")
+                    }
+                }
+                self.isVisible = true
+            }
+        }
+    }
+
+    
     public func end() {
-        self.isVisible = false
-        self.spotcheckID = 0
-        self.spotcheckPosition = "bottom"
-        self.currentQuestionHeight = 0
-        self.spotcheckContactID = 0
-        self.spotcheckURL = ""
-        self.isCloseButtonEnabled = false
-        self.closeButtonStyle = [:]
+
+            let targetWebView = spotCheckType == "chat" ? chatWebView : classicWebView
+            let jsToInject = """
+            (function() {
+                window.dispatchEvent(new MessageEvent('message', {
+                    data: {"type":"UNMOUNT_APP"}
+                }));
+            })();
+            """
+
+            DispatchQueue.main.async {
+                targetWebView?.evaluateJavaScript(jsToInject)
+                self.isVisible = false
+                self.isFullScreenMode = false
+                self.spotcheckID = 0
+                self.spotcheckPosition = "bottom"
+                self.currentQuestionHeight = 0.0
+                self.isCloseButtonEnabled = false
+                self.spotcheckContactID = 0
+                self.spotcheckURL = ""
+                self.isMounted = false
+                self.spotChecksMode = ""
+                self.avatarEnabled = false
+                self.avatarUrl = ""
+                self.injectionJS = ""
+                self.spotCheckType = ""
+                if (self.isSpotCheckButton) {
+                    self.showSurveyContent = true
+                }
+                self.isSpotCheckButton = false
+                self.isThankyouPageSubmission = false
+            }
+          
+            
+        
         if(self.isUIKitApp) {
             DispatchQueue.main.async {
                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -82,6 +256,7 @@ public class SpotcheckState: ObservableObject {
                 }
             }
         }
+
     }
     
     public func sendTrackScreenRequest(screen: String, completion: @escaping (Bool, Bool) -> Void) {
@@ -115,7 +290,7 @@ public class SpotcheckState: ObservableObject {
             ]
         ]
         
-        guard let baseURL = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/properties") else {
+        guard let baseURL = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/properties?isSpotCheck=true&sdk=IOS") else {
             print("Invalid URL")
             completion(false, false)
             return
@@ -177,7 +352,6 @@ public class SpotcheckState: ObservableObject {
                             
                             self.setAppearance(json: json ?? [:], screen: screen)
                             self.isSpotPassed = show
-                            completion(show, false)
                             
                         } else {
                             print("Error: Spots or Checks or Visitor or Reccurence Condition Failed")
@@ -205,7 +379,6 @@ public class SpotcheckState: ObservableObject {
                                     } else {
                                         self.setAppearance(json: json ?? [:], screen: screen)
                                         self.isChecksPassed = checkPassed
-                                        completion(checkPassed, false)
                                     }
                                 }
                                 
@@ -255,10 +428,6 @@ public class SpotcheckState: ObservableObject {
                                             self.afterDelay = aftrDelay
                                     }
                                     self.setAppearance(json: selectedSpotCheck, screen: screen)
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + Double(self.afterDelay)) {
-                                        self.start()
-                                    }
-                                    completion(true , true)
                                 } else {
                                     completion(false , true)
                                     
@@ -339,7 +508,7 @@ public class SpotcheckState: ObservableObject {
                                     ]
                                 ]
                                 
-                                guard let baseURL = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/eventTrigger") else {
+                                guard let baseURL = URL(string: "https://\(self.domainName)/api/internal/spotcheck/widget/\(self.targetToken)/eventTrigger?isSpotCheck=true") else {
                                     print("Invalid URL")
                                     completion(false)
                                     return
@@ -399,7 +568,6 @@ public class SpotcheckState: ObservableObject {
                                                 } else {
                                                     self.setAppearance(json: json ?? [:], screen: screen)
                                                     print("Spots & Checks & Visitor & Reccurence Condition Passed")
-                                                    completion(show)
                                                 }
                                             }
                                             
@@ -420,7 +588,6 @@ public class SpotcheckState: ObservableObject {
                                                         }
                                                         self.setAppearance(json: json ?? [:], screen: screen)
                                                         print("EventShow Condition Passed ")
-                                                        completion(eventShow)
                                                         
                                                     } else {
                                                         print("Error: EventShow Condition Failed")
@@ -449,47 +616,214 @@ public class SpotcheckState: ObservableObject {
         }
     }
     
-    public func setAppearance(json: [String: Any] = [:], screen: String) -> Void {
-        if let appearance = json["appearance"] as? [String: Any],
-           let position = appearance["position"] as? String,
-           let isCloseButtonEnabled = appearance["closeButton"] as? Bool,
-           let cardProp = appearance["cardProperties"] as? [String: Any],
-           let colors = appearance["colors"] as? [String: Any],
-           let overrides = colors["overrides"] as? [String: String] {
-            if position == "top_full" {self.spotcheckPosition = "top"}
-            else if position == "center_center" {self.spotcheckPosition = "center"}
-            else if position == "bottom_full" {self.spotcheckPosition = "bottom"}
-            self.isCloseButtonEnabled = isCloseButtonEnabled ?? false
-            let mxHeight = cardProp["maxHeight"] as? Double ?? Double(cardProp["maxHeight"] as? String ?? "1") ?? 1
-            self.maxHeight = mxHeight / 100
-            self.closeButtonStyle = overrides
-            self.isFullScreenMode = appearance["mode"] as? String == "fullScreen" ? true : false
-            if let bannerImage = appearance["bannerImage"] as? [String: Any],
-               let enabled = bannerImage["enabled"] as? Bool {
-                self.isBannerImageOn = enabled
-            }
+    
+    func getUserAgent(completion: @escaping (String) -> Void) {
+        var userAgent = "Mozilla/5.0 "
+
+        let device = UIDevice.current
+        let deviceName = device.name
+        let model = device.model
+        let iosVersion = device.systemVersion.replacingOccurrences(of: ".", with: "_")
+
+        let isTablet = UIDevice.current.userInterfaceIdiom == .pad
+
+        if isTablet {
+            userAgent += "(iPad; CPU iOS \(iosVersion) like Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Version/16.0 Safari/537.36"
+        } else {
+            userAgent += "(\(deviceName) - \(model) CPU iOS \(iosVersion) like Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/537.36"
         }
+
+        completion(userAgent)
+    }
+
+    
+    public func setAppearance(json: [String: Any] = [:], screen: String) -> Void {
+        
+        let appearance = json["appearance"] as? [String: Any] ?? [:]
+        let position = appearance["position"] as? String
+        let cardProp = appearance["cardProperties"] as? [String: Any] ?? [:]
+        let colors = appearance["colors"] as? [String: Any] ?? [:]
+        let overrides = colors["overrides"] as? [String: String] ?? [:]
+        var isChat: Bool = false
+        let matchingSpotcheckId = "\(json["spotCheckId"] ?? json["id"] ?? 0)"
+        
+        let currentSpotCheck = self.filteredSpotChecks.first(where: {
+            if let id = $0["id"] as? NSNumber {
+                return id.stringValue == matchingSpotcheckId
+            }
+            return false
+        })
+        
+        if let currentSpotCheck = currentSpotCheck,
+           let survey = currentSpotCheck["survey"] as? [String: Any],
+           let surveyType = survey["surveyType"] as? String {
+            isChat = self.isChatSurvey(surveyType) && appearance["mode"] as? String == "fullScreen"
+        }
+
+        if position == "top_full" {
+            self.spotcheckPosition = "top"
+        } else if position == "center_center" {
+            self.spotcheckPosition = "center"
+        } else {
+            self.spotcheckPosition = "bottom"
+        }
+
+        self.isCloseButtonEnabled = appearance["closeButton"] as? Bool ?? true
+        let maxHeightRaw = cardProp["maxHeight"]
+        let mxHeight = maxHeightRaw as? Double ?? Double(maxHeightRaw as? String ?? "1") ?? 1
+        self.maxHeight = mxHeight / 100
+
+        self.closeButtonStyle = overrides
+        self.isFullScreenMode = appearance["mode"] as? String == "fullScreen"
+        self.spotChecksMode = appearance["mode"] as? String ?? ""
+        self.isBannerImageOn = (appearance["bannerImage"] as? [String: Any])?["enabled"] as? Bool ?? false
+        self.avatarEnabled = (appearance["avatar"] as? [String: Any])?["enabled"] as? Bool ?? false
+        self.avatarUrl = (appearance["avatar"] as? [String: Any])?["avatarUrl"] as? String ?? ""
+
+        self.spotCheckType = isChat ? "chat" : "classic"
+        
+        self.isSpotCheckButton = (appearance["type"] as? String) == "spotcheckButton"
+        
+        
+        if self.isSpotCheckButton {
+            if let current = currentSpotCheck,
+               let appearance = current["appearance"] as? [String: Any],
+               let buttonConfig = appearance["buttonConfig"] as? [String: Any] {
+                self.spotCheckButtonConfig = buttonConfig
+            } else {
+                self.spotCheckButtonConfig = [:]
+            }
+        } else {
+            self.spotCheckButtonConfig = [:]
+        }
+        
+        self.showSurveyContent = !self.isSpotCheckButton
         
         self.spotcheckID = (json["spotCheckId"] as? Int64) ?? (json["id"] as? Int64) ?? 0
-        self.spotcheckContactID = (json["spotCheckContactId"] as? Int64) ?? 0
-        if self.spotcheckContactID == 0,
-           let spotCheckContact = json["spotCheckContact"] as? [String: Any],
-           let contactID = spotCheckContact["id"] as? Int64 {
-            self.spotcheckContactID = contactID
-        }
-        
-        self.triggerToken = json["triggerToken"] as! String
-        self.spotcheckURL = "https://\(self.domainName)/n/spotcheck/\(self.triggerToken)?spotcheckContactId=\(self.spotcheckContactID)&traceId=\(self.traceId)&spotcheckUrl=\(screen)&isSpotCheck=true"
+        self.spotcheckContactID = (json["spotCheckContactId"] as? Int64) ?? (json["spotCheckContact"] as? [String: Any])?["id"] as? Int64 ?? 0
+        self.triggerToken = json["triggerToken"] as? String ?? ""
+        var baseURL = "https://\(self.domainName)/s/spotcheck/\(self.triggerToken)/\(isChat ? "config" : "bootstrap")?spotcheckContactId=\(self.spotcheckContactID)&traceId=\(self.traceId)&spotcheckUrl=\(screen)&isSpotCheck=true"
         
         self.variables.forEach { key, value in
-            self.spotcheckURL = self.spotcheckURL + "&\(key)=\(value)"
+            baseURL += "&\(key)=\(value)"
         }
         
-        if(sparrowLang != nil && !sparrowLang.isEmpty) {
-            self.spotcheckURL = self.spotcheckURL + "&sparrowLang=\(sparrowLang)"
-        }
+        self.spotcheckURL = baseURL
         
+        guard let url = URL(string: baseURL) else { return }
+        
+        var userAgentString: String = ""
+
+        getUserAgent { userAgent in
+            userAgentString = userAgent
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue(userAgentString, forHTTPHeaderField: "User-Agent")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            
+            guard error == nil else {
+                return
+            }
+            
+            guard let data = data else {
+                return
+            }
+
+
+            guard let jsonObj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                return
+            }
+            
+            
+            var themeCSS: [String: Any]? = [:]
+
+            if let config = jsonObj["config"] as? [String: Any] {
+                themeCSS = config["generatedCSS"] as? [String: Any]
+            }
+
+            let appearanceDict = jsonObj["appearance"] as? [String: Any] ?? [:]
+
+            var injectedData: [String: Any] = [
+                "type": "RESET_STATE",
+                "state": [
+                    
+                    "skip": true,
+                    "spotCheckAppearance": appearanceDict,
+                    "spotcheckUrl": screen,
+                    "traceId": self.traceId,
+                    "elementBuilderParams": self.variables,
+                    "targetType": "MOBILE"
+                ]
+            ]
+            
+
+            if var state = injectedData["state"] as? [String: Any] {
+                state.merge(jsonObj) { _, new in new }
+                injectedData["state"] = state
+            } else {
+                injectedData["state"] = jsonObj
+            }
+
+            let themePayload: [String: Any] = [
+                "type": "THEME_UPDATE_SPOTCHECK",
+                "themeInfo": themeCSS
+            ]
+            DispatchQueue.main.async{
+                
+                if(isChat){
+                    self.injectionJS = """
+                (function() {
+                    window.dispatchEvent(new MessageEvent('message', { data: \(self.jsonString(from: injectedData)) }));
+                })();
+                """
+                }else{
+                    self.injectionJS = """
+                (function() {
+                    window.dispatchEvent(new MessageEvent('message', { data: \(self.jsonString(from: injectedData)) }));
+                    window.dispatchEvent(new MessageEvent('message', { data: \(self.jsonString(from: themePayload)) }));
+                })();
+                """
+                }
+                
+                if isChat {
+                    if !self.isChatLoading {
+                        self.chatBool = true
+                        self.start()
+                    }
+                    else{
+                        self.preStart()
+                    }
+                } else {
+                    if !self.isClassicLoading {
+                        self.classicBool = true
+                        self.start()
+                    }
+                    else{
+                        self.preStart()
+                    }
+                }
+                
+                }
+        }.resume()
+
     }
+    
+
+
+    private func jsonString(from dict: [String: Any]) -> String {
+        if let data = try? JSONSerialization.data(withJSONObject: dict, options: []),
+           let str = String(data: data, encoding: .utf8) {
+            return str
+        }
+        return "{}"
+    }
+    
+    private func currentSurveyType() -> String {
+        return self.spotCheckType ?? ""
+    }
+
         
     public func getCurrentDate() -> String {
         let currentDate = Date()

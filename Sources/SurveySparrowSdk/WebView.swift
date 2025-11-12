@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Gokulkrishna raju on 03/04/24.
 //
@@ -13,15 +13,20 @@ public struct WebView: View {
     
     let delegate: SsSpotcheckDelegate
     let state: SpotcheckState
-    @State private var isLoading: Bool = true
+    @State public var urlType: String
 
     public var body: some View {
         ZStack {
-            if isLoading {
+            if  urlType == "classic" ? state.isClassicLoading : state.isChatLoading{
                 ProgressView("Loading...")
                     .progressViewStyle(CircularProgressViewStyle())
             }
-            WebViewRepresentable(urlString: state.spotcheckURL, delegate: delegate, state: state, isLoading: $isLoading)
+            WebViewRepresentable(
+                urlString: urlType == "classic" ? state.classicUrl : state.chatUrl,
+                delegate: delegate,
+                state: state,
+                urlType: $urlType
+            )
         }
     }
 }
@@ -31,7 +36,7 @@ struct WebViewRepresentable: UIViewRepresentable {
     let urlString: String
     let delegate: SsSpotcheckDelegate
     let state: SpotcheckState
-    @Binding var isLoading: Bool
+    @Binding var urlType: String
     private let surveyResponseHandler = WKUserContentController()
     
     public static func dismantleUIView(_ uiView: WKWebView, coordinator: Coordinator) {
@@ -45,6 +50,18 @@ struct WebViewRepresentable: UIViewRepresentable {
         config.preferences.javaScriptEnabled = true
         config.userContentController = surveyResponseHandler
         let webView = WKWebView(frame: .zero, configuration: config)
+        
+        if(urlType=="classic"){
+            DispatchQueue.main.async{
+                self.state.classicWebView = webView
+            }
+        }
+        else{
+            DispatchQueue.main.async{
+                self.state.chatWebView = webView
+            }
+          
+        }
         webView.navigationDelegate = context.coordinator
         surveyResponseHandler.add(context.coordinator, name: "surveyResponse")
         surveyResponseHandler.add(context.coordinator, name: "spotCheckData")
@@ -113,11 +130,15 @@ struct WebViewRepresentable: UIViewRepresentable {
                 else if responseType == thankYouPageSubmission
                 {
                     self.parent.state.isCloseButtonEnabled = true
+                    self.parent.state.isThankyouPageSubmission = true
                     if self.parent.delegate != nil {
                         let capturedResponse = response
                         Task {
                             await self.parent.delegate.handleSurveyResponse(response: capturedResponse)
                         }
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                        self.parent.state.end()
                     }
                 }
                 
@@ -125,11 +146,27 @@ struct WebViewRepresentable: UIViewRepresentable {
                     if self.parent.delegate != nil {
                         if let currentQuestionSize = response["data"]?["currentQuestionSize"] as? [String: Any],
                            let height = currentQuestionSize["height"] as? Double {
+                            
                             self.parent.state.currentQuestionHeight = height
+                            
+                            if(self.parent.state.spotChecksMode=="miniCard" && self.parent.state.isCloseButtonEnabled){
+                                self.parent.state.currentQuestionHeight -= 40;
+                            }
+                            if(self.parent.state.spotChecksMode=="miniCard" && self.parent.state.avatarEnabled){
+                                self.parent.state.currentQuestionHeight -= 56;
+                            }
+                        }
+                        
+                        if let isCloseButtonEnabled = response["data"]?["isCloseButtonEnabled"] as? Bool{
+                            self.parent.state.isCloseButtonEnabled = isCloseButtonEnabled
                         }
                     }
+              
+                } else if responseType == "slideInFrame" {
+                    self.parent.state.isMounted = true
                 }
             }
+
 
         }
         
@@ -140,7 +177,16 @@ struct WebViewRepresentable: UIViewRepresentable {
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            parent.isLoading = false
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                if(self.parent.urlType == "classic"){
+                    self.parent.state.isClassicLoading = false
+                }
+                else{
+                    self.parent.state.isChatLoading = false
+                }
+            }
+            
         }
         
         public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
