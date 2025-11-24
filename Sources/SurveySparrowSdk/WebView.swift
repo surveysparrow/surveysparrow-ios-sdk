@@ -133,7 +133,6 @@ struct WebViewRepresentable: UIViewRepresentable {
                 }
                 else if responseType == thankYouPageSubmission
                 {
-                    self.parent.state.isCloseButtonEnabled = true
                     self.parent.state.isThankyouPageSubmission = true
                     if self.parent.delegate != nil {
                         let capturedResponse = response
@@ -141,8 +140,15 @@ struct WebViewRepresentable: UIViewRepresentable {
                             await self.parent.delegate.handleSurveyResponse(response: capturedResponse)
                         }
                     }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                        self.parent.state.end()
+                    
+                    if(self.parent.state.spotChecksMode == "miniCard" && !self.parent.state.isCloseButtonEnabled)
+                    {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                            self.parent.state.end()
+                        }
+                    }
+                    else{
+                        self.parent.state.isCloseButtonEnabled = true
                     }
                 }
                 

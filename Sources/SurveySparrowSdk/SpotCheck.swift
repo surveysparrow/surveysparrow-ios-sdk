@@ -56,14 +56,31 @@ public struct Spotcheck: View {
         }
     }
 
-    public func CloseSpotchecks () {
+    private struct NavControllerFinder: UIViewControllerRepresentable {
+        public var state: SpotcheckState
+
+        public func makeUIViewController(context: Context) -> NavigationControllerSniffer {
+            let s = NavigationControllerSniffer()
+            s.state = state
+            return s
+        }
+
+        public func updateUIViewController(_ uiViewController: NavigationControllerSniffer, context: Context) {}
+    }
+
+
+    public func CloseSpotchecks() {
         state.closeSpotCheck()
-        state.end()
+        state.end(isNavigation: true)
+    }
+    
+    public var navControllerFinder: some View {
+        NavControllerFinder(state: self.state)
+            .frame(width: 0, height: 0)
     }
     
     public var body: some View {
         ZStack {
-            
             if (!state.classicUrl.isEmpty) {
                 ZStack {
                     Spacer()
@@ -78,21 +95,8 @@ public struct Spotcheck: View {
                                 HStack {
                                     Spacer()
                                     Button(action: {
-                                        
-                                        if(!self.state.isSpotCheckButton){
-                                            state.closeSpotCheck()
-                                            state.end()
-                                        }
-                                        else {
-                                            if(self.state.isThankyouPageSubmission)
-                                            {
-                                                state.closeSpotCheck()
-                                                state.end()
-                                            }
-                                            else{
-                                                state.showSurveyContent = false
-                                            }
-                                        }
+                                        state.closeSpotCheck()
+                                        state.end()
                                     }) {
                                         ZStack {
                                             Circle()
@@ -187,7 +191,10 @@ public struct Spotcheck: View {
                         generatedIcon: buttonConfigMap["generatedIcon"] as? String ?? "",
                         cornerRadius: buttonConfigMap["cornerRadius"] as? String ?? "sharp",
                         onPress: {
-                            state.showSurveyContent = true
+                            Task {
+                                await state.performBootstrapRequest()
+                                state.showSurveyContent = true
+                            }
                         }
                     )
                     
@@ -202,7 +209,6 @@ public struct Spotcheck: View {
                                 SpotCheckButton(config: buttonConfig)
                             }
                         }
-                        
                     }
                 }
             }
@@ -259,21 +265,8 @@ struct WebViewContainer: View {
                         self.state.spotChecksMode != "miniCard"
                     ) {
                         Button {
-                            if(!self.state.isSpotCheckButton){
                                 state.closeSpotCheck()
                                 state.end()
-                            }
-                            else{
-                                if(self.state.isThankyouPageSubmission)
-                                {
-                                    state.closeSpotCheck()
-                                    state.end()
-                                }
-                                else{
-                                    state.showSurveyContent = false
-                                }
-                            }
-                            
                         } label: {
                             Image(systemName: "xmark")
                         }
@@ -365,4 +358,47 @@ public class ssSurveyDelegate: SsSpotcheckDelegate {
 
     public func handleCloseButtonTap() async{}
 
+}
+
+
+private final class SsNavigationListener: NSObject, UINavigationControllerDelegate {
+    
+    private static let shared = SsNavigationListener()
+    
+    private weak var previousViewController: UIViewController?
+    public weak var spotcheckState: SpotcheckState?
+    
+    public static func attach(to nav: UINavigationController, state: SpotcheckState) {
+        let listener = SsNavigationListener.shared
+        listener.spotcheckState = state
+        nav.delegate = listener
+    }
+    
+    public func navigationController(
+        _ navigationController: UINavigationController,
+        willShow viewController: UIViewController,
+        animated: Bool
+    ) {
+        if(spotcheckState?.isVisible ?? false || (spotcheckState?.isSpotCheckButton ?? false)){
+            spotcheckState?.closeSpotCheck()
+            spotcheckState?.end(isNavigation: true)
+        }
+    }
+}
+
+
+@available(iOS 15.0, *)
+private final class NavigationControllerSniffer: UIViewController {
+
+    public var state: SpotcheckState!
+
+    public override func didMove(toParent parent: UIViewController?) {
+        super.didMove(toParent: parent)
+
+        guard let nav = parent?.navigationController else {
+            return
+        }
+
+        SsNavigationListener.attach(to: nav, state: state)
+    }
 }

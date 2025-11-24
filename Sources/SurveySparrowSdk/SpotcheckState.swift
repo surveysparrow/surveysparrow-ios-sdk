@@ -41,6 +41,9 @@ public class SpotcheckState: ObservableObject {
     @Published public var spotCheckButtonConfig: [String: Any] = [:]
     @Published public var showSurveyContent: Bool = true
     @Published public var isThankyouPageSubmission: Bool = false
+    @Published public var isChat: Bool = false
+    @Published public var  screenName: String = ""
+    @Published public var appearance: [String: Any] = [:]
     @Published public var isChatLoading: Bool = true {
         
         didSet {
@@ -189,12 +192,10 @@ public class SpotcheckState: ObservableObject {
     }
     
     public func start() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + Double(self.afterDelay)) {
-            self.isVisible = true
-        }
+        self.isVisible = true
     }
     
-    public func end() {
+    public func end(isNavigation: Bool = false) {
 
             let targetWebView = spotCheckType == "chat" ? chatWebView : classicWebView
             let jsToInject = """
@@ -208,8 +209,8 @@ public class SpotcheckState: ObservableObject {
             DispatchQueue.main.async {
                 targetWebView?.evaluateJavaScript(jsToInject)
             }
-          
-            self.isVisible = false
+        
+        if(!self.isSpotCheckButton || isNavigation){
             self.isFullScreenMode = false
             self.spotcheckID = 0
             self.spotcheckPosition = "bottom"
@@ -224,11 +225,21 @@ public class SpotcheckState: ObservableObject {
             self.injectionJS = ""
             self.spotCheckType = ""
             if (self.isSpotCheckButton) {
-            self.showSurveyContent = true
+                self.showSurveyContent = true
             }
             self.isSpotCheckButton = false
             self.isThankyouPageSubmission = false
-
+            self.isChat = false
+            self.screenName = ""
+            self.appearance = [:]
+        }
+        else if(self.isVisible){
+            self.isVisible = false
+            self.showSurveyContent = false
+            self.isMounted = false
+            self.isThankyouPageSubmission = false
+            self.currentQuestionHeight = 0.0
+        }
     }
     
     public func sendTrackScreenRequest(screen: String, completion: @escaping (Bool, Bool) -> Void) {
@@ -624,25 +635,22 @@ public class SpotcheckState: ObservableObject {
         } else {
             self.spotcheckPosition = "bottom"
         }
-
+        self.appearance = appearance
         self.isCloseButtonEnabled = appearance["closeButton"] as? Bool ?? true
         let maxHeightRaw = cardProp["maxHeight"]
         let mxHeight = maxHeightRaw as? Double ?? Double(maxHeightRaw as? String ?? "1") ?? 1
         self.maxHeight = mxHeight / 100
-
+        print(self.isCloseButtonEnabled)
         self.closeButtonStyle = overrides
         self.isFullScreenMode = appearance["mode"] as? String == "fullScreen"
         self.spotChecksMode = appearance["mode"] as? String ?? ""
         self.isBannerImageOn = (appearance["bannerImage"] as? [String: Any])?["enabled"] as? Bool ?? false
         self.avatarEnabled = (appearance["avatar"] as? [String: Any])?["enabled"] as? Bool ?? false
         self.avatarUrl = (appearance["avatar"] as? [String: Any])?["avatarUrl"] as? String ?? ""
-
         self.spotCheckType = isChat ? "chat" : "classic"
+        let isSpotCheckButton = (appearance["type"] as? String) == "spotcheckButton"
         
-        self.isSpotCheckButton = (appearance["type"] as? String) == "spotcheckButton"
-        
-        
-        if self.isSpotCheckButton {
+        if isSpotCheckButton {
             if let current = currentSpotCheck,
                let appearance = current["appearance"] as? [String: Any],
                let buttonConfig = appearance["buttonConfig"] as? [String: Any] {
@@ -654,20 +662,34 @@ public class SpotcheckState: ObservableObject {
             self.spotCheckButtonConfig = [:]
         }
         
-        self.showSurveyContent = !self.isSpotCheckButton
-        
+        self.showSurveyContent = !isSpotCheckButton
         
         self.spotcheckID = (json["spotCheckId"] as? Int64) ?? (json["id"] as? Int64) ?? 0
-        self.spotcheckContactID = (json["spotCheckContactId"] as? Int64) ?? (json["spotCheckContact"] as? [String: Any])?["id"] as? Int64 ?? 0
+        self.spotcheckContactID = (json["spotCheckContactId"] as? Int64)
+        ?? (json["spotCheckContact"] as? [String: Any])?["id"] as? Int64 ?? 0
         self.triggerToken = json["triggerToken"] as? String ?? ""
-        var baseURL = "https://\(self.domainName)/s/spotcheck/\(self.triggerToken)/\(isChat ? "config" : "bootstrap")?spotcheckContactId=\(self.spotcheckContactID)&traceId=\(self.traceId)&spotcheckUrl=\(screen)"
+        self.isChat = isChat
+        self.screenName = screen
+        DispatchQueue.main.asyncAfter(deadline: .now() + Double(self.afterDelay)) {
+            self.isSpotCheckButton = isSpotCheckButton
+            if(!self.isSpotCheckButton){
+                self.performBootstrapRequest()
+            }
+        } 
+    }
+    
+    public func performBootstrapRequest() {
         
+        let screen = self.screenName
+        let isChat = self.isChat
+        
+        var baseURL = "https://\(self.domainName)/s/spotcheck/\(self.triggerToken)/\(isChat ? "config" : "bootstrap")"
+        baseURL += "?spotcheckContactId=\(self.spotcheckContactID)&traceId=\(self.traceId)&spotcheckUrl=\(screen)"
         self.variables.forEach { key, value in
             baseURL += "&\(key)=\(value)"
         }
         
         self.spotcheckURL = baseURL
-        
         guard let url = URL(string: baseURL) else { return }
         
         var userAgentString: String = ""
@@ -696,13 +718,12 @@ public class SpotcheckState: ObservableObject {
             
             
             var themeCSS: [String: Any]? = [:]
-
             if let config = jsonObj["config"] as? [String: Any] {
                 themeCSS = config["generatedCSS"] as? [String: Any]
             }
-
-            let appearanceDict = jsonObj["appearance"] as? [String: Any] ?? [:]
-
+            
+            let appearanceDict = self.appearance ?? [:]
+            
             var injectedData: [String: Any] = [
                 "type": "RESET_STATE",
                 "state": [

@@ -1,6 +1,227 @@
 import SwiftUI
 import WebKit
 
+
+fileprivate class ImageCache {
+    static let shared = ImageCache()
+    private let cache = NSCache<NSString, UIImage>()
+
+    private init() {}
+
+    func get(forKey key: String) -> UIImage? {
+        cache.object(forKey: key as NSString)
+    }
+
+    func set(_ image: UIImage, forKey key: String) {
+        cache.setObject(image, forKey: key as NSString)
+    }
+}
+
+@available(iOS 14.0, *)
+@MainActor
+fileprivate class ImageLoader: ObservableObject {
+    @Published private(set) var state: LoadState = .loading
+    
+    enum LoadState {
+        case loading
+        case success(UIImage)
+        case failure
+    }
+    
+    private let url: URL
+    private var task: URLSessionDataTask?
+    
+    init(url: URL) {
+        self.url = url
+    }
+    
+    func load() {
+        let urlString = url.absoluteString
+        if let cachedImage = ImageCache.shared.get(forKey: urlString) {
+            self.state = .success(cachedImage)
+            return
+        }
+        
+        task = URLSession.shared.dataTask(with: url) { data, response, error in
+            DispatchQueue.main.async {
+                if let data = data, let loadedImage = UIImage(data: data) {
+                    ImageCache.shared.set(loadedImage, forKey: urlString)
+                    self.state = .success(loadedImage)
+                } else {
+                    self.state = .failure
+                }
+            }
+        }
+        task?.resume()
+    }
+    
+    func cancel() {
+        task?.cancel()
+    }
+}
+
+@available(iOS 14.0, *)
+fileprivate struct CachedAsyncImage<Content: View, Placeholder: View, Failure: View>: View {
+    @StateObject private var loader: ImageLoader
+    private let content: (Image) -> Content
+    private let placeholder: () -> Placeholder
+    private let failure: () -> Failure
+    
+    init(url: URL,
+         @ViewBuilder content: @escaping (Image) -> Content,
+         @ViewBuilder placeholder: @escaping () -> Placeholder,
+         @ViewBuilder failure: @escaping () -> Failure) {
+        _loader = StateObject(wrappedValue: ImageLoader(url: url))
+        self.content = content
+        self.placeholder = placeholder
+        self.failure = failure
+    }
+    
+    var body: some View {
+        Group {
+            switch loader.state {
+            case .loading:
+                placeholder()
+            case .success(let uiImage):
+                content(Image(uiImage: uiImage))
+            case .failure:
+                failure()
+            }
+        }
+        .onAppear(perform: loader.load)
+        .onDisappear(perform: loader.cancel)
+    }
+}
+
+fileprivate class SVGRenderer: NSObject, WKNavigationDelegate {
+    private var webView: WKWebView?
+    private var completion: ((UIImage?) -> Void)?
+
+    func image(from svgString: String, size: CGSize, completion: @escaping (UIImage?) -> Void) {
+        self.completion = completion
+
+        DispatchQueue.main.async {
+            let config = WKWebViewConfiguration()
+            let webView = WKWebView(frame: CGRect(origin: .zero, size: size), configuration: config)
+            webView.navigationDelegate = self
+            webView.backgroundColor = .clear
+            webView.isOpaque = false
+            webView.scrollView.isScrollEnabled = false
+            self.webView = webView
+
+            let html = """
+            <html>
+              <head>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0, shrink-to-fit=no'>
+                <style>
+                  body { margin: 0; padding: 0; background: transparent; display: flex; justify-content: center; align-items: center; height: 100vh; }
+                  svg { width: 100%; height: 100%; }
+                </style>
+              </head>
+              <body>\(svgString)</body>
+            </html>
+            """
+            webView.loadHTMLString(html, baseURL: nil)
+        }
+    }
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            webView.takeSnapshot(with: nil) { image, error in
+                self.completion?(image)
+                self.webView = nil
+                self.completion = nil
+            }
+        }
+    }
+    
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        print("SVG rendering failed: \(error)")
+        completion?(nil)
+        self.webView = nil
+        self.completion = nil
+    }
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        print("SVG rendering failed provisionally: \(error)")
+        completion?(nil)
+        self.webView = nil
+        self.completion = nil
+    }
+}
+
+@available(iOS 14.0, *)
+@MainActor
+fileprivate class SVGLoader: ObservableObject {
+    @Published private(set) var state: ImageLoader.LoadState = .loading
+
+    private let svgString: String
+    private var renderer: SVGRenderer?
+
+    init(svgString: String) {
+        self.svgString = svgString
+    }
+
+    func load(size: CGSize) {
+        if let cachedImage = ImageCache.shared.get(forKey: svgString) {
+            self.state = .success(cachedImage)
+            return
+        }
+
+        renderer = SVGRenderer()
+        renderer?.image(from: svgString, size: size) { [weak self] image in
+            guard let self = self else { return }
+            if let image = image {
+                ImageCache.shared.set(image, forKey: self.svgString)
+                self.state = .success(image)
+            } else {
+                self.state = .failure
+            }
+            self.renderer = nil
+        }
+    }
+
+    func cancel() {
+        renderer = nil
+    }
+}
+
+@available(iOS 14.0, *)
+fileprivate struct CachedSVGImageView<Content: View, Placeholder: View, Failure: View>: View {
+    @StateObject private var loader: SVGLoader
+    private let size: CGSize
+    private let content: (Image) -> Content
+    private let placeholder: () -> Placeholder
+    private let failure: () -> Failure
+
+    init(svgString: String,
+         size: CGSize,
+         @ViewBuilder content: @escaping (Image) -> Content,
+         @ViewBuilder placeholder: @escaping () -> Placeholder,
+         @ViewBuilder failure: @escaping () -> Failure) {
+        _loader = StateObject(wrappedValue: SVGLoader(svgString: svgString))
+        self.size = size
+        self.content = content
+        self.placeholder = placeholder
+        self.failure = failure
+    }
+
+    var body: some View {
+        Group {
+            switch loader.state {
+            case .loading:
+                placeholder()
+            case .success(let uiImage):
+                content(Image(uiImage: uiImage))
+            case .failure:
+                failure()
+            }
+        }
+        .onAppear { loader.load(size: size) }
+        .onDisappear { loader.cancel() }
+    }
+}
+
 struct SpotCheckButtonConfig {
     var type: String = "floatingButton"
     var position: String = "bottom_right"
@@ -14,6 +235,7 @@ struct SpotCheckButtonConfig {
     var onPress: () -> Void = {}
 }
 
+@available(iOS 13.0, *)
 struct SpotCheckButtonUtils {
     static let FLOATING_BUTTON: [String: CGFloat] = [
         "small": 28, "medium": 32, "large": 40
@@ -39,7 +261,6 @@ struct SpotCheckButtonUtils {
         BORDER_RADIUS[corner]?[size] ?? 6
     }
     
-    @available(iOS 13.0, *)
     static func hexToColor(_ hex: String, opacity: Double = 1.0) -> Color {
         var hexClean = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         if hexClean.hasPrefix("#") { hexClean.removeFirst() }
@@ -61,7 +282,6 @@ struct SpotCheckButtonUtils {
         return Color(red: r, green: g, blue: b).opacity(opacity)
     }
     
-    @available(iOS 13.0, *)
     static func getTextStyle(for size: String) -> Font {
         switch size {
         case "small": return .system(size: 12, weight: .bold)
@@ -71,11 +291,11 @@ struct SpotCheckButtonUtils {
     }
 }
 
+@available(iOS 13.0, *)
 struct RoundedCorner: Shape {
     var radius: CGFloat = .infinity
     var corners: UIRectCorner = .allCorners
 
-    @available(iOS 13.0, *)
     func path(in rect: CGRect) -> Path {
         let path = UIBezierPath(
             roundedRect: rect,
@@ -116,6 +336,7 @@ struct InlineSVGView: UIViewRepresentable {
 }
 
 
+@available(iOS 13.0, *)
 struct SpotCheckIcon: View {
     var icon: String
     var buttonSize: String
@@ -127,7 +348,6 @@ struct SpotCheckIcon: View {
         : SpotCheckButtonUtils.getTextButtonIconSize(buttonSize)
     }
     
-    @available(iOS 13.0, *)
     var body: some View {
         Group {
             if icon.isEmpty {
@@ -135,35 +355,41 @@ struct SpotCheckIcon: View {
                     .frame(width: size, height: size)
                     .clipShape(Circle())
             } else if icon.trimmingCharacters(in: .whitespaces).contains("<svg") {
-                
-                InlineSVGView(svgString: icon)
-                    .frame(width: size, height: size)
-                    .clipShape(Circle())
-                    .aspectRatio(contentMode: .fit)
-            } else {
-                if #available(iOS 15.0, *) {
-                    AsyncImage(url: URL(string: icon)) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                        case .failure(_):
-                            Image(systemName: "photo")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                        case .empty:
-                            Color.clear
-                        @unknown default:
-                            Color.clear
-                        }
+                if #available(iOS 14.0, *) {
+                    CachedSVGImageView(svgString: icon, size: CGSize(width: size, height: size)) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                    } placeholder: {
+                        Color.clear
+                    } failure: {
+                        Color.clear
                     }
                     .frame(width: size, height: size)
                     .clipShape(Circle())
                 } else {
-                    Color.clear
+                    InlineSVGView(svgString: icon)
                         .frame(width: size, height: size)
                         .clipShape(Circle())
+                        .aspectRatio(contentMode: .fit)
+                }
+            } else {
+                if #available(iOS 14.0, *) {
+                    if let url = URL(string: icon) {
+                        CachedAsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                        } placeholder: {
+                            Color.clear
+                        } failure: {
+                            Color.clear
+                        }
+                    } else {
+                        Color.clear
+                    }
+                } else {
+                    Color.clear
                 }
             }
         }
@@ -173,10 +399,10 @@ struct SpotCheckIcon: View {
 
 
 
+@available(iOS 13.0, *)
 struct FloatingButton: View {
     var config: SpotCheckButtonConfig
     
-    @available(iOS 13.0, *)
     var body: some View {
         let size = SpotCheckButtonUtils.getFloatingButtonSize(config.buttonSize)
         let bgColor = SpotCheckButtonUtils.hexToColor(config.backgroundColor)
@@ -214,10 +440,10 @@ struct FloatingButton: View {
 }
 
 
+@available(iOS 13.0, *)
 struct TextButton: View {
     var config: SpotCheckButtonConfig
     
-    @available(iOS 13.0, *)
     var body: some View {
         let radius = SpotCheckButtonUtils.getBorderRadius(config.cornerRadius, config.buttonSize)
         let bgColor = SpotCheckButtonUtils.hexToColor(config.backgroundColor)
@@ -361,10 +587,10 @@ struct SideTab: View {
 }
 
 
+@available(iOS 13.0, *)
 struct SpotCheckButton: View {
     var config: SpotCheckButtonConfig
 
-    @available(iOS 13.0, *)
     var body: some View {
         switch config.type {
         case "floatingButton": FloatingButton(config: config)

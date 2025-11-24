@@ -78,7 +78,7 @@ struct ContentView: View {
                         .frame(height: 400)
                 }.sheet(isPresented: $isModalPresented) {
                     FullScreenSurveyView(domain: domain, token: token, params: params, properties: properties)
-                }
+                }.background(spotCheck.navControllerFinder)
             }
             spotCheck
         }
