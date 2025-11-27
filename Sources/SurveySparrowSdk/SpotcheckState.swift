@@ -640,7 +640,6 @@ public class SpotcheckState: ObservableObject {
         let maxHeightRaw = cardProp["maxHeight"]
         let mxHeight = maxHeightRaw as? Double ?? Double(maxHeightRaw as? String ?? "1") ?? 1
         self.maxHeight = mxHeight / 100
-        print(self.isCloseButtonEnabled)
         self.closeButtonStyle = overrides
         self.isFullScreenMode = appearance["mode"] as? String == "fullScreen"
         self.spotChecksMode = appearance["mode"] as? String ?? ""

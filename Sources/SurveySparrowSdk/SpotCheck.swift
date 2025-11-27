@@ -67,6 +67,27 @@ public struct Spotcheck: View {
 
         public func updateUIViewController(_ uiViewController: NavigationControllerSniffer, context: Context) {}
     }
+    
+    private func isVisible(for type: String) -> Bool {
+        guard state.isVisible,
+              state.showSurveyContent,
+              state.spotCheckType == type
+        else { return false }
+        
+        switch type {
+        case "classic":
+            return !state.isClassicLoading &&
+            (state.isMounted || state.isFullScreenMode)
+            
+        case "chat":
+            return !state.isChatLoading &&
+            state.isFullScreenMode
+            
+        default:
+            return false
+        }
+    }
+
 
 
     public func CloseSpotchecks() {
@@ -152,8 +173,8 @@ public struct Spotcheck: View {
                         if state.spotcheckPosition == "top" { Spacer() }
                     }
                 }
-                .opacity((state.isVisible && state.showSurveyContent && state.spotCheckType == "classic" && !state.isClassicLoading && (state.isMounted || state.isFullScreenMode)) ? 1 : 0)
-                .disabled(!(state.isVisible && state.spotCheckType == "classic" && state.showSurveyContent && !state.isClassicLoading && (state.isMounted || state.isFullScreenMode)))
+                .opacity(isVisible(for: "classic") ? 1 : 0)
+                .disabled(!isVisible(for: "classic"))
             }
             
             
@@ -172,8 +193,8 @@ public struct Spotcheck: View {
                         if state.spotcheckPosition == "top" { Spacer() }
                     }
                 }
-                .opacity((state.isVisible && state.showSurveyContent && state.spotCheckType == "chat" && !state.isChatLoading && state.isFullScreenMode) ? 1 : 0)
-                .disabled(!(state.isVisible && state.showSurveyContent && state.spotCheckType == "chat" && !state.isChatLoading && state.isFullScreenMode))
+                .opacity(isVisible(for: "chat") ? 1 : 0)
+                .disabled(!isVisible(for: "chat"))
             }
             
             
@@ -361,6 +382,7 @@ public class ssSurveyDelegate: SsSpotcheckDelegate {
 }
 
 
+@available(iOS 13.0, *)
 private final class SsNavigationListener: NSObject, UINavigationControllerDelegate {
     
     private static let shared = SsNavigationListener()
