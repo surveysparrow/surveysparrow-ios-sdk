@@ -174,6 +174,10 @@ struct WebViewRepresentable: UIViewRepresentable {
               
                 } else if responseType == "slideInFrame" {
                     self.parent.state.isMounted = true
+                } else if responseType == "chatLoadEvent" {
+                    self.parent.state.isChatLoading = false
+                } else if responseType == "classicLoadEvent" {
+                    self.parent.state.isClassicLoading = false
                 }
             }
 
@@ -184,19 +188,6 @@ struct WebViewRepresentable: UIViewRepresentable {
 
         init(_ parent: WebViewRepresentable) {
             self.parent = parent
-        }
-
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                if(self.parent.urlType == "classic"){
-                    self.parent.state.isClassicLoading = false
-                }
-                else{
-                    self.parent.state.isChatLoading = false
-                }
-            }
-            
         }
         
         public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
