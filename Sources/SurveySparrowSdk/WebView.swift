@@ -13,15 +13,20 @@ public struct WebView: View {
     
     let delegate: SsSpotcheckDelegate
     let state: SpotcheckState
-    @State private var isLoading: Bool = true
+    @State public var urlType: String
 
     public var body: some View {
         ZStack {
-            if isLoading {
+            if  urlType == "classic" ? state.isClassicLoading : state.isChatLoading{
                 ProgressView("Loading...")
                     .progressViewStyle(CircularProgressViewStyle())
             }
-            WebViewRepresentable(urlString: state.spotcheckURL, delegate: delegate, state: state, isLoading: $isLoading)
+            WebViewRepresentable(
+                urlString: urlType == "classic" ? state.classicUrl : state.chatUrl,
+                delegate: delegate,
+                state: state,
+                urlType: $urlType
+            )
         }
     }
 }
@@ -31,7 +36,7 @@ struct WebViewRepresentable: UIViewRepresentable {
     let urlString: String
     let delegate: SsSpotcheckDelegate
     let state: SpotcheckState
-    @Binding var isLoading: Bool
+    @Binding var urlType: String
     private let surveyResponseHandler = WKUserContentController()
     
     public static func dismantleUIView(_ uiView: WKWebView, coordinator: Coordinator) {
@@ -43,12 +48,66 @@ struct WebViewRepresentable: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         config.preferences.javaScriptEnabled = true
-        config.userContentController = surveyResponseHandler
+
+        let js = """
+          window.addEventListener(
+            'scroll',
+            function () {
+              if (
+                document.querySelector(
+                  '.surveysparrow-chat__wrapper'
+                )
+              ) {
+                window.scrollTo(0, 0);
+              }
+            },
+            { passive: false }
+          );
+
+          (function() {
+            var styleTag = document.createElement("style");
+            styleTag.innerHTML = `
+                .surveysparrow-chat__wrapper .ss-language-selector--wrapper {
+                    margin-right: 45px;
+                }
+                .close-btn-chat--spotchecks {
+                    display: none !important;
+                }
+            `;
+            document.head.appendChild(styleTag);
+        })();
+        """
+
+        let userScript = WKUserScript(
+            source: js,
+            injectionTime: .atDocumentEnd,
+            forMainFrameOnly: true
+        )
+
+
+        let contentController = WKUserContentController()
+        contentController.addUserScript(userScript)
+
+        contentController.add(context.coordinator, name: "surveyResponse")
+        contentController.add(context.coordinator, name: "spotCheckData")
+        contentController.add(context.coordinator, name: "flutterSpotCheckData")
+
+        config.userContentController = contentController
+
         let webView = WKWebView(frame: .zero, configuration: config)
+        
+        if(urlType=="classic"){
+            DispatchQueue.main.async{
+                self.state.classicWebView = webView
+            }
+        }
+        else{
+            DispatchQueue.main.async{
+                self.state.chatWebView = webView
+            }
+          
+        }
         webView.navigationDelegate = context.coordinator
-        surveyResponseHandler.add(context.coordinator, name: "surveyResponse")
-        surveyResponseHandler.add(context.coordinator, name: "spotCheckData")
-        surveyResponseHandler.add(context.coordinator, name: "flutterSpotCheckData")
         return webView
     }
 
@@ -116,12 +175,22 @@ struct WebViewRepresentable: UIViewRepresentable {
                 }
                 else if responseType == thankYouPageSubmission
                 {
-                    self.parent.state.isCloseButtonEnabled = true
+                    self.parent.state.isThankyouPageSubmission = true
                     if self.parent.delegate != nil {
                         let capturedResponse = response
                         Task {
                             await self.parent.delegate.handleSurveyResponse(response: capturedResponse)
                         }
+                    }
+                    
+                    if(self.parent.state.spotChecksMode == "miniCard" && !self.parent.state.isCloseButtonEnabled)
+                    {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                            self.parent.state.end()
+                        }
+                    }
+                    else{
+                        self.parent.state.isCloseButtonEnabled = true
                     }
                 }
                 
@@ -129,11 +198,31 @@ struct WebViewRepresentable: UIViewRepresentable {
                     if self.parent.delegate != nil {
                         if let currentQuestionSize = response["data"]?["currentQuestionSize"] as? [String: Any],
                            let height = currentQuestionSize["height"] as? Double {
+                            
                             self.parent.state.currentQuestionHeight = height
+                            
+                            if(self.parent.state.spotChecksMode=="miniCard" && self.parent.state.isCloseButtonEnabled){
+                                self.parent.state.currentQuestionHeight -= 40;
+                            }
+                            if(self.parent.state.spotChecksMode=="miniCard" && self.parent.state.avatarEnabled){
+                                self.parent.state.currentQuestionHeight -= 56;
+                            }
+                        }
+
+                        if let isCloseButtonEnabled = response["data"]?["isCloseButtonEnabled"] as? Bool{
+                            self.parent.state.isCloseButtonEnabled = isCloseButtonEnabled
                         }
                     }
+              
+                } else if responseType == "slideInFrame" {
+                    self.parent.state.isMounted = true
+                } else if responseType == "chatLoadEvent" {
+                    self.parent.state.isChatLoading = false
+                } else if responseType == "classicLoadEvent" {
+                    self.parent.state.isClassicLoading = false
                 }
             }
+
 
         }
         
@@ -141,10 +230,6 @@ struct WebViewRepresentable: UIViewRepresentable {
 
         init(_ parent: WebViewRepresentable) {
             self.parent = parent
-        }
-
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            parent.isLoading = false
         }
         
         public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
