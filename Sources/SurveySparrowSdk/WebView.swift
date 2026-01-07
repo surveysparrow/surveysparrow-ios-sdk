@@ -48,7 +48,42 @@ struct WebViewRepresentable: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         config.preferences.javaScriptEnabled = true
-        config.userContentController = surveyResponseHandler
+
+        let js = """
+          window.addEventListener('scroll', function() {
+          window.scrollTo(0, 0);
+          }, { passive: false });
+
+          (function() {
+            var styleTag = document.createElement("style");
+            styleTag.innerHTML = `
+                .surveysparrow-chat__wrapper .ss-language-selector--wrapper {
+                    margin-right: 45px;
+                }
+                .close-btn-chat--spotchecks {
+                    display: none !important;
+                }
+            `;
+            document.head.appendChild(styleTag);
+        })();
+        """
+
+        let userScript = WKUserScript(
+            source: js,
+            injectionTime: .atDocumentEnd,
+            forMainFrameOnly: true
+        )
+
+
+        let contentController = WKUserContentController()
+        contentController.addUserScript(userScript)
+
+        contentController.add(context.coordinator, name: "surveyResponse")
+        contentController.add(context.coordinator, name: "spotCheckData")
+        contentController.add(context.coordinator, name: "flutterSpotCheckData")
+
+        config.userContentController = contentController
+
         let webView = WKWebView(frame: .zero, configuration: config)
         
         if(urlType=="classic"){
@@ -63,9 +98,6 @@ struct WebViewRepresentable: UIViewRepresentable {
           
         }
         webView.navigationDelegate = context.coordinator
-        surveyResponseHandler.add(context.coordinator, name: "surveyResponse")
-        surveyResponseHandler.add(context.coordinator, name: "spotCheckData")
-        surveyResponseHandler.add(context.coordinator, name: "flutterSpotCheckData")
         return webView
     }
 
