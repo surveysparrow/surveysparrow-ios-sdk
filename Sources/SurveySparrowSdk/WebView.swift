@@ -50,9 +50,19 @@ struct WebViewRepresentable: UIViewRepresentable {
         config.preferences.javaScriptEnabled = true
 
         let js = """
-          window.addEventListener('scroll', function() {
-          window.scrollTo(0, 0);
-          }, { passive: false });
+          window.addEventListener(
+            'scroll',
+            function () {
+              if (
+                document.querySelector(
+                  '.surveysparrow-chat__wrapper'
+                )
+              ) {
+                window.scrollTo(0, 0);
+              }
+            },
+            { passive: false }
+          );
 
           (function() {
             var styleTag = document.createElement("style");
