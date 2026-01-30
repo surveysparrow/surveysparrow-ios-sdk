@@ -7,7 +7,6 @@
 
 
 import SwiftUI
-import CoreLocation
 import SurveySparrowSdk
 
 @available(iOS 15.0, *)
