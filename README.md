@@ -4,11 +4,9 @@ SurveySparrow provides various SDKs and maintaining these under different versio
 
 | SDK                                | Latest Version | Branch 
 |------------------------------------|---------------|---------------------------------|
-| SpotChecks for UIKit Apps         | [v3.0.4](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/3.0.4) | [spotchecks-for-uikit-app](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/spotchecks-for-uikit-app) |  |
-| SpotChecks for SwiftUI Apps       | [v1.2.5](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/1.2.5) | [master]() |  |
-| SurveySparrow iOS SDK for UIKit Apps | [v0.5.3](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/0.5.3) | [framework-master](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/framework-master) |  |
-| SurveySparrow iOS SDK for SwiftUI Apps | [v1.0.8](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/1.0.8) | [master]() |  |
-
+| SwiftUI Apps - Spotchecks & SDK Share       | [v1.2.6](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/1.2.6) | [master]() |  |
+| SpotChecks for UIKit Apps         | [v3.0.5](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/3.0.5) | [spotchecks-for-uikit-app](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/spotchecks-for-uikit-app) |  |
+| SDK Share for UIKit Apps | [v0.5.3](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/0.5.3) | [framework-master](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/framework-master) |  |
 
 ## Survey Sparrow iOS SDK
 
