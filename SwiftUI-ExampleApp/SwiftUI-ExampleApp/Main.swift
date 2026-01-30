@@ -63,6 +63,11 @@ struct ContentView: View {
                         Text("Show Full Screen Survey")
                     }.padding()
                     Button{
+                        FullScreenSurveyWithValidation(domain: domain, token: token, properties: properties, params: params).startFullScreenSurveyWithValidation()
+                    } label:{
+                        Text("Show Full Screen Survey with Validation")
+                    }.padding()
+                    Button{
                         showEmbedSurvey.toggle()
                     }label: {
                         Text("Show Embed Survey")
@@ -71,7 +76,7 @@ struct ContentView: View {
                     EmbeddedSurveyView(isSurveyActive: $showEmbedSurvey, domain: domain, token: token, params: params, properties: properties)
                         .frame(height: 400)
                 }.sheet(isPresented: $isModalPresented) {
-                    FullScreenSurveyView()
+                    FullScreenSurveyView(domain: domain, token: token, params: params, properties: properties)
                 }
             }
             spotCheck
