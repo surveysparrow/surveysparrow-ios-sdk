@@ -65,7 +65,7 @@ public class SurveySparrow: SsSurveyDelegate {
         if promptTime == 0 {
             let nextPrompt = currentTime + startAfter
             UserDefaults.standard.set(nextPrompt, forKey: promptTimeKey)
-            dataStore.set(1, forKey: incrementMultiplierKey)
+            dataStore.set(1 as Int, forKey: incrementMultiplierKey)
             return
         }
         if self.domain != nil && self.token != nil {
