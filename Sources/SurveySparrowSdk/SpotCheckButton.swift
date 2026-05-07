@@ -385,6 +385,8 @@ struct SpotCheckIcon: View {
                         } failure: {
                             Color.clear
                         }
+                        .frame(width: size, height: size)
+                        .clipShape(Circle())
                     } else {
                         Color.clear
                     }

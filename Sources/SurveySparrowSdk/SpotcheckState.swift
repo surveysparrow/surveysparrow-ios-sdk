@@ -628,7 +628,7 @@ public class SpotcheckState: ObservableObject {
             isChat = self.isChatSurvey(surveyType) && appearance["mode"] as? String == "fullScreen"
         }
 
-        if position == "top_full" {
+        if position == "top_full" || position == "center_top" {
             self.spotcheckPosition = "top"
         } else if position == "center_center" {
             self.spotcheckPosition = "center"

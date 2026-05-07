@@ -100,10 +100,6 @@ public struct Spotcheck: View {
             .frame(width: 0, height: 0)
     }
     
-    public func CloseSpotchecks () {
-        state.closeSpotCheck()
-        state.end()
-    }
     
     public var body: some View {
         ZStack {
