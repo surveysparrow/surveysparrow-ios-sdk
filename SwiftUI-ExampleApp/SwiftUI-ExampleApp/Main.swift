@@ -77,10 +77,12 @@ struct ContentView: View {
                         .frame(height: 400)
                 }.sheet(isPresented: $isModalPresented) {
                     FullScreenSurveyView(domain: domain, token: token, params: params, properties: properties)
-                }
-            }
+                }.background(spotCheck.navControllerFinder) // Required: nav listener; dismisses spot check on push/pop
+            }.navigationViewStyle(StackNavigationViewStyle()) // Required: stack style so the nav bar stays visible
             spotCheck
-        }
+        }.onAppear
+            {spotCheck.TrackScreen(screen: "homescreens")}
+        
     }
 }
 
