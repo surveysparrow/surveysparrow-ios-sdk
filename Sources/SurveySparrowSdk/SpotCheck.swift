@@ -169,7 +169,7 @@ public struct Spotcheck: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             }
                         }
-                        .padding(.horizontal, (state.spotChecksMode == "miniCard") ? 8 : 0)
+                        .padding(.horizontal, (state.spotChecksMode == "miniCard") ? 12 : 0)
                         
                         if state.spotcheckPosition == "top" { Spacer() }
                     }
