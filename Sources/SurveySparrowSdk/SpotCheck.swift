@@ -100,6 +100,10 @@ public struct Spotcheck: View {
             .frame(width: 0, height: 0)
     }
     
+    private var miniCardAvatarAlignment: Alignment {
+        state.isRTLLanguage ? .trailing : .leading
+    }
+    
     
     public var body: some View {
         ZStack {
@@ -115,7 +119,7 @@ public struct Spotcheck: View {
                         VStack {
                             if state.spotChecksMode == "miniCard" && state.isCloseButtonEnabled {
                                 HStack {
-                                    Spacer()
+                                    if !state.isRTLLanguage { Spacer() }
                                     Button(action: {
                                         state.closeSpotCheck()
                                         state.end()
@@ -133,6 +137,7 @@ public struct Spotcheck: View {
                                                 .foregroundColor(.black)
                                         }
                                     }
+                                    if state.isRTLLanguage { Spacer() }
                                 }
                                 .padding(.vertical, 8)
                             }
@@ -166,7 +171,7 @@ public struct Spotcheck: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 24))
                                         .padding(.vertical, 8)
                                 }
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .frame(maxWidth: .infinity, alignment: miniCardAvatarAlignment)
                             }
                         }
                         .padding(.horizontal, (state.spotChecksMode == "miniCard") ? 12 : 0)
@@ -272,6 +277,10 @@ struct WebViewContainer: View {
         self.urlType = urlType
 
     }
+    
+    private var closeButtonAlignment: Alignment {
+        state.isRTLLanguage ? .topLeading : .topTrailing
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -280,7 +289,7 @@ struct WebViewContainer: View {
                 .fixedSize(horizontal: true, vertical: false)
                 .clipShape(RoundedRectangle(cornerRadius: 0))
                 .shadow(radius: 20)
-                .overlay(alignment: .topTrailing) {
+                .overlay(alignment: closeButtonAlignment) {
                     if (
                         self.state.isCloseButtonEnabled &&
                         (self.state.isFullScreenMode || self.state.currentQuestionHeight != 0) &&

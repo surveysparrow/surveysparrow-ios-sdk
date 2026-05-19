@@ -67,9 +67,6 @@ struct WebViewRepresentable: UIViewRepresentable {
           (function() {
             var styleTag = document.createElement("style");
             styleTag.innerHTML = `
-                .surveysparrow-chat__wrapper .ss-language-selector--wrapper {
-                    margin-right: 45px;
-                }
                 .close-btn-chat--spotchecks {
                     display: none !important;
                 }
@@ -111,10 +108,37 @@ struct WebViewRepresentable: UIViewRepresentable {
         return webView
     }
 
+    private static func languageSelectorMarginScript(closeButtonEnabled: Bool) -> String {
+        if closeButtonEnabled {
+            return """
+            (function() {
+              var id = 'ss-sdk-lang-close-margin';
+              var el = document.getElementById(id);
+              if (!el) {
+                el = document.createElement('style');
+                el.id = id;
+                document.head.appendChild(el);
+              }
+              el.textContent = '.surveysparrow-chat__wrapper .ss-language-selector--wrapper{margin-right:45px;}' +
+                '.ss-eui-wrapper--rtl .surveysparrow-chat__wrapper .ss-language-selector--wrapper{margin-left:45px;margin-right:0;}';
+            })();
+            """
+        }
+        return """
+        (function() {
+          var el = document.getElementById('ss-sdk-lang-close-margin');
+          if (el) { el.textContent = ''; }
+        })();
+        """
+    }
+
     func updateUIView(_ uiView: WKWebView, context: Context) {
         if let url = URL(string: urlString) {
             let request = URLRequest(url: url)
             uiView.load(request)
+        }
+        DispatchQueue.main.async {
+            context.coordinator.applyLanguageSelectorMarginsIfNeeded(webView: uiView)
         }
     }
 
@@ -132,7 +156,7 @@ struct WebViewRepresentable: UIViewRepresentable {
         private var closeModel: String = "closeModal"
         private var partialSubmission: String = "partialSubmission"
         private var thankYouPageSubmission: String = "thankYouPageSubmission"
-        
+        private var languageChanged: String = "languageChanged"
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if self.parent.delegate != nil {
                 var response: [String: AnyObject] = [:]
@@ -162,6 +186,11 @@ struct WebViewRepresentable: UIViewRepresentable {
                         Task {
                             await self.parent.delegate.handleSurveyResponse(response: capturedResponse)
                         }
+                    }
+                }
+                else if responseType == languageChanged {
+                    if self.parent.delegate != nil {
+                        self.parent.state.currentLanguage = response["data"]?["language"] as? String ?? ""
                     }
                 }
                 else if responseType == partialSubmission
@@ -230,6 +259,17 @@ struct WebViewRepresentable: UIViewRepresentable {
 
         init(_ parent: WebViewRepresentable) {
             self.parent = parent
+        }
+
+        fileprivate func applyLanguageSelectorMarginsIfNeeded(webView: WKWebView) {
+            let script = WebViewRepresentable.languageSelectorMarginScript(
+                closeButtonEnabled: parent.state.isCloseButtonEnabled
+            )
+            webView.evaluateJavaScript(script, completionHandler: nil)
+        }
+
+        public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            applyLanguageSelectorMarginsIfNeeded(webView: webView)
         }
         
         public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
