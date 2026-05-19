@@ -254,6 +254,7 @@ public class SpotcheckState: ObservableObject {
             self.isMounted = false
             self.isThankyouPageSubmission = false
             self.currentQuestionHeight = 0.0
+            self.currentLanguage = ""
         }
     }
     
