@@ -117,10 +117,13 @@ struct WebViewRepresentable: UIViewRepresentable {
               if (!el) {
                 el = document.createElement('style');
                 el.id = id;
-                document.head.appendChild(el);
+                (document.head || document.documentElement).appendChild(el);
               }
-              el.textContent = '.surveysparrow-chat__wrapper .ss-language-selector--wrapper{margin-right:45px;}' +
-                '.ss-eui-wrapper--rtl .surveysparrow-chat__wrapper .ss-language-selector--wrapper{margin-left:45px;margin-right:0;}';
+              el.textContent =
+                '.surveysparrow-chat__wrapper .ss-language-selector--wrapper{margin-right:45px;}' +
+                '.ss-eui-wrapper--rtl .surveysparrow-chat__wrapper .ss-language-selector--wrapper{margin-left:45px;margin-right:0;}' +
+                '.ss-language-selector--wrapper{margin-right:45px;}' +
+                '.ss-eui-wrapper--rtl .ss-language-selector--wrapper{margin-left:45px;margin-right:0;}';
             })();
             """
         }
@@ -157,6 +160,31 @@ struct WebViewRepresentable: UIViewRepresentable {
         private var partialSubmission: String = "partialSubmission"
         private var thankYouPageSubmission: String = "thankYouPageSubmission"
         private var languageChanged: String = "languageChanged"
+
+        var parent: WebViewRepresentable
+
+        init(_ parent: WebViewRepresentable) {
+            self.parent = parent
+        }
+
+        private func webView(from message: WKScriptMessage) -> WKWebView? {
+            if #available(iOS 14.0, *) {
+                if let wv = message.webView { return wv }
+            }
+            return parent.state.spotCheckType == "chat"
+                ? parent.state.chatWebView
+                : parent.state.classicWebView
+        }
+
+        fileprivate func applyLanguageSelectorMargins(webView: WKWebView, closeButtonEnabled: Bool) {
+            let script = WebViewRepresentable.languageSelectorMarginScript(closeButtonEnabled: closeButtonEnabled)
+            webView.evaluateJavaScript(script, completionHandler: nil)
+        }
+
+        fileprivate func applyLanguageSelectorMarginsIfNeeded(webView: WKWebView) {
+            applyLanguageSelectorMargins(webView: webView, closeButtonEnabled: parent.state.isCloseButtonEnabled)
+        }
+
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if self.parent.delegate != nil {
                 var response: [String: AnyObject] = [:]
@@ -220,6 +248,11 @@ struct WebViewRepresentable: UIViewRepresentable {
                     }
                     else{
                         self.parent.state.isCloseButtonEnabled = true
+                        if let webView = self.webView(from: message) {
+                            DispatchQueue.main.async { [weak self] in
+                                self?.applyLanguageSelectorMargins(webView: webView, closeButtonEnabled: true)
+                            }
+                        }
                     }
                 }
                 
@@ -240,6 +273,14 @@ struct WebViewRepresentable: UIViewRepresentable {
 
                         if let isCloseButtonEnabled = response["data"]?["isCloseButtonEnabled"] as? Bool{
                             self.parent.state.isCloseButtonEnabled = isCloseButtonEnabled
+                            if let webView = self.webView(from: message) {
+                                DispatchQueue.main.async { [weak self] in
+                                    self?.applyLanguageSelectorMargins(
+                                        webView: webView,
+                                        closeButtonEnabled: isCloseButtonEnabled
+                                    )
+                                }
+                            }
                         }
                     }
               
@@ -253,19 +294,6 @@ struct WebViewRepresentable: UIViewRepresentable {
             }
 
 
-        }
-        
-        var parent: WebViewRepresentable
-
-        init(_ parent: WebViewRepresentable) {
-            self.parent = parent
-        }
-
-        fileprivate func applyLanguageSelectorMarginsIfNeeded(webView: WKWebView) {
-            let script = WebViewRepresentable.languageSelectorMarginScript(
-                closeButtonEnabled: parent.state.isCloseButtonEnabled
-            )
-            webView.evaluateJavaScript(script, completionHandler: nil)
         }
 
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
