@@ -136,9 +136,8 @@ struct WebViewRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
-        if let url = URL(string: urlString) {
-            let request = URLRequest(url: url)
-            uiView.load(request)
+        if uiView.url?.absoluteString != urlString, let url = URL(string: urlString) {
+            uiView.load(URLRequest(url: url))
         }
         DispatchQueue.main.async {
             context.coordinator.applyLanguageSelectorMarginsIfNeeded(webView: uiView)
@@ -182,7 +181,11 @@ struct WebViewRepresentable: UIViewRepresentable {
         }
 
         fileprivate func applyLanguageSelectorMarginsIfNeeded(webView: WKWebView) {
-            applyLanguageSelectorMargins(webView: webView, closeButtonEnabled: parent.state.isCloseButtonEnabled)
+            let isMiniCard = parent.state.spotChecksMode == "miniCard"
+            applyLanguageSelectorMargins(
+                webView: webView,
+                closeButtonEnabled: parent.state.isCloseButtonEnabled && !isMiniCard
+            )
         }
 
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -217,9 +220,7 @@ struct WebViewRepresentable: UIViewRepresentable {
                     }
                 }
                 else if responseType == languageChanged {
-                    if self.parent.delegate != nil {
-                        self.parent.state.currentLanguage = response["data"]?["language"] as? String ?? ""
-                    }
+                    self.parent.state.isRTLLanguage = response["data"]?["isRtl"] as? Bool ?? false
                 }
                 else if responseType == partialSubmission
                 {
@@ -250,7 +251,7 @@ struct WebViewRepresentable: UIViewRepresentable {
                         self.parent.state.isCloseButtonEnabled = true
                         if let webView = self.webView(from: message) {
                             DispatchQueue.main.async { [weak self] in
-                                self?.applyLanguageSelectorMargins(webView: webView, closeButtonEnabled: true)
+                                self?.applyLanguageSelectorMarginsIfNeeded(webView: webView)
                             }
                         }
                     }

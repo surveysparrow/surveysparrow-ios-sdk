@@ -44,19 +44,7 @@ public class SpotcheckState: ObservableObject {
     @Published public var isChat: Bool = false
     @Published public var  screenName: String = ""
     @Published public var appearance: [String: Any] = [:]
-    @Published public var  currentLanguage: String = ""
-    
-    private static let rtlLanguageCodes: Set<String> = ["ar", "he", "fa", "ps", "ur"]
-    
-    public var isRTLLanguage: Bool {
-        let normalized = currentLanguage
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .lowercased()
-            .replacingOccurrences(of: "_", with: "-")
-        guard !normalized.isEmpty else { return false }
-        let code = normalized.split(separator: "-").first.map(String.init) ?? normalized
-        return Self.rtlLanguageCodes.contains(code)
-    }
+    @Published public var isRTLLanguage: Bool = false
     
     @Published public var isChatLoading: Bool = true {
         
@@ -246,7 +234,7 @@ public class SpotcheckState: ObservableObject {
             self.isChat = false
             self.screenName = ""
             self.appearance = [:]
-            self.currentLanguage = ""
+            self.isRTLLanguage = false
         }
         else if(self.isVisible){
             self.isVisible = false
@@ -254,7 +242,7 @@ public class SpotcheckState: ObservableObject {
             self.isMounted = false
             self.isThankyouPageSubmission = false
             self.currentQuestionHeight = 0.0
-            self.currentLanguage = ""
+            self.isRTLLanguage = false
         }
     }
     
