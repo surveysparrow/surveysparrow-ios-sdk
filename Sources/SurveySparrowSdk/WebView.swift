@@ -122,15 +122,21 @@ struct WebViewRepresentable: UIViewRepresentable {
               el.textContent =
                 '.surveysparrow-chat__wrapper .ss-language-selector--wrapper{margin-right:45px;}' +
                 '.ss-eui-wrapper--rtl .surveysparrow-chat__wrapper .ss-language-selector--wrapper{margin-left:45px;margin-right:0;}' +
-                '.ss-language-selector--wrapper{margin-right:45px;}' +
-                '.ss-eui-wrapper--rtl .ss-language-selector--wrapper{margin-left:45px;margin-right:0;}';
+                '.ss-eui-wrapper--rtl .ss-language-selector--wrapper.ss-language-selector--spotchecks{left:62px;right:auto;}' +
+                '.ss-eui-wrapper--rtl .ss-language-selector--wrapper.ss-language-selector--spotchecks-no-close-btn{left:24px;right:auto;}';
             })();
             """
         }
         return """
         (function() {
-          var el = document.getElementById('ss-sdk-lang-close-margin');
-          if (el) { el.textContent = ''; }
+          var id = 'ss-sdk-lang-close-margin';
+          var el = document.getElementById(id);
+          if (!el) {
+            el = document.createElement('style');
+            el.id = id;
+            (document.head || document.documentElement).appendChild(el);
+          }
+          el.textContent = '.ss-eui-wrapper--rtl .ss-language-selector--wrapper.ss-language-selector--spotchecks-no-close-btn{left:24px;right:auto;}';
         })();
         """
     }
@@ -221,6 +227,11 @@ struct WebViewRepresentable: UIViewRepresentable {
                 }
                 else if responseType == languageChanged {
                     self.parent.state.isRTLLanguage = response["data"]?["isRtl"] as? Bool ?? false
+                    if let webView = self.webView(from: message) {
+                        DispatchQueue.main.async { [weak self] in
+                            self?.applyLanguageSelectorMarginsIfNeeded(webView: webView)
+                        }
+                    }
                 }
                 else if responseType == partialSubmission
                 {
@@ -269,18 +280,6 @@ struct WebViewRepresentable: UIViewRepresentable {
                             }
                             if(self.parent.state.spotChecksMode=="miniCard" && self.parent.state.avatarEnabled){
                                 self.parent.state.currentQuestionHeight -= 56;
-                            }
-                        }
-
-                        if let isCloseButtonEnabled = response["data"]?["isCloseButtonEnabled"] as? Bool{
-                            self.parent.state.isCloseButtonEnabled = isCloseButtonEnabled
-                            if let webView = self.webView(from: message) {
-                                DispatchQueue.main.async { [weak self] in
-                                    self?.applyLanguageSelectorMargins(
-                                        webView: webView,
-                                        closeButtonEnabled: isCloseButtonEnabled
-                                    )
-                                }
                             }
                         }
                     }

@@ -213,6 +213,7 @@ public class SpotcheckState: ObservableObject {
             }
         
         if(!self.isSpotCheckButton || isNavigation){
+            self.isVisible = false
             self.isFullScreenMode = false
             self.spotcheckID = 0
             self.spotcheckPosition = "bottom"
@@ -640,7 +641,7 @@ public class SpotcheckState: ObservableObject {
             self.spotcheckPosition = "bottom"
         }
         self.appearance = appearance
-        self.isCloseButtonEnabled = appearance["closeButton"] as? Bool ?? true
+        self.isCloseButtonEnabled = appearance["closeButton"] as? Bool ?? false
         let maxHeightRaw = cardProp["maxHeight"]
         let mxHeight = maxHeightRaw as? Double ?? Double(maxHeightRaw as? String ?? "1") ?? 1
         self.maxHeight = mxHeight / 100
