@@ -244,26 +244,14 @@ struct WebViewRepresentable: UIViewRepresentable {
                 }
                 else if responseType == thankYouPageSubmission
                 {
-                    self.parent.state.isThankyouPageSubmission = true
+                    self.parent.state.isCloseButtonEnabled = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                        self.parent.state.end()
+                    }
                     if self.parent.delegate != nil {
                         let capturedResponse = response
                         Task {
                             await self.parent.delegate.handleSurveyResponse(response: capturedResponse)
-                        }
-                    }
-                    
-                    if(self.parent.state.spotChecksMode == "miniCard" && !self.parent.state.isCloseButtonEnabled)
-                    {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                            self.parent.state.end()
-                        }
-                    }
-                    else{
-                        self.parent.state.isCloseButtonEnabled = true
-                        if let webView = self.webView(from: message) {
-                            DispatchQueue.main.async { [weak self] in
-                                self?.applyLanguageSelectorMarginsIfNeeded(webView: webView)
-                            }
                         }
                     }
                 }

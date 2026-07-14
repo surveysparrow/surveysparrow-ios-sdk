@@ -40,7 +40,6 @@ public class SpotcheckState: ObservableObject {
     @Published public var isSpotCheckButton: Bool = false
     @Published public var spotCheckButtonConfig: [String: Any] = [:]
     @Published public var showSurveyContent: Bool = true
-    @Published public var isThankyouPageSubmission: Bool = false
     @Published public var isChat: Bool = false
     @Published public var  screenName: String = ""
     @Published public var appearance: [String: Any] = [:]
@@ -231,7 +230,6 @@ public class SpotcheckState: ObservableObject {
                 self.showSurveyContent = true
             }
             self.isSpotCheckButton = false
-            self.isThankyouPageSubmission = false
             self.isChat = false
             self.screenName = ""
             self.appearance = [:]
@@ -241,7 +239,6 @@ public class SpotcheckState: ObservableObject {
             self.isVisible = false
             self.showSurveyContent = false
             self.isMounted = false
-            self.isThankyouPageSubmission = false
             self.currentQuestionHeight = 0.0
             self.isRTLLanguage = false
         }
