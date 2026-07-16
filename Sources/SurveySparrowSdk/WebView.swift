@@ -67,9 +67,6 @@ struct WebViewRepresentable: UIViewRepresentable {
           (function() {
             var styleTag = document.createElement("style");
             styleTag.innerHTML = `
-                .surveysparrow-chat__wrapper .ss-language-selector--wrapper {
-                    margin-right: 45px;
-                }
                 .close-btn-chat--spotchecks {
                     display: none !important;
                 }
@@ -111,10 +108,45 @@ struct WebViewRepresentable: UIViewRepresentable {
         return webView
     }
 
+    private static func languageSelectorMarginScript(closeButtonEnabled: Bool) -> String {
+        if closeButtonEnabled {
+            return """
+            (function() {
+              var id = 'ss-sdk-lang-close-margin';
+              var el = document.getElementById(id);
+              if (!el) {
+                el = document.createElement('style');
+                el.id = id;
+                (document.head || document.documentElement).appendChild(el);
+              }
+              el.textContent =
+                '.surveysparrow-chat__wrapper .ss-language-selector--wrapper{margin-right:45px;}' +
+                '.ss-eui-wrapper--rtl .surveysparrow-chat__wrapper .ss-language-selector--wrapper{margin-left:45px;margin-right:0;}' +
+                '.ss-eui-wrapper--rtl .ss-language-selector--wrapper.ss-language-selector--spotchecks{left:62px;right:auto;}' +
+                '.ss-eui-wrapper--rtl .ss-language-selector--wrapper.ss-language-selector--spotchecks-no-close-btn{left:24px;right:auto;}';
+            })();
+            """
+        }
+        return """
+        (function() {
+          var id = 'ss-sdk-lang-close-margin';
+          var el = document.getElementById(id);
+          if (!el) {
+            el = document.createElement('style');
+            el.id = id;
+            (document.head || document.documentElement).appendChild(el);
+          }
+          el.textContent = '.ss-eui-wrapper--rtl .ss-language-selector--wrapper.ss-language-selector--spotchecks-no-close-btn{left:24px;right:auto;}';
+        })();
+        """
+    }
+
     func updateUIView(_ uiView: WKWebView, context: Context) {
-        if let url = URL(string: urlString) {
-            let request = URLRequest(url: url)
-            uiView.load(request)
+        if uiView.url?.absoluteString != urlString, let url = URL(string: urlString) {
+            uiView.load(URLRequest(url: url))
+        }
+        DispatchQueue.main.async {
+            context.coordinator.applyLanguageSelectorMarginsIfNeeded(webView: uiView)
         }
     }
 
@@ -132,7 +164,36 @@ struct WebViewRepresentable: UIViewRepresentable {
         private var closeModel: String = "closeModal"
         private var partialSubmission: String = "partialSubmission"
         private var thankYouPageSubmission: String = "thankYouPageSubmission"
-        
+        private var languageChanged: String = "languageChanged"
+
+        var parent: WebViewRepresentable
+
+        init(_ parent: WebViewRepresentable) {
+            self.parent = parent
+        }
+
+        private func webView(from message: WKScriptMessage) -> WKWebView? {
+            if #available(iOS 14.0, *) {
+                if let wv = message.webView { return wv }
+            }
+            return parent.state.spotCheckType == "chat"
+                ? parent.state.chatWebView
+                : parent.state.classicWebView
+        }
+
+        fileprivate func applyLanguageSelectorMargins(webView: WKWebView, closeButtonEnabled: Bool) {
+            let script = WebViewRepresentable.languageSelectorMarginScript(closeButtonEnabled: closeButtonEnabled)
+            webView.evaluateJavaScript(script, completionHandler: nil)
+        }
+
+        fileprivate func applyLanguageSelectorMarginsIfNeeded(webView: WKWebView) {
+            let isMiniCard = parent.state.spotChecksMode == "miniCard"
+            applyLanguageSelectorMargins(
+                webView: webView,
+                closeButtonEnabled: parent.state.isCloseButtonEnabled && !isMiniCard
+            )
+        }
+
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             if self.parent.delegate != nil {
                 var response: [String: AnyObject] = [:]
@@ -164,6 +225,14 @@ struct WebViewRepresentable: UIViewRepresentable {
                         }
                     }
                 }
+                else if responseType == languageChanged {
+                    self.parent.state.isRTLLanguage = response["data"]?["isRtl"] as? Bool ?? false
+                    if let webView = self.webView(from: message) {
+                        DispatchQueue.main.async { [weak self] in
+                            self?.applyLanguageSelectorMarginsIfNeeded(webView: webView)
+                        }
+                    }
+                }
                 else if responseType == partialSubmission
                 {
                     if self.parent.delegate != nil {
@@ -175,22 +244,15 @@ struct WebViewRepresentable: UIViewRepresentable {
                 }
                 else if responseType == thankYouPageSubmission
                 {
-                    self.parent.state.isThankyouPageSubmission = true
+                    self.parent.state.isCloseButtonEnabled = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                        self.parent.state.end()
+                    }
                     if self.parent.delegate != nil {
                         let capturedResponse = response
                         Task {
                             await self.parent.delegate.handleSurveyResponse(response: capturedResponse)
                         }
-                    }
-                    
-                    if(self.parent.state.spotChecksMode == "miniCard" && !self.parent.state.isCloseButtonEnabled)
-                    {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                            self.parent.state.end()
-                        }
-                    }
-                    else{
-                        self.parent.state.isCloseButtonEnabled = true
                     }
                 }
                 
@@ -208,10 +270,6 @@ struct WebViewRepresentable: UIViewRepresentable {
                                 self.parent.state.currentQuestionHeight -= 56;
                             }
                         }
-
-                        if let isCloseButtonEnabled = response["data"]?["isCloseButtonEnabled"] as? Bool{
-                            self.parent.state.isCloseButtonEnabled = isCloseButtonEnabled
-                        }
                     }
               
                 } else if responseType == "slideInFrame" {
@@ -225,11 +283,9 @@ struct WebViewRepresentable: UIViewRepresentable {
 
 
         }
-        
-        var parent: WebViewRepresentable
 
-        init(_ parent: WebViewRepresentable) {
-            self.parent = parent
+        public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            applyLanguageSelectorMarginsIfNeeded(webView: webView)
         }
         
         public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {

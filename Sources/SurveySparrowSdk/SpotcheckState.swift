@@ -40,10 +40,11 @@ public class SpotcheckState: ObservableObject {
     @Published public var isSpotCheckButton: Bool = false
     @Published public var spotCheckButtonConfig: [String: Any] = [:]
     @Published public var showSurveyContent: Bool = true
-    @Published public var isThankyouPageSubmission: Bool = false
     @Published public var isChat: Bool = false
     @Published public var  screenName: String = ""
     @Published public var appearance: [String: Any] = [:]
+    @Published public var isRTLLanguage: Bool = false
+    
     @Published public var isChatLoading: Bool = true {
         
         didSet {
@@ -211,6 +212,7 @@ public class SpotcheckState: ObservableObject {
             }
         
         if(!self.isSpotCheckButton || isNavigation){
+            self.isVisible = false
             self.isFullScreenMode = false
             self.spotcheckID = 0
             self.spotcheckPosition = "bottom"
@@ -228,17 +230,17 @@ public class SpotcheckState: ObservableObject {
                 self.showSurveyContent = true
             }
             self.isSpotCheckButton = false
-            self.isThankyouPageSubmission = false
             self.isChat = false
             self.screenName = ""
             self.appearance = [:]
+            self.isRTLLanguage = false
         }
         else if(self.isVisible){
             self.isVisible = false
             self.showSurveyContent = false
             self.isMounted = false
-            self.isThankyouPageSubmission = false
             self.currentQuestionHeight = 0.0
+            self.isRTLLanguage = false
         }
     }
     
@@ -636,7 +638,7 @@ public class SpotcheckState: ObservableObject {
             self.spotcheckPosition = "bottom"
         }
         self.appearance = appearance
-        self.isCloseButtonEnabled = appearance["closeButton"] as? Bool ?? true
+        self.isCloseButtonEnabled = appearance["closeButton"] as? Bool ?? false
         let maxHeightRaw = cardProp["maxHeight"]
         let mxHeight = maxHeightRaw as? Double ?? Double(maxHeightRaw as? String ?? "1") ?? 1
         self.maxHeight = mxHeight / 100
