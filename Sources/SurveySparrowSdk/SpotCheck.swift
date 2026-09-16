@@ -1,10 +1,22 @@
 import SwiftUI
+import WebKit
+
+// MARK: - Public API — Preserved from old architecture
+// Example app uses: Spotcheck(domainName:, targetToken:, userDetails:, sparrowLang:, surveyDelegate:)
+// Methods: .TrackScreen(screen:), .TrackEvent(onScreen:, event:), .navControllerFinder, .CloseSpotchecks()
 
 @available(iOS 15.0, *)
 public struct Spotcheck: View {
-    
-    @ObservedObject var state: SpotcheckState
-    
+    @ObservedObject private var sdk: SpotCheckSDK
+
+    private let domainName: String
+    private let targetToken: String
+    private let userDetails: [String: Any]
+    private let variables: [String: Any]
+    private let customProperties: [String: Any]
+    private let sparrowLang: String
+    private let surveyDelegate: SsSpotcheckDelegate
+
     public init(
         domainName: String,
         targetToken: String,
@@ -14,322 +26,64 @@ public struct Spotcheck: View {
         sparrowLang: String = "",
         surveyDelegate: SsSpotcheckDelegate = ssSurveyDelegate()
     ) {
-        self.state = SpotcheckState(
-            targetToken: targetToken,
-            domainName: domainName,
-            userDetails: userDetails,
-            variables: variables,
-            customProperties: customProperties,
-            sparrowLang: sparrowLang,
-            surveyDelegate: surveyDelegate
-        )
+        self.domainName = domainName
+        self.targetToken = targetToken
+        self.userDetails = userDetails
+        self.variables = variables
+        self.customProperties = customProperties
+        self.sparrowLang = sparrowLang
+        self.surveyDelegate = surveyDelegate
+        self.sdk = SpotCheckSDKManager.shared.sdk(for: targetToken)
     }
-    
+
     public func TrackScreen(screen: String) {
-        state.sendTrackScreenRequest(screen: screen) { valid, multiShow in
-            if multiShow {
-                if valid {
-                    print("MultiShow Passed")
-                } else {
-                    print("TrackScreen Failed")
-                }
-            } else {
-                if valid {
-                   
-                        print("TrackScreen Passed. Delay: \(state.afterDelay) Seconds")
-                   
-                } else {
-                    print("TrackScreen Failed")
-                }
-            }
-            
-        }
+        sdk.trackScreen(screen)
     }
-    
+
     public func TrackEvent(onScreen screen: String, event: [String: Any]) {
-        state.sendTrackEventRequest(screen: screen, event: event) { valid in
-            if valid {
-                    print("TrackEvent Passed. Delay: \(state.afterDelay) Seconds")
-            } else {
-                print("TrackEvent Failed")
-            }
-        }
+        sdk.trackEvent(screen, event: event)
     }
-
-    private struct NavControllerFinder: UIViewControllerRepresentable {
-        public var state: SpotcheckState
-
-        public func makeUIViewController(context: Context) -> NavigationControllerSniffer {
-            let s = NavigationControllerSniffer()
-            s.state = state
-            return s
-        }
-
-        public func updateUIViewController(_ uiViewController: NavigationControllerSniffer, context: Context) {}
-    }
-    
-    private func isVisible(for type: String) -> Bool {
-        guard state.isVisible,
-              state.showSurveyContent,
-              state.spotCheckType == type
-        else { return false }
-        
-        switch type {
-        case "classic":
-            return !state.isClassicLoading &&
-            (state.isMounted || state.isFullScreenMode)
-            
-        case "chat":
-            return !state.isChatLoading &&
-            state.isFullScreenMode
-            
-        default:
-            return false
-        }
-    }
-
-
 
     public func CloseSpotchecks() {
-        state.closeSpotCheck()
-        state.end(isNavigation: true)
+        sdk.closeSpotCheck()
     }
-    
+
     public var navControllerFinder: some View {
-        NavControllerFinder(state: self.state)
+        NavControllerFinder(sdk: sdk)
             .frame(width: 0, height: 0)
     }
-    
-    private var miniCardAvatarAlignment: Alignment {
-        state.isRTLLanguage ? .trailing : .leading
-    }
-    
-    
+
     public var body: some View {
-        ZStack {
-            if (!state.classicUrl.isEmpty) {
-                ZStack {
-                    Spacer()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color.black.opacity(0.4))
-                    
-                    VStack {
-                        if state.spotcheckPosition == "bottom" { Spacer() }
-                        
-                        VStack {
-                            if state.spotChecksMode == "miniCard" && state.isCloseButtonEnabled {
-                                HStack {
-                                    if !state.isRTLLanguage { Spacer() }
-                                    Button(action: {
-                                        state.closeSpotCheck()
-                                        state.end()
-                                    }) {
-                                        ZStack {
-                                            Circle()
-                                                .fill(Color.white)
-                                                .frame(width: 32, height: 32)
-                                                .shadow(color: Color.white.opacity(0.26), radius: 4)
-                                            
-                                            Image(systemName: "xmark")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 12, height: 12)
-                                                .foregroundColor(.black)
-                                        }
-                                    }
-                                    if state.isRTLLanguage { Spacer() }
-                                }
-                                .padding(.vertical, 8)
-                            }
-                            
-                            WebViewContainer(state: state, urlType: "classic")
-                                .clipShape(RoundedRectangle(cornerRadius: (state.spotChecksMode == "miniCard") ? 12 : 0))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: (state.spotChecksMode == "miniCard") ? 12 : 0)
-                                        .stroke(Color.clear, lineWidth: (state.spotChecksMode == "miniCard") ? 2 : 0)
-                                )
-                                .frame(
-                                    height: (!state.isVisible) ? 200 :
-                                        self.state.isFullScreenMode
-                                    ? (UIScreen.main.bounds.height - 100)
-                                    : min(
-                                        (UIScreen.main.bounds.height - 100),
-                                        min(state.currentQuestionHeight,
-                                            (state.maxHeight * UIScreen.main.bounds.height))
-                                    )
-                                )
-                            
-                            if state.spotChecksMode == "miniCard" && state.avatarEnabled && !state.avatarUrl.description.isEmpty {
-                                HStack(alignment: .center) {
-                                    ImageView(url: state.avatarUrl)
-                                        .frame(width: 48, height: 48)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 24)
-                                                .fill(Color.white)
-                                                .shadow(radius: 4)
-                                        )
-                                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                                        .padding(.vertical, 8)
-                                }
-                                .frame(maxWidth: .infinity, alignment: miniCardAvatarAlignment)
-                            }
-                        }
-                        .padding(.horizontal, (state.spotChecksMode == "miniCard") ? 12 : 0)
-                        
-                        if state.spotcheckPosition == "top" { Spacer() }
-                    }
-                }
-                .opacity(isVisible(for: "classic") ? 1 : 0)
-                .disabled(!isVisible(for: "classic"))
+        SpotCheckRootView(sdk: sdk)
+            .onAppear {
+                sdk.initialize(
+                    domainName: domainName,
+                    targetToken: targetToken,
+                    userDetails: userDetails,
+                    variables: variables,
+                    customProperties: customProperties,
+                    sparrowLang: sparrowLang,
+                    delegate: surveyDelegate
+                )
             }
-            
-            
-            if (!state.chatUrl.isEmpty) {
-                ZStack {
-                    Spacer()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background((state.isVisible && state.spotCheckType == "chat" && !state.isChatLoading)
-                                    ? Color.black.opacity(0.4)
-                                    : Color.clear)
-                    
-                    VStack {
-                        if state.spotcheckPosition == "bottom" { Spacer() }
-                        WebViewContainer(state: state, urlType: "chat")
-                            .frame(height: (UIScreen.main.bounds.height - 100))
-                        if state.spotcheckPosition == "top" { Spacer() }
-                    }
-                }
-                .opacity(isVisible(for: "chat") ? 1 : 0)
-                .disabled(!isVisible(for: "chat"))
-            }
-            
-            
-            if state.isSpotCheckButton && !state.showSurveyContent {
-                let buttonConfigMap = state.spotCheckButtonConfig
-                if !buttonConfigMap.isEmpty {
-                    let buttonConfig = SpotCheckButtonConfig(
-                        type: buttonConfigMap["type"] as? String ?? "floatingButton",
-                        position: buttonConfigMap["position"] as? String ?? "bottom_right",
-                        buttonSize: buttonConfigMap["buttonSize"] as? String ?? "medium",
-                        backgroundColor: buttonConfigMap["backgroundColor"] as? String ?? "",
-                        textColor: buttonConfigMap["textColor"] as? String ?? "#FFFFFF",
-                        buttonText: buttonConfigMap["buttonText"] as? String ?? "",
-                        icon: buttonConfigMap["icon"] as? String ?? "",
-                        generatedIcon: buttonConfigMap["generatedIcon"] as? String ?? "",
-                        cornerRadius: buttonConfigMap["cornerRadius"] as? String ?? "sharp",
-                        onPress: {
-                            Task {
-                                await state.performBootstrapRequest()
-                                state.showSurveyContent = true
-                            }
-                        }
-                    )
-                    
-                    VStack {
-                        Spacer()
-                        HStack {
-                            if buttonConfig.position.contains("left") {
-                                SpotCheckButton(config: buttonConfig)
-                                Spacer()
-                            } else {
-                                Spacer()
-                                SpotCheckButton(config: buttonConfig)
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
-
-@available(iOS 15.0, *)
-struct ImageView: View {
-    let url: String
-
-    var body: some View {
-        AsyncImage(url: URL(string: url)) { phase in
-            switch phase {
-            case .empty:
-                EmptyView()
-            case .success(let image):
-                image
-                    .resizable()
-                    .scaledToFill()
-            case .failure:
-                Color.gray // fallback if image fails
-            @unknown default:
-                Color.gray
-            }
-        }
-    }
-}
-
-
-@available(iOS 15.0, *)
-struct WebViewContainer: View {
-    @ObservedObject var state: SpotcheckState
-    var urlType: String
-
-    init(state: SpotcheckState, urlType: String) {
-        self.state = state
-        self.urlType = urlType
-
-    }
-    
-    private var closeButtonAlignment: Alignment {
-        state.isRTLLanguage ? .topLeading : .topTrailing
-    }
-
-    var body: some View {
-        GeometryReader { geometry in
-            WebView(delegate: state.surveyDelegate, state: state, urlType: self.urlType)
-                .frame(width: geometry.size.width, height: geometry.size.height)
-                .fixedSize(horizontal: true, vertical: false)
-                .clipShape(RoundedRectangle(cornerRadius: 0))
-                .shadow(radius: 20)
-                .overlay(alignment: closeButtonAlignment) {
-                    if (
-                        self.state.isCloseButtonEnabled &&
-                        (self.state.isFullScreenMode || self.state.currentQuestionHeight != 0) &&
-                        self.state.spotChecksMode != "miniCard"
-                    ) {
-                        Button {
-                                state.closeSpotCheck()
-                                state.end()
-                        } label: {
-                            Image(systemName: "xmark")
-                        }
-                        .buttonStyle(
-                            CustomButtonStyle(
-                                iconColor: (
-                                    state.closeButtonStyle["ctaButton"] != nil &&
-                                    state.closeButtonStyle["ctaButton"]!.isNotHex()
-                                ) ? "#000000" : state.closeButtonStyle["ctaButton"] ?? "#000000"
-                            )
-                        )
-                    }
-                }
-        }
-    }
-}
-
-@available(iOS 13.4, *)
-struct CustomButtonStyle: ButtonStyle {
-    var iconColor: String
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size: 15))
-            .padding(24)
-            .foregroundColor(Color(hex: iconColor))
-            .contentShape(Rectangle())
-    }
-}
+// MARK: - Default Delegate (no-op)
 
 @available(iOS 13.0, *)
-extension Color {
+public class ssSurveyDelegate: SsSpotcheckDelegate {
+    public init() {}
+    public func handleSurveyResponse(response: [String: AnyObject]) async {}
+    public func handleSurveyLoaded(response: [String: AnyObject]) async {}
+    public func handlePartialSubmission(response: [String: AnyObject]) async {}
+    public func handleCloseButtonTap() async {}
+}
+
+// MARK: - Color Extension
+
+@available(iOS 13.0, *)
+public extension Color {
     init(hex: String) {
         let scanner = Scanner(string: hex)
         scanner.currentIndex = hex.hasPrefix("#") ? hex.index(after: hex.startIndex) : hex.startIndex
@@ -342,14 +96,52 @@ extension Color {
     }
 }
 
-extension String {
-    func isNotHex() -> Bool {
-        let hexPattern = "^#(?:[0-9a-fA-F]{3}){1,2}$"
-        let regex = try? NSRegularExpression(pattern: hexPattern, options: .caseInsensitive)
-        let matches = regex?.matches(in: self, options: [], range: NSRange(location: 0, length: self.count))
-        return matches?.count == 0
+// MARK: - Navigation Controller Listener
+
+@available(iOS 15.0, *)
+private struct NavControllerFinder: UIViewControllerRepresentable {
+    let sdk: SpotCheckSDK
+
+    func makeUIViewController(context: Context) -> NavigationControllerSniffer {
+        let vc = NavigationControllerSniffer()
+        vc.sdk = sdk
+        return vc
+    }
+
+    func updateUIViewController(_ uiViewController: NavigationControllerSniffer, context: Context) {}
+}
+
+@available(iOS 15.0, *)
+final class NavigationControllerSniffer: UIViewController {
+    weak var sdk: SpotCheckSDK?
+
+    override func didMove(toParent parent: UIViewController?) {
+        super.didMove(toParent: parent)
+        guard let nav = parent?.navigationController else { return }
+        SsNavigationListener.attach(to: nav, sdk: sdk)
     }
 }
+
+@available(iOS 15.0, *)
+private final class SsNavigationListener: NSObject, UINavigationControllerDelegate {
+    private static let shared = SsNavigationListener()
+    private weak var sdk: SpotCheckSDK?
+
+    static func attach(to nav: UINavigationController, sdk: SpotCheckSDK?) {
+        shared.sdk = sdk
+        nav.delegate = shared
+    }
+
+    func navigationController(
+        _ navigationController: UINavigationController,
+        willShow viewController: UIViewController,
+        animated: Bool
+    ) {
+        sdk?.handleNavigationChange()
+    }
+}
+
+// MARK: - Loader View
 
 @available(iOS 13.0, *)
 struct Loader: View {
@@ -360,77 +152,15 @@ struct Loader: View {
             Circle()
                 .stroke(style: StrokeStyle(lineWidth: 6.0, lineCap: .round, lineJoin: .round))
                 .opacity(0.3)
-                .foregroundColor(Color.black)
-            
+                .foregroundColor(.black)
             Circle()
                 .trim(from: 0.0, to: 0.7)
                 .stroke(lineWidth: 6.0)
-                .foregroundColor(Color.white)
+                .foregroundColor(.white)
                 .rotationEffect(Angle(degrees: isAnimating ? 360 : 0))
-                .animation(Animation.linear(duration: 1.5).repeatForever(autoreverses: false))
-                .onAppear {
-                    self.isAnimating = true
-                }
+                .animation(Animation.linear(duration: 1.5).repeatForever(autoreverses: false), value: isAnimating)
+                .onAppear { isAnimating = true }
         }
-        .frame(width: 60.0, height: 60.0)
-    }
-}
-
-@available(iOS 13.0, *)
-public class ssSurveyDelegate: SsSpotcheckDelegate {
-
-    public init() {}
-
-    public func handleSurveyResponse(response: [String : AnyObject]) async{}
-
-    public func handleSurveyLoaded(response: [String : AnyObject]) async{}
-    
-    public func handlePartialSubmission(response: [String : AnyObject]) async {}
-
-    public func handleCloseButtonTap() async{}
-
-}
-
-
-@available(iOS 13.0, *)
-private final class SsNavigationListener: NSObject, UINavigationControllerDelegate {
-    
-    private static let shared = SsNavigationListener()
-    
-    private weak var previousViewController: UIViewController?
-    public weak var spotcheckState: SpotcheckState?
-    
-    public static func attach(to nav: UINavigationController, state: SpotcheckState) {
-        let listener = SsNavigationListener.shared
-        listener.spotcheckState = state
-        nav.delegate = listener
-    }
-    
-    public func navigationController(
-        _ navigationController: UINavigationController,
-        willShow viewController: UIViewController,
-        animated: Bool
-    ) {
-        if(spotcheckState?.isVisible ?? false || (spotcheckState?.isSpotCheckButton ?? false)){
-            spotcheckState?.closeSpotCheck()
-            spotcheckState?.end(isNavigation: true)
-        }
-    }
-}
-
-
-@available(iOS 15.0, *)
-private final class NavigationControllerSniffer: UIViewController {
-
-    public var state: SpotcheckState!
-
-    public override func didMove(toParent parent: UIViewController?) {
-        super.didMove(toParent: parent)
-
-        guard let nav = parent?.navigationController else {
-            return
-        }
-
-        SsNavigationListener.attach(to: nav, state: state)
+        .frame(width: 60, height: 60)
     }
 }

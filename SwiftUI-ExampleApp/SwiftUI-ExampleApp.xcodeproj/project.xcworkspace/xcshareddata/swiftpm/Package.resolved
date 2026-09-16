@@ -1,0 +1,15 @@
+{
+  "originHash" : "a0ae4ab2a746431e4bdc3be0f0095bd8e7b6037cc0bc3bb8cc6178fd5b8e13c4",
+  "pins" : [
+    {
+      "identity" : "surveysparrow-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/surveysparrow/surveysparrow-ios-sdk",
+      "state" : {
+        "revision" : "92c85af76acfc7017766fa5fa50bb1401d2f1fa9",
+        "version" : "1.2.8"
+      }
+    }
+  ],
+  "version" : 3
+}
