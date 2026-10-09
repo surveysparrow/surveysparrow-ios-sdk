@@ -83,10 +83,12 @@ public class ssSurveyDelegate: SsSpotcheckDelegate {
 // MARK: - Color Extension
 
 @available(iOS 13.0, *)
-public extension Color {
+extension Color {
     init(hex: String) {
-        let scanner = Scanner(string: hex)
-        scanner.currentIndex = hex.hasPrefix("#") ? hex.index(after: hex.startIndex) : hex.startIndex
+        // #RGB expands to #RRGGBB.
+        var digits = hex.hasPrefix("#") ? String(hex.dropFirst()) : hex
+        if digits.count == 3 { digits = digits.map { "\($0)\($0)" }.joined() }
+        let scanner = Scanner(string: digits)
         var rgb: UInt64 = 0
         scanner.scanHexInt64(&rgb)
         let r = Double((rgb >> 16) & 0xFF) / 255.0
@@ -122,14 +124,36 @@ final class NavigationControllerSniffer: UIViewController {
     }
 }
 
+/// Listens for pushes/pops without replacing the host app's own navigation delegate (calls are forwarded to it).
 @available(iOS 15.0, *)
 private final class SsNavigationListener: NSObject, UINavigationControllerDelegate {
-    private static let shared = SsNavigationListener()
+    private static var associationKey = 0
     private weak var sdk: SpotCheckSDK?
+    private weak var hostDelegate: UINavigationControllerDelegate?
 
     static func attach(to nav: UINavigationController, sdk: SpotCheckSDK?) {
-        shared.sdk = sdk
-        nav.delegate = shared
+        if let existing = nav.delegate as? SsNavigationListener {
+            existing.sdk = sdk
+            return
+        }
+        let listener = SsNavigationListener()
+        listener.sdk = sdk
+        listener.hostDelegate = nav.delegate
+        // `delegate` is weak; the navigation controller keeps the listener alive.
+        objc_setAssociatedObject(nav, &associationKey, listener, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        nav.delegate = listener
+        if let host = listener.hostDelegate {
+            // UIKit caches responds(to:) at assignment; re-assign when the host delegate goes away.
+            let watcher = DeallocWatcher { [weak nav, weak listener] in
+                guard let nav, let listener, nav.delegate === listener else { return }
+                let reassign = {
+                    nav.delegate = nil
+                    nav.delegate = listener
+                }
+                if Thread.isMainThread { reassign() } else { DispatchQueue.main.async(execute: reassign) }
+            }
+            objc_setAssociatedObject(host, &DeallocWatcher.key, watcher, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
     }
 
     func navigationController(
@@ -137,8 +161,43 @@ private final class SsNavigationListener: NSObject, UINavigationControllerDelega
         willShow viewController: UIViewController,
         animated: Bool
     ) {
+        hostDelegate?.navigationController?(navigationController, willShow: viewController, animated: animated)
+        // Interactive swipe-back: close only if the swipe completes (a cancelled swipe stays on the screen).
+        if let coordinator = navigationController.transitionCoordinator, coordinator.isInteractive {
+            // Hold the revealed screen's trackScreen until the reset has run.
+            let sdk = self.sdk
+            sdk?.beginInteractiveNavigation()
+            coordinator.notifyWhenInteractionChanges { context in
+                if context.isCancelled {
+                    sdk?.cancelInteractiveNavigation()
+                } else {
+                    sdk?.handleNavigationChange()
+                }
+            }
+            return
+        }
         sdk?.handleNavigationChange()
     }
+
+    override func responds(to aSelector: Selector!) -> Bool {
+        super.responds(to: aSelector) || (hostDelegate?.responds(to: aSelector) ?? false)
+    }
+
+    override func forwardingTarget(for aSelector: Selector!) -> Any? {
+        hostDelegate?.responds(to: aSelector) == true ? hostDelegate : super.forwardingTarget(for: aSelector)
+    }
+}
+
+/// Runs a callback when its owner object is deallocated.
+private final class DeallocWatcher: NSObject {
+    static var key = 0
+    private let onDealloc: () -> Void
+
+    init(_ onDealloc: @escaping () -> Void) {
+        self.onDealloc = onDealloc
+    }
+
+    deinit { onDealloc() }
 }
 
 // MARK: - Loader View

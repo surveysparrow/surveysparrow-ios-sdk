@@ -15,6 +15,7 @@ struct SpotCheckRootView: View {
             SpotCheckButtonView(sdk: sdk)
         }
         .environmentObject(sdk)
+        .environment(\.spotcheckActionRunner, sdk.genericActionRunner)
         .allowsHitTesting(isInteractive(spotCheckState))
     }
 

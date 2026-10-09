@@ -5,37 +5,20 @@ final class FunctionStore: ObservableObject {
     @Published private(set) var functions: [String: Any] = [:]
     @Published private(set) var isLoaded: Bool = false
 
+    private static let nonFunctionKeys: Set<String> = ["componentSchemas", "config"]
+
     func load(from initResponse: [String: Any]) {
+        // Load every function the backend sends (non-function keys skipped).
         var funcs: [String: Any] = [:]
-
-        let topLevelKeys = [
-            "initializeSpotcheckComponent", "trackScreen", "trackEvent",
-            "handleNavigationChange", "handleExitAnimationComplete",
-        ]
-        for key in topLevelKeys {
-            if let val = initResponse[key] as? String {
-                funcs[key] = val
-            }
-        }
-
-        let groupedKeys: [String: [String]] = [
-            "webviewComponent": ["handleWebViewMessage", "handleWebViewError", "handleWebViewInjection",
-                                 "classicWebViewRefCallback", "chatWebViewRefCallback"],
-            "closeButton": ["handleCloseButton", "getCloseButtonStyles"],
-            "wrapper": ["getWrapperStyles"],
-            "spotCheckButton": ["handleSpotCheckButtonPress", "handleSideTabLayout", "getSpotCheckButtonStyles"],
-            "sentry": ["processSentryError"],
-        ]
-
-        for (groupKey, subKeys) in groupedKeys {
-            if let group = initResponse[groupKey] as? [String: Any] {
-                var groupDict: [String: Any] = [:]
-                for subKey in subKeys {
-                    if let val = group[subKey] as? String {
-                        groupDict[subKey] = val
-                    }
+        for (key, value) in initResponse where !Self.nonFunctionKeys.contains(key) {
+            if let fn = value as? String, !fn.isEmpty {
+                funcs[key] = fn
+            } else if let group = value as? [String: Any] {
+                let fns = group.compactMapValues { v -> String? in
+                    guard let fn = v as? String, !fn.isEmpty else { return nil }
+                    return fn
                 }
-                funcs[groupKey] = groupDict
+                if !fns.isEmpty { funcs[key] = fns }
             }
         }
 

@@ -80,9 +80,10 @@ final class SpotCheckStateStore: ObservableObject {
     }
 
     func dispatch(_ update: [String: Any]) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.mergeState(update)
+        if Thread.isMainThread {
+            mergeState(update)
+        } else {
+            DispatchQueue.main.async { [weak self] in self?.mergeState(update) }
         }
     }
 

@@ -36,54 +36,121 @@ private actor ExecuteSerialGate {
 
 @available(iOS 15.0, *)
 final class ExecuteBridge: @unchecked Sendable {
-    /// Bundled helpers + API parity (keep in sync with `buildPayload` `sdkVersion`).
-    static let spotcheckSdkVersion = "1.0.4-beta.1"
+    /// Keep in sync with the released SDK version tag.
+    static let spotcheckSdkVersion = "1.2.10-beta.1"
+
+    private static let executeTimeout: TimeInterval = 15
 
     private let spotcheckStore: SpotCheckStateStore
     private let functionStore: FunctionStore
     private let sentry: SentryAdapter
     private weak var listener: ListenerBridge?
-    private let jsContext: JSContext
     private let serialGate = ExecuteSerialGate()
+
+    /// One context for the SDK lifetime; every JS call happens on `jsQueue`.
+    private let jsQueue = DispatchQueue(label: "com.surveysparrow.spotcheck.js")
+    private let jsContext: JSContext
+    private var timers: [Int: DispatchWorkItem] = [:]
+    private var nextTimerId = 0
+    /// Delegate calls run in the order JS made them (mutated on `jsQueue` only).
+    private var listenerTail: Task<Void, Never>?
+    /// Count of running `sentry.*` functions, so their JS exceptions aren't re-reported (jsQueue only).
+    private var sentryRunDepth = 0
+
+    /// Backend-driven script injection into the classic/chat webview (called on main).
+    var onWebViewInject: ((String, String) -> Void)?
 
     init(spotcheckStore: SpotCheckStateStore, functionStore: FunctionStore, sentry: SentryAdapter) {
         self.spotcheckStore = spotcheckStore
         self.functionStore = functionStore
         self.sentry = sentry
-        self.jsContext = JSContext()!
-        setupJSContext()
+        // Created on jsQueue so JSC's GC timers don't run on the main run loop.
+        var context: JSContext?
+        jsQueue.sync { context = JSContext() }
+        self.jsContext = context!
+        jsQueue.sync { setupJSContext() }
     }
 
     func setListener(_ listener: ListenerBridge?) {
         self.listener = listener
     }
 
+    // MARK: Globals (installed once)
+
     private func setupJSContext() {
-        jsContext.exceptionHandler = { [weak self] _, exception in
-            guard let msg = exception?.toString() else { return }
-            self?.sentry.captureP1Error(msg, "GENERAL", ["action": "jsContextException"])
+        let ctx = jsContext
+        ctx.exceptionHandler = { [weak self] _, exception in
+            let message = exception?.toString() ?? "Unknown JS exception"
+            NSLog("[SurveySparrow Spotcheck] JS exception: %@", message)
+            guard let self, self.sentryRunDepth == 0 else { return }
+            self.sentry.captureP1Error(message, "GENERAL", ["action": "jsException"])
         }
+
+        let console = JSValue(newObjectIn: ctx)!
+        let log: @convention(block) () -> Void = {
+            #if DEBUG
+            let args = (JSContext.currentArguments() as? [JSValue])?.map { $0.toString() ?? "" } ?? []
+            print("[SurveySparrow Spotcheck]", args.joined(separator: " "))
+            #endif
+        }
+        // console.error stays visible in release so host developers see SDK errors.
+        let error: @convention(block) () -> Void = {
+            let args = (JSContext.currentArguments() as? [JSValue])?.map { $0.toString() ?? "" } ?? []
+            NSLog("[SurveySparrow Spotcheck] %@", args.joined(separator: " "))
+        }
+        console.setObject(log, forKeyedSubscript: "log" as NSString)
+        console.setObject(log, forKeyedSubscript: "warn" as NSString)
+        console.setObject(error, forKeyedSubscript: "error" as NSString)
+        ctx.setObject(console, forKeyedSubscript: "console" as NSString)
+
+        let setTimeout: @convention(block) (JSValue, JSValue) -> Int = { [weak self] callback, ms in
+            self?.schedule(callback, ms: ms, repeats: false) ?? 0
+        }
+        let setInterval: @convention(block) (JSValue, JSValue) -> Int = { [weak self] callback, ms in
+            self?.schedule(callback, ms: ms, repeats: true) ?? 0
+        }
+        let clearTimer: @convention(block) (JSValue) -> Void = { [weak self] id in
+            guard let self, id.isNumber else { return }
+            self.timers.removeValue(forKey: Int(id.toInt32()))?.cancel()
+        }
+        ctx.setObject(setTimeout, forKeyedSubscript: "setTimeout" as NSString)
+        ctx.setObject(setInterval, forKeyedSubscript: "setInterval" as NSString)
+        ctx.setObject(clearTimer, forKeyedSubscript: "clearTimeout" as NSString)
+        ctx.setObject(clearTimer, forKeyedSubscript: "clearInterval" as NSString)
 
         let fetch: @convention(block) (String, JSValue) -> JSValue = { [weak self] urlString, options in
-            guard let ctx = self?.jsContext else { return JSValue(undefinedIn: JSContext.current()) }
-            return self?.jsFetch(urlString, options: options, context: ctx) ?? JSValue(undefinedIn: ctx)
+            guard let self else { return JSValue(undefinedIn: JSContext.current()) }
+            return self.jsFetch(urlString, options: options)
         }
-        jsContext.setObject(fetch, forKeyedSubscript: "nativeFetch" as NSString)
+        ctx.setObject(fetch, forKeyedSubscript: "fetch" as NSString)
 
-        let setTimeout: @convention(block) (JSValue, Int) -> Void = { callback, ms in
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(ms)) {
+        ctx.evaluateScript(Self.responsePolyfill)
+        ctx.evaluateScript(Self.urlSearchParamsPolyfill)
+    }
+
+    /// Must run on `jsQueue`.
+    private func schedule(_ callback: JSValue, ms: JSValue, repeats: Bool) -> Int {
+        nextTimerId += 1
+        let id = nextTimerId
+        let delay = max(0, ms.isNumber ? Int(ms.toInt32()) : 0)
+        func arm() {
+            let item = DispatchWorkItem { [weak self] in
+                guard let self, self.timers[id] != nil else { return }
+                if repeats {
+                    arm()
+                } else {
+                    self.timers.removeValue(forKey: id)
+                }
                 callback.call(withArguments: [])
             }
+            timers[id] = item
+            jsQueue.asyncAfter(deadline: .now() + .milliseconds(delay), execute: item)
         }
-        jsContext.setObject(setTimeout, forKeyedSubscript: "setTimeout" as NSString)
-
-        let consoleObj = JSValue(newObjectIn: jsContext)!
-        let logBlock: @convention(block) (JSValue) -> Void = { _ in }
-        let errorBlock: @convention(block) (JSValue) -> Void = { _ in }
-        consoleObj.setObject(logBlock, forKeyedSubscript: "log" as NSString)
-        consoleObj.setObject(errorBlock, forKeyedSubscript: "error" as NSString)
-        jsContext.setObject(consoleObj, forKeyedSubscript: "console" as NSString)
+        arm()
+        return id
     }
+
+    // MARK: Execute
 
     @discardableResult
     func execute(_ functionName: String, params: [String: Any]? = nil) async -> Any? {
@@ -93,8 +160,7 @@ final class ExecuteBridge: @unchecked Sendable {
         }
     }
 
-    /// Native prelude + `executeUnserialized` in one unit that **jumps ahead** of pending `execute` work
-    /// so navigation teardown (unmount + dismiss + reset) runs before an already-queued `trackScreen`.
+    /// Runs ahead of already-queued work (navigation teardown before a queued `trackScreen`).
     @discardableResult
     func executeWithNativePrelude(
         nativePrelude: @Sendable @escaping () async -> Void,
@@ -108,268 +174,222 @@ final class ExecuteBridge: @unchecked Sendable {
         }
     }
 
-    private func executeUnserialized(_ functionName: String, params: [String: Any]?) async -> Any? {
-        if !functionStore.isLoaded {
-            for _ in 0..<50 { // Max 5 seconds
-                if functionStore.isLoaded { break }
-                try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
-            }
-        }
+    // Reporting failures are not reported again (avoids loops).
+    private static func isSentryFunction(_ name: String) -> Bool { name.hasPrefix("sentry.") }
 
-        guard functionStore.isLoaded else {
-            return nil
-        }
-
-        guard let functionString = functionStore.resolve(functionName) else {
-            return nil
-        }
-
-        let state = spotcheckStore.getState()
-        let payload = buildPayload(params: params, state: state)
-
-        do {
-            let result = try await runFunction(functionString, payload: payload, functionName: functionName)
-            return result
-        } catch {
-            sentry.captureP1Error(error, "GENERAL", ["action": "execute", "functionName": functionName])
-            return nil
-        }
+    // Style getters run on every render; they would push useful breadcrumbs out.
+    private static func isBreadcrumbWorthy(_ name: String) -> Bool {
+        !isSentryFunction(name) && name.range(of: "\\.get\\w*Styles$", options: .regularExpression) == nil
     }
 
-    private func buildPayload(params: [String: Any]?, state: [String: Any]) -> [String: Any] {
+    // Message type only; never survey content.
+    private static func describeParams(_ name: String, _ params: [String: Any]?) -> [String: Any] {
+        guard name == "webviewComponent.handleWebViewMessage",
+              let event = params?["event"] as? [String: Any],
+              let native = event["nativeEvent"] as? [String: Any],
+              let data = native["data"] as? String else { return [:] }
+        if data == "captureImage" { return ["messageType": data] }
+        guard let json = try? JSONSerialization.jsonObject(with: Data(data.utf8)) as? [String: Any],
+              let type = json["type"] as? String else { return [:] }
+        return ["messageType": type]
+    }
+
+    private func executeUnserialized(_ functionName: String, params: [String: Any]?) async -> Any? {
+        guard functionStore.isLoaded, let functionString = functionStore.resolve(functionName) else {
+            return nil
+        }
+        let reportErrors = !Self.isSentryFunction(functionName)
+        if Self.isBreadcrumbWorthy(functionName) {
+            sentry.addBreadcrumb("execute", ["functionName": functionName].merging(Self.describeParams(functionName, params)) { a, _ in a })
+        }
+
         var mergedParams = params ?? [:]
         mergedParams["sdkVersion"] = Self.spotcheckSdkVersion
+        let state = await MainActor.run { spotcheckStore.getState() }
 
-        var payload: [String: Any] = [
-            "params": mergedParams,
-            "state": state,
-        ]
-
-        let dispatchRef: @convention(block) (JSValue) -> Void = { [weak self] jsUpdate in
-            guard let update = jsUpdate.toDictionary() as? [String: Any] else { return }
-            DispatchQueue.main.async {
-                self?.spotcheckStore.dispatch(update)
+        let result: Any?
+        do {
+            result = try await runFunction(functionString, params: mergedParams, state: state, isSentry: !reportErrors)
+        } catch {
+            if reportErrors {
+                sentry.captureP1Error(error, "GENERAL", ["action": "execute:runtime", "functionName": functionName])
             }
+            result = nil
         }
-        payload["dispatchWrapper"] = dispatchRef
-
-        let saveData: @convention(block) (String) -> Void = { value in
-            StorageAdapter.saveData(value)
-        }
-        let loadData: @convention(block) (Bool) -> String = { isTraceId in
-            return StorageAdapter.loadData(isTraceId)
-        }
-        payload["storage"] = [
-            "saveData": saveData,
-            "loadData": loadData,
-        ] as [String: Any]
-
-        let captureP0: @convention(block) (JSValue, String, JSValue) -> Void = { [weak self] error, source, context in
-            let ctx = context.toDictionary() as? [String: Any] ?? [:]
-            self?.sentry.captureP0Error(error.toString() ?? "Unknown", source, ctx)
-        }
-        let captureP1: @convention(block) (JSValue, String, JSValue) -> Void = { [weak self] error, source, context in
-            let ctx = context.toDictionary() as? [String: Any] ?? [:]
-            self?.sentry.captureP1Error(error.toString() ?? "Unknown", source, ctx)
-        }
-        payload["sentry"] = [
-            "captureP0Error": captureP0,
-            "captureP1Error": captureP1,
-        ] as [String: Any]
-
-        payload["keyboard"] = [
-            "pauseDefaultKeyboardBehavior": { KeyboardAdapter.pauseDefaultKeyboardBehavior() } as @convention(block) () -> Void,
-            "resumeDefaultKeyboardBehavior": { KeyboardAdapter.resumeDefaultKeyboardBehavior() } as @convention(block) () -> Void,
-        ] as [String: Any]
-
-        let listenerRef = self.listener
-        var listenerDict: [String: Any] = [:]
-        let onSurveyResponse: @convention(block) (JSValue) -> Void = { data in
-            let d = data.toDictionary() as? [String: Any] ?? [:]
-            Task { @MainActor in await listenerRef?.delegate?.handleSurveyResponse(response: d as [String: AnyObject]) }
-        }
-        let onSurveyLoaded: @convention(block) (JSValue) -> Void = { data in
-            let d = data.toDictionary() as? [String: Any] ?? [:]
-            Task { @MainActor in await listenerRef?.delegate?.handleSurveyLoaded(response: d as [String: AnyObject]) }
-        }
-        let onPartialSubmission: @convention(block) (JSValue) -> Void = { data in
-            let d = data.toDictionary() as? [String: Any] ?? [:]
-            Task { @MainActor in await listenerRef?.delegate?.handlePartialSubmission(response: d as [String: AnyObject]) }
-        }
-        let onCloseButtonTap: @convention(block) () -> Void = {
-            Task { @MainActor in await listenerRef?.delegate?.handleCloseButtonTap() }
-        }
-        listenerDict["onSurveyResponse"] = onSurveyResponse
-        listenerDict["onSurveyLoaded"] = onSurveyLoaded
-        listenerDict["onPartialSubmission"] = onPartialSubmission
-        listenerDict["onCloseButtonTap"] = onCloseButtonTap
-        payload["listener"] = listenerDict
-
-        return payload
+        // Main queue is FIFO: state dispatched during the call is applied before we return.
+        await MainActor.run {}
+        return result
     }
 
-    @Sendable
-    private func runFunction(_ functionString: String, payload: [String: Any], functionName: String) async throws -> Any? {
-        return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                guard let self = self else {
-                    continuation.resume(returning: nil)
-                    return
+    private func runFunction(_ functionString: String, params: [String: Any], state: [String: Any], isSentry: Bool = false) async throws -> Any? {
+        let paramsJSON = try Self.json(params)
+        let stateJSON = try Self.json(state)
+
+        return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Any?, Error>) in
+            jsQueue.async { [weak self] in
+                guard let self else { continuation.resume(returning: nil); return }
+                var finished = false
+                if isSentry { self.sentryRunDepth += 1 }
+                let finish: (Result<Any?, Error>) -> Void = { [weak self] result in
+                    guard !finished else { return }
+                    finished = true
+                    if isSentry { self?.sentryRunDepth -= 1 }
+                    continuation.resume(with: result)
                 }
 
-                let ctx = JSContext()!
-                ctx.exceptionHandler = { _, _ in }
-
-                self.injectGlobals(into: ctx)
-
-                ctx.setObject(payload["dispatchWrapper"], forKeyedSubscript: "__dispatchWrapper" as NSString)
-                ctx.setObject(payload["storage"], forKeyedSubscript: "__storage" as NSString)
-                ctx.setObject(payload["sentry"], forKeyedSubscript: "__sentry" as NSString)
-                ctx.setObject(payload["keyboard"], forKeyedSubscript: "__keyboard" as NSString)
-                ctx.setObject(payload["listener"], forKeyedSubscript: "__listener" as NSString)
-
-                let stateJSON: String
-                let paramsJSON: String
-                do {
-                    let stateData = try JSONSerialization.data(withJSONObject: payload["state"] as Any)
-                    stateJSON = String(data: stateData, encoding: .utf8) ?? "{}"
-                    let paramsData = try JSONSerialization.data(withJSONObject: payload["params"] as Any)
-                    paramsJSON = String(data: paramsData, encoding: .utf8) ?? "{}"
-                } catch {
-                    continuation.resume(throwing: error)
-                    return
-                }
-
+                let ctx = self.jsContext
+                ctx.setObject(self.makePayloadBridges(), forKeyedSubscript: "__ssBridges" as NSString)
                 let script = """
                 (async function() {
                     var func = (\(functionString));
-                    var payload = {
-                        params: \(paramsJSON),
-                        state: \(stateJSON),
-                        dispatchWrapper: __dispatchWrapper,
-                        storage: __storage,
-                        sentry: __sentry,
-                        keyboard: __keyboard,
-                        listener: __listener,
-                    };
+                    var payload = Object.assign({ params: \(paramsJSON), state: \(stateJSON) }, __ssBridges);
                     return await func(payload);
                 })();
                 """
-
-                let result = ctx.evaluateScript(script)
-
-                if let promiseResult = result, promiseResult.isObject {
-                    let thenFunc = promiseResult.objectForKeyedSubscript("then")
-                    if let thenFunc = thenFunc, !thenFunc.isUndefined {
-                        let resolve: @convention(block) (JSValue) -> Void = { val in
-                            if val.isNull || val.isUndefined {
-                                continuation.resume(returning: nil)
-                            } else {
-                                continuation.resume(returning: val.toObject())
-                            }
-                        }
-                        let reject: @convention(block) (JSValue) -> Void = { err in
-                            continuation.resume(throwing: SpotCheckError.executionError(err.toString()))
-                        }
-                        promiseResult.invokeMethod("then", withArguments: [JSValue(object: resolve, in: ctx)!])
-                        promiseResult.invokeMethod("catch", withArguments: [JSValue(object: reject, in: ctx)!])
-                        return
-                    }
+                guard let promise = ctx.evaluateScript(script), promise.isObject else {
+                    finish(.success(nil))
+                    return
                 }
 
-                if let r = result, !r.isUndefined && !r.isNull {
-                    continuation.resume(returning: r.toObject())
+                let resolve: @convention(block) (JSValue) -> Void = { value in
+                    finish(.success(value.isNull || value.isUndefined ? nil : value.toObject()))
+                }
+                let reject: @convention(block) (JSValue) -> Void = { error in
+                    finish(.failure(SpotCheckError.executionError(error.toString())))
+                }
+                promise.invokeMethod("then", withArguments: [
+                    JSValue(object: resolve, in: ctx)!,
+                    JSValue(object: reject, in: ctx)!,
+                ])
+
+                self.jsQueue.asyncAfter(deadline: .now() + Self.executeTimeout) {
+                    finish(.failure(SpotCheckError.executionError("Execution timed out")))
+                }
+            }
+        }
+    }
+
+    /// Payload callbacks; all run on `jsQueue`.
+    private func makePayloadBridges() -> [String: Any] {
+        let store = spotcheckStore
+        let listenerRef = listener
+
+        // Async: main.sync while holding the JS lock deadlocks with JSC timers on the main run loop.
+        // execute() waits for these before returning, so callers never read stale state.
+        let dispatch: @convention(block) (JSValue) -> Void = { update in
+            guard let dict = update.toDictionary() as? [String: Any] else { return }
+            DispatchQueue.main.async { store.dispatch(dict) }
+        }
+
+        let saveData: @convention(block) (String) -> Void = { StorageAdapter.saveData($0) }
+        let loadData: @convention(block) (Bool) -> JSValue = { isTraceId in
+            let value = StorageAdapter.loadData(isTraceId)
+            let ctx = JSContext.current()!
+            return ctx.objectForKeyedSubscript("Promise").invokeMethod("resolve", withArguments: [value])
+        }
+
+        let capture: (String) -> @convention(block) (JSValue, String, JSValue) -> Void = { [weak self] priority in
+            return { error, source, context in
+                let message = error.objectForKeyedSubscript("message")?.toString().flatMap { $0 == "undefined" ? nil : $0 }
+                    ?? error.toString() ?? "Unknown"
+                let ctx = context.toDictionary() as? [String: Any] ?? [:]
+                if priority == "P0" {
+                    self?.sentry.captureP0Error(message, source, ctx)
                 } else {
-                    continuation.resume(returning: nil)
+                    self?.sentry.captureP1Error(message, source, ctx)
                 }
             }
         }
-    }
 
-    private func injectGlobals(into ctx: JSContext) {
-        let consoleObj = JSValue(newObjectIn: ctx)!
-        let log: @convention(block) (JSValue) -> Void = { _ in }
-        let err: @convention(block) (JSValue) -> Void = { _ in }
-        consoleObj.setObject(log, forKeyedSubscript: "log" as NSString)
-        consoleObj.setObject(err, forKeyedSubscript: "error" as NSString)
-        consoleObj.setObject(log, forKeyedSubscript: "warn" as NSString)
-        ctx.setObject(consoleObj, forKeyedSubscript: "console" as NSString)
-
-        let fetch: @convention(block) (String, JSValue) -> JSValue = { [weak self] urlString, options in
-            return self?.jsFetch(urlString, options: options, context: ctx) ?? JSValue(undefinedIn: ctx)
-        }
-        ctx.setObject(fetch, forKeyedSubscript: "fetch" as NSString)
-
-        let setTimeoutBlock: @convention(block) (JSValue, JSValue) -> Void = { callback, ms in
-            let delay = ms.isUndefined ? 0 : ms.toInt32()
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(delay))) {
-                callback.call(withArguments: [])
+        let notify: (@escaping (SsSpotcheckDelegate, [String: AnyObject]) async -> Void) -> @convention(block) (JSValue) -> JSValue = { [weak self] call in
+            return { data in
+                let dict = (data.toDictionary() as? [String: Any] ?? [:]) as [String: AnyObject]
+                let previous = self?.listenerTail
+                self?.listenerTail = Task { @MainActor in
+                    await previous?.value
+                    if let delegate = listenerRef?.delegate { await call(delegate, dict) }
+                }
+                let ctx = JSContext.current()!
+                return ctx.objectForKeyedSubscript("Promise").invokeMethod("resolve", withArguments: [])
             }
         }
-        ctx.setObject(setTimeoutBlock, forKeyedSubscript: "setTimeout" as NSString)
 
-        let setIntervalBlock: @convention(block) (JSValue, JSValue) -> JSValue = { callback, ms in
-            let delay = ms.isUndefined ? 1000 : ms.toInt32()
-            var timer: Timer?
-            timer = Timer.scheduledTimer(withTimeInterval: Double(delay) / 1000.0, repeats: true) { _ in
-                callback.call(withArguments: [])
-            }
-            RunLoop.main.add(timer!, forMode: .common)
-            return JSValue(int32: 0, in: ctx)
+        let inject: @convention(block) (String, String) -> Void = { [weak self] target, script in
+            DispatchQueue.main.async { self?.onWebViewInject?(target, script) }
         }
-        ctx.setObject(setIntervalBlock, forKeyedSubscript: "setInterval" as NSString)
 
-        ctx.evaluateScript(Self.urlSearchParamsPolyfill)
+        return [
+            "dispatchWrapper": dispatch,
+            "storage": ["saveData": saveData, "loadData": loadData] as [String: Any],
+            "sentry": ["captureP0Error": capture("P0"), "captureP1Error": capture("P1")] as [String: Any],
+            "keyboard": [
+                "pauseDefaultKeyboardBehavior": { KeyboardAdapter.pauseDefaultKeyboardBehavior() } as @convention(block) () -> Void,
+                "resumeDefaultKeyboardBehavior": { KeyboardAdapter.resumeDefaultKeyboardBehavior() } as @convention(block) () -> Void,
+            ] as [String: Any],
+            "listener": [
+                "onSurveyResponse": notify { await $0.handleSurveyResponse(response: $1) },
+                "onSurveyLoaded": notify { await $0.handleSurveyLoaded(response: $1) },
+                "onPartialSubmission": notify { await $0.handlePartialSubmission(response: $1) },
+                "onCloseButtonTap": notify { delegate, _ in await delegate.handleCloseButtonTap() },
+            ] as [String: Any],
+            "webview": ["inject": inject] as [String: Any],
+        ]
     }
 
-    private func jsFetch(_ urlString: String, options: JSValue, context: JSContext) -> JSValue {
-        let executor: @convention(block) (JSValue, JSValue) -> Void = { resolve, reject in
+    private static func json(_ value: Any) throws -> String {
+        let data = try JSONSerialization.data(withJSONObject: value, options: [.fragmentsAllowed])
+        return String(data: data, encoding: .utf8) ?? "{}"
+    }
+
+    // MARK: fetch
+
+    /// Must run on `jsQueue`.
+    private func jsFetch(_ urlString: String, options: JSValue) -> JSValue {
+        let ctx = jsContext
+        let executor: @convention(block) (JSValue, JSValue) -> Void = { [weak self] resolve, reject in
+            guard let self else { return }
             guard let url = URL(string: urlString) else {
                 reject.call(withArguments: ["Invalid URL: \(urlString)"])
                 return
             }
-
             var request = URLRequest(url: url)
             if let opts = options.toDictionary() {
                 request.httpMethod = (opts["method"] as? String)?.uppercased() ?? "GET"
-                if let headers = opts["headers"] as? [String: String] {
-                    for (k, v) in headers {
-                        request.setValue(v, forHTTPHeaderField: k)
-                    }
+                if let headers = opts["headers"] as? [String: Any] {
+                    for (k, v) in headers { request.setValue("\(v)", forHTTPHeaderField: k) }
                 }
                 if let body = opts["body"] as? String {
                     request.httpBody = body.data(using: .utf8)
                 }
             }
-
             URLSession.shared.dataTask(with: request) { data, response, error in
-                if let error = error {
-                    reject.call(withArguments: [error.localizedDescription])
-                    return
+                self.jsQueue.async {
+                    if let error = error {
+                        reject.call(withArguments: [error.localizedDescription])
+                        return
+                    }
+                    let body = data.flatMap { String(data: $0, encoding: .utf8) } ?? ""
+                    let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+                    let make = ctx.objectForKeyedSubscript("__ssMakeResponse")
+                    resolve.call(withArguments: [make?.call(withArguments: [status, body]) as Any])
                 }
-                let bodyString = data.flatMap { String(data: $0, encoding: .utf8) } ?? ""
-                let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
-
-                let responseObj = JSValue(newObjectIn: context)!
-                responseObj.setObject(statusCode >= 200 && statusCode < 300, forKeyedSubscript: "ok" as NSString)
-                responseObj.setObject(statusCode, forKeyedSubscript: "status" as NSString)
-
-                let jsonFunc: @convention(block) () -> JSValue = {
-                    context.evaluateScript("(function() { return \(bodyString); })()") ?? JSValue(undefinedIn: context)
-                }
-                responseObj.setObject(jsonFunc, forKeyedSubscript: "json" as NSString)
-
-                let textFunc: @convention(block) () -> String = { bodyString }
-                responseObj.setObject(textFunc, forKeyedSubscript: "text" as NSString)
-
-                resolve.call(withArguments: [responseObj])
             }.resume()
         }
-
-        let executorValue = JSValue(object: executor, in: context)!
-        let promiseConstructor = context.objectForKeyedSubscript("Promise")!
-        return promiseConstructor.construct(withArguments: [executorValue])!
+        let promise = ctx.objectForKeyedSubscript("Promise")!
+        return promise.construct(withArguments: [JSValue(object: executor, in: ctx)!])!
     }
+
+    private static let responsePolyfill = """
+    function __ssMakeResponse(status, body) {
+        return {
+            ok: status >= 200 && status < 300,
+            status: status,
+            headers: { get: function() { return null; } },
+            json: function() { return Promise.resolve(JSON.parse(body)); },
+            text: function() { return Promise.resolve(body); }
+        };
+    }
+    """
 
     private static let urlSearchParamsPolyfill = """
     if (typeof URLSearchParams === 'undefined') {

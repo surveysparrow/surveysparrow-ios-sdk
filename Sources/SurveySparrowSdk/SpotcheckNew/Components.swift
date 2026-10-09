@@ -18,7 +18,7 @@ struct CloseButtonComponent: View {
             styles: sdk.closeButtonStyles,
             handlers: [
                 "handleClosePress": { [weak sdk] in
-                    sdk?.closeSpotCheck()
+                    sdk?.handleCloseButtonTap()
                 } as () -> Void,
             ]
         )
@@ -55,8 +55,15 @@ struct WebViewRendererComponent: View {
         (meta["webViewType"] as? String) ?? "?"
     }
 
+    private var canShow: Bool {
+        (props["canShow"] as? Bool) ?? true
+    }
+
+    // Hidden webviews stay mounted (preloaded) but invisible and untouchable.
     var body: some View {
         webContent
+            .opacity(canShow ? 1 : 0)
+            .allowsHitTesting(canShow)
             .onAppear {
                 if !uri.isEmpty { pinnedUri = uri }
             }
@@ -176,12 +183,21 @@ struct SpotCheckWebView: UIViewRepresentable {
         return webView
     }
 
+    private static var scriptProxyKey = 0
+
+    // Point the WebView's permanent handler at the new coordinator; remove/add left a gap where page messages were lost.
     private static func rewireScriptHandlers(webView: WKWebView, coordinator: Coordinator) {
+        if let proxy = objc_getAssociatedObject(webView, &scriptProxyKey) as? ScriptMessageProxy {
+            proxy.target = coordinator
+            return
+        }
+        let proxy = ScriptMessageProxy(target: coordinator)
         let cc = webView.configuration.userContentController
         for name in scriptMessageNames {
             cc.removeScriptMessageHandler(forName: name)
-            cc.add(coordinator, name: name)
+            cc.add(proxy, name: name)
         }
+        objc_setAssociatedObject(webView, &scriptProxyKey, proxy, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
     private func createNewWebView(context: Context) -> WKWebView {
@@ -190,7 +206,15 @@ struct SpotCheckWebView: UIViewRepresentable {
 
         let contentController = WKUserContentController()
 
-        let defaultJS = """
+        // Native bridge shim stays here; the page script can come from the backend.
+        let bridgeJS = """
+        window.flutterSpotCheckData = {
+            postMessage: function(data) {
+                window.webkit.messageHandlers.spotCheckData.postMessage(data);
+            }
+        };
+        """
+        let defaultPageJS = """
         window.addEventListener('scroll', function() {
             if (document.querySelector('.surveysparrow-chat__wrapper')) {
                 window.scrollTo(0, 0);
@@ -199,26 +223,23 @@ struct SpotCheckWebView: UIViewRepresentable {
 
         (function() {
             var styleTag = document.createElement("style");
-            styleTag.innerHTML = ".surveysparrow-chat__wrapper .ss-language-selector--wrapper { margin-right: 45px; } .close-btn-chat--spotchecks { display: none !important; }";
+            styleTag.innerHTML = ".close-btn-chat--spotchecks { display: none !important; }";
             document.head.appendChild(styleTag);
         })();
-
-        window.flutterSpotCheckData = {
-            postMessage: function(data) {
-                window.webkit.messageHandlers.spotCheckData.postMessage(data);
-            }
-        };
         """
+        let defaultJS = bridgeJS + "\n" + (sdk.remoteWebViewScript ?? defaultPageJS)
         let userScript = WKUserScript(source: defaultJS, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         contentController.addUserScript(userScript)
 
-        contentController.add(context.coordinator, name: "surveyResponse")
-        contentController.add(context.coordinator, name: "spotCheckData")
-        contentController.add(context.coordinator, name: "flutterSpotCheckData")
+        let proxy = ScriptMessageProxy(target: context.coordinator)
+        for name in Self.scriptMessageNames {
+            contentController.add(proxy, name: name)
+        }
 
         config.userContentController = contentController
 
         let webView = WKWebView(frame: .zero, configuration: config)
+        objc_setAssociatedObject(webView, &Self.scriptProxyKey, proxy, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         webView.navigationDelegate = context.coordinator
         webView.backgroundColor = .clear
         webView.isOpaque = false
@@ -248,32 +269,6 @@ struct SpotCheckWebView: UIViewRepresentable {
             if let url = URL(string: urlString) {
                 uiView.load(URLRequest(url: url))
                 sdk.registerWebView(uiView, for: urlString)
-            }
-        }
-
-        // Legacy pattern: only the active classic/chat WebView applies `pendingInjection` when loading flags allow (avoids wrong WKWebView clearing pending).
-        if let injectionJS = sdk.pendingInjection, !injectionJS.isEmpty {
-            let storeState = sdk.spotcheckStore.state
-            let spotCheckState = storeState["SpotCheckState"] as? [String: Any] ?? [:]
-            let wd = spotCheckState["webViewDetails"] as? [String: Any] ?? [:]
-            let isClassicLoading = wd["isClassicLoading"] as? Bool ?? true
-            let isChatLoading = wd["isChatLoading"] as? Bool ?? true
-            let isCurrentSpotcheckChat = wd["isCurrentSpotcheckChat"] as? Bool
-
-            let isThisClassic = webViewKind == "classic"
-            let isThisChat = webViewKind == "chat"
-            let classicReady = isThisClassic && isCurrentSpotcheckChat != true && !isClassicLoading
-            let chatReady = isThisChat && isCurrentSpotcheckChat == true && !isChatLoading
-
-            if classicReady || chatReady {
-                uiView.evaluateJavaScript(injectionJS) { _, err in
-                    // Avoid @Published updates during UIViewRepresentable.updateUIView (SwiftUI warning).
-                    DispatchQueue.main.async { [weak sdk] in
-                        guard let sdk else { return }
-                        sdk.dispatchFullscreenIsMountedAfterNativeInjection(error: err)
-                        sdk.pendingInjection = nil
-                    }
-                }
             }
         }
     }
@@ -343,5 +338,18 @@ struct SpotCheckWebView: UIViewRepresentable {
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
             onError(error.localizedDescription)
         }
+    }
+}
+
+// One handler per WebView for its lifetime; forwards to the current SwiftUI coordinator.
+final class ScriptMessageProxy: NSObject, WKScriptMessageHandler {
+    var target: WKScriptMessageHandler?
+
+    init(target: WKScriptMessageHandler) {
+        self.target = target
+    }
+
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        target?.userContentController(userContentController, didReceive: message)
     }
 }

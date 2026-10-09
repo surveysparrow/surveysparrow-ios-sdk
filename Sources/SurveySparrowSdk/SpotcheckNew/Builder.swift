@@ -1,5 +1,4 @@
 import SwiftUI
-import JavaScriptCore
 import WebKit
 
 // MARK: - Builder — Schema JSON → SwiftUI
@@ -10,16 +9,36 @@ struct BuilderContext {
     var styles: [String: Any]?
     var slots: [String: AnyView]?
     var handlers: [String: Any]?
+    // Runs a backend function by name for `$execute` bindings; nil means no-op.
+    var execute: ((String, [String: Any]) -> Void)? = nil
+}
+
+private struct SpotcheckActionRunnerKey: EnvironmentKey {
+    static let defaultValue: ((String, [String: Any]) -> Void)? = nil
+}
+
+extension EnvironmentValues {
+    var spotcheckActionRunner: ((String, [String: Any]) -> Void)? {
+        get { self[SpotcheckActionRunnerKey.self] }
+        set { self[SpotcheckActionRunnerKey.self] = newValue }
+    }
 }
 
 @available(iOS 15.0, *)
 struct Builder: View {
     let schema: [String: Any]?
     let context: BuilderContext
+    @Environment(\.spotcheckActionRunner) private var actionRunner
+
+    private var effectiveContext: BuilderContext {
+        var c = context
+        if c.execute == nil { c.execute = actionRunner }
+        return c
+    }
 
     var body: some View {
         if let schema = schema {
-            renderNode(schema, context: context, key: "root")
+            renderNode(schema, context: effectiveContext, key: "root")
         }
     }
 }
@@ -31,9 +50,8 @@ func resolveBinding(_ value: Any?, context: BuilderContext) -> Any? {
     guard let value = value else { return nil }
 
     if let dict = value as? [String: Any] {
-        if let expr = dict["$expr"] as? String {
-            return evaluateExpression(expr, context: context)
-        }
+        // $expr is not supported on native; backend style functions compute values.
+        if dict["$expr"] != nil { return nil }
 
         if let ref = dict["$ref"] as? String {
             let parts = ref.split(separator: ".").map(String.init)
@@ -65,6 +83,13 @@ func resolveBinding(_ value: Any?, context: BuilderContext) -> Any? {
             return context.handlers?[handler]
         }
 
+        // `{"$execute": "group.fn", "args": {...}}`: generic action for taps.
+        if let fn = dict["$execute"] as? String {
+            let args = dict["args"] as? [String: Any] ?? [:]
+            let run = context.execute
+            return { () -> Void in run?(fn, args) } as () -> Void
+        }
+
         if let handlerNames = dict["$handlers"] as? [String] {
             let handlers = context.handlers
             return { () -> Void in
@@ -90,35 +115,6 @@ func resolveBinding(_ value: Any?, context: BuilderContext) -> Any? {
     }
 
     return value
-}
-
-@available(iOS 15.0, *)
-func evaluateExpression(_ expr: String, context: BuilderContext) -> Any? {
-    let ctx = JSContext()!
-    ctx.exceptionHandler = { _, _ in }
-
-    if let stateData = try? JSONSerialization.data(withJSONObject: context.state ?? [:]),
-       let stateJSON = String(data: stateData, encoding: .utf8) {
-        ctx.evaluateScript("var state = \(stateJSON);")
-    }
-
-    if let stylesData = try? JSONSerialization.data(withJSONObject: context.styles ?? [:]),
-       let stylesJSON = String(data: stylesData, encoding: .utf8) {
-        ctx.evaluateScript("var styles = \(stylesJSON);")
-    }
-
-    ctx.evaluateScript("var Math = { min: function(a,b){return a<b?a:b}, max: function(a,b){return a>b?a:b}, abs: function(a){return a<0?-a:a}, floor: function(a){return parseInt(a)}, ceil: function(a){return parseInt(a)+1}, round: function(a){return parseInt(a+0.5)} };")
-
-    let result = ctx.evaluateScript(expr)
-
-    if let result = result {
-        if result.isNull || result.isUndefined { return nil }
-        if result.isNumber { return result.toDouble() }
-        if result.isString { return result.toString() }
-        if result.isBoolean { return result.toBool() }
-        return result.toObject()
-    }
-    return nil
 }
 
 // MARK: - Condition Evaluation
@@ -239,43 +235,44 @@ func renderNode(_ node: [String: Any], context: BuilderContext, key: String) -> 
         .flatMap { resolveBinding($0, context: context) } as? [String: Any] ?? [:]
 
     let children = node["children"] as? [[String: Any]] ?? []
-    let animation = node["animation"] as? [String: Any]
     let hasContent = node.keys.contains("content")
     let content = hasContent ? resolveBinding(node["content"], context: context) : nil
     let style = props["style"] as? [String: Any] ?? [:]
     let meta = node["meta"] as? [String: Any] ?? [:]
 
-    let viewNode: AnyView
-    if let animation = animation {
-        viewNode = AnyView(
-            AnimatedNodeView(
-                type: type,
-                props: props,
-                style: style,
-                children: children,
-                animation: animation,
-                context: context,
-                key: key,
-                hasContent: hasContent,
-                content: content,
-                meta: meta
-            )
-        )
-    } else {
-        viewNode = buildComponent(
-            type: type,
-            props: props,
-            style: style,
-            children: children,
-            context: context,
-            key: key,
-            hasContent: hasContent,
-            content: content,
-            meta: meta
-        )
-    }
+    let viewNode = buildComponent(
+        type: type,
+        props: props,
+        style: style,
+        children: children,
+        context: context,
+        key: key,
+        hasContent: hasContent,
+        content: content,
+        meta: meta
+    )
 
-    return AnyView(applyAbsolutePositioning(style: style, content: viewNode, role: meta["componentRole"] as? String))
+    return AnyView(applyAbsolutePositioning(style: style, content: applyShadow(style, applyScale(style, viewNode)), role: meta["componentRole"] as? String))
+}
+
+/// Uniform tap feedback on every platform: dim while pressed.
+private struct PressedOpacityButtonStyle: ButtonStyle {
+    let pressedOpacity: Double
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label.opacity(configuration.isPressed ? pressedOpacity : 1)
+    }
+}
+
+/// Optional shadow (shadowRadius, shadowColor, shadowOffsetX/Y); applied outside any clip.
+private func applyShadow(_ style: [String: Any], _ view: AnyView) -> AnyView {
+    guard let radius = toDoubleOpt(style["shadowRadius"]), radius > 0 else { return view }
+    let color = (style["shadowColor"] as? String).map { parseColor($0) } ?? Color.black.opacity(0.33)
+    return AnyView(view.shadow(
+        color: color,
+        radius: CGFloat(radius),
+        x: CGFloat(toDoubleOpt(style["shadowOffsetX"]) ?? 0),
+        y: CGFloat(toDoubleOpt(style["shadowOffsetY"]) ?? 0)
+    ))
 }
 
 @available(iOS 15.0, *)
@@ -438,13 +435,21 @@ func buildComponent(
         )
 
     case "ZStack":
-        let zAlign = parseAlignment(styleString(style, key: "alignment"))
+        let zAlign = flexZAlignment(style, base: parseAlignment(styleString(style, key: "alignment")))
         let w = toDoubleOpt(style["width"])
         let h = toDoubleOpt(style["height"])
+        // New keys only; zero insets when absent.
+        let zPad = EdgeInsets(
+            top: CGFloat(styleNum(style, "paddingTop") ?? styleNum(style, "paddingVertical") ?? 0),
+            leading: CGFloat(styleNum(style, "paddingLeft") ?? styleNum(style, "paddingHorizontal") ?? 0),
+            bottom: CGFloat(styleNum(style, "paddingBottom") ?? styleNum(style, "paddingVertical") ?? 0),
+            trailing: CGFloat(styleNum(style, "paddingRight") ?? styleNum(style, "paddingHorizontal") ?? 0)
+        )
         return AnyView(
             ZStack(alignment: zAlign) {
                 renderedChildren
             }
+            .padding(zPad)
             .frame(
                 width: w.flatMap { $0 < 0 ? nil : CGFloat($0) },
                 height: h.flatMap { $0 < 0 ? nil : CGFloat($0) }
@@ -453,6 +458,7 @@ func buildComponent(
                 maxWidth: (w ?? 0) < 0 ? .infinity : nil,
                 maxHeight: (h ?? 0) < 0 ? .infinity : nil
             )
+            .padding(marginInsets(style))
         )
 
     case "VStack":
@@ -463,30 +469,65 @@ func buildComponent(
         )
 
     case "HStack":
-        let arrangement = (style["horizontalArrangement"] as? String)?.lowercased() ?? ""
+        // justifyContent (when present) overrides horizontalArrangement.
+        let justify = styleString(style, key: "justifyContent")?.lowercased()
+        let justifyArrangement: String? = {
+            switch justify {
+            case "flex-start", "start": return "start"
+            case "flex-end", "end": return "end"
+            case "center": return "center"
+            default: return nil
+            }
+        }()
+        let arrangement = justifyArrangement ?? (style["horizontalArrangement"] as? String)?.lowercased() ?? ""
+        let rowAlign = flexVAlign(styleString(style, key: "alignItems")) ?? .center
         let pv = toDoubleOpt(style["paddingVertical"]) ?? 0
         let pb = toDoubleOpt(style["paddingBottom"]) ?? 0
+        // New keys only; zero when absent.
+        let pt = styleNum(style, "paddingTop")
+        let pl = styleNum(style, "paddingLeft") ?? styleNum(style, "paddingHorizontal") ?? 0
+        let pr = styleNum(style, "paddingRight") ?? styleNum(style, "paddingHorizontal") ?? 0
         let gap = CGFloat(toDouble(style["gap"]))
         let stack: AnyView
         if arrangement == "end" || arrangement == "trailing" {
             stack = AnyView(
-                HStack(spacing: gap) {
+                HStack(alignment: rowAlign, spacing: gap) {
                     Spacer(minLength: 0)
                     renderedChildren
                 }
             )
+        } else if arrangement == "start" || arrangement == "leading" {
+            stack = AnyView(
+                HStack(alignment: rowAlign, spacing: gap) {
+                    renderedChildren
+                    Spacer(minLength: 0)
+                }
+            )
+        } else if justifyArrangement == "center" {
+            stack = AnyView(
+                HStack(alignment: rowAlign, spacing: gap) {
+                    Spacer(minLength: 0)
+                    renderedChildren
+                    Spacer(minLength: 0)
+                }
+            )
         } else {
             stack = AnyView(
-                HStack(spacing: gap) {
+                HStack(alignment: rowAlign, spacing: gap) {
                     renderedChildren
                 }
             )
         }
         return AnyView(
             stack
-                .padding(.vertical, CGFloat(pv))
+                // paddingTop replaces the vertical top inset when present.
+                .padding(.top, CGFloat(pt ?? pv))
+                .padding(.bottom, CGFloat(pv))
                 .padding(.bottom, CGFloat(pb))
+                .padding(.leading, CGFloat(pl))
+                .padding(.trailing, CGFloat(pr))
                 .frame(maxWidth: (toDoubleOpt(style["width"]) ?? 0) < 0 ? .infinity : nil)
+                .padding(marginInsets(style))
         )
 
     case "Frame":
@@ -527,7 +568,9 @@ func buildComponent(
                     }
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(PressedOpacityButtonStyle(
+                    pressedOpacity: toDoubleOpt(props["pressedOpacity"]) ?? 0.6
+                ))
             }
         )
 
@@ -626,6 +669,142 @@ private struct SideTabLayoutReporter<Content: View>: View {
 }
 
 // MARK: - Style Helpers
+
+// Finite number for a style key; nil when absent or NaN/inf.
+private func styleNum(_ style: [String: Any], _ key: String) -> Double? {
+    guard let v = toDoubleOpt(style[key]), v.isFinite else { return nil }
+    return v
+}
+
+// True when any of the keys holds a number.
+private func styleHasAny(_ style: [String: Any], _ keys: [String]) -> Bool {
+    keys.contains { styleNum(style, $0) != nil }
+}
+
+private let sidePaddingKeys = ["paddingTop", "paddingBottom", "paddingLeft", "paddingRight"]
+private let newMarginKeys = ["margin", "marginTop", "marginBottom", "marginLeft", "marginRight"]
+
+// Container padding: per-side wins, else today's additive padding + axis value.
+private func containerPaddingInsets(_ style: [String: Any]) -> EdgeInsets {
+    let p = styleNum(style, "padding") ?? 0
+    let ph = styleNum(style, "paddingHorizontal") ?? 0
+    let pv = styleNum(style, "paddingVertical") ?? 0
+    return EdgeInsets(
+        top: CGFloat(styleNum(style, "paddingTop") ?? p + pv),
+        leading: CGFloat(styleNum(style, "paddingLeft") ?? p + ph),
+        bottom: CGFloat(styleNum(style, "paddingBottom") ?? p + pv),
+        trailing: CGFloat(styleNum(style, "paddingRight") ?? p + ph)
+    )
+}
+
+// RN margin: per-side, then axis, then margin; zero when absent.
+private func marginInsets(_ style: [String: Any]) -> EdgeInsets {
+    let m = styleNum(style, "margin")
+    let mh = styleNum(style, "marginHorizontal") ?? m ?? 0
+    let mv = styleNum(style, "marginVertical") ?? m ?? 0
+    return EdgeInsets(
+        top: CGFloat(styleNum(style, "marginTop") ?? mv),
+        leading: CGFloat(styleNum(style, "marginLeft") ?? mh),
+        bottom: CGFloat(styleNum(style, "marginBottom") ?? mv),
+        trailing: CGFloat(styleNum(style, "marginRight") ?? mh)
+    )
+}
+
+// RN alignItems/justifyContent token → horizontal alignment.
+private func flexHAlign(_ token: String?) -> HorizontalAlignment? {
+    switch token?.lowercased() {
+    case "flex-start", "start": return .leading
+    case "center": return .center
+    case "flex-end", "end": return .trailing
+    default: return nil
+    }
+}
+
+// RN alignItems/justifyContent token → vertical alignment.
+private func flexVAlign(_ token: String?) -> VerticalAlignment? {
+    switch token?.lowercased() {
+    case "flex-start", "start": return .top
+    case "center": return .center
+    case "flex-end", "end": return .bottom
+    default: return nil
+    }
+}
+
+// ZStack/Frame alignment: column justifyContent → vertical, alignItems → horizontal; base when absent.
+private func flexZAlignment(_ style: [String: Any], base: Alignment) -> Alignment {
+    let h = flexHAlign(styleString(style, key: "alignItems"))
+    let v = flexVAlign(styleString(style, key: "justifyContent"))
+    if h == nil && v == nil { return base }
+    return Alignment(horizontal: h ?? base.horizontal, vertical: v ?? base.vertical)
+}
+
+// RN flex stack used only when justifyContent/alignItems is present.
+@available(iOS 15.0, *)
+@ViewBuilder
+private func flexStack<C: View>(
+    row: Bool,
+    gap: CGFloat,
+    justify: String?,
+    alignItems: String?,
+    defaultH: HorizontalAlignment,
+    @ViewBuilder content: () -> C
+) -> some View {
+    let j = justify?.lowercased()
+    let lead = j == "flex-end" || j == "end" || j == "center"
+    let trail = j == "flex-start" || j == "start" || j == "center"
+    if row {
+        HStack(spacing: 0) {
+            if lead { Spacer(minLength: 0) }
+            HStack(alignment: flexVAlign(alignItems) ?? .center, spacing: gap) { content() }
+            if trail { Spacer(minLength: 0) }
+        }
+    } else {
+        VStack(alignment: flexHAlign(alignItems) ?? defaultH, spacing: 0) {
+            if lead { Spacer(minLength: 0) }
+            VStack(alignment: flexHAlign(alignItems) ?? defaultH, spacing: gap) { content() }
+            if trail { Spacer(minLength: 0) }
+        }
+    }
+}
+
+// Border shape choices (AnyShape needs iOS 16).
+@available(iOS 15.0, *)
+private enum ErasedShape: Shape {
+    case rect
+    case circle
+    case rounded(CGFloat)
+    case roundedCircular(CGFloat)
+    case selective(CGFloat, ContainerCornerMask)
+
+    func path(in rect: CGRect) -> Path {
+        switch self {
+        case .rect: return Rectangle().path(in: rect)
+        case .circle: return Circle().path(in: rect)
+        case .rounded(let r): return RoundedRectangle(cornerRadius: r, style: .continuous).path(in: rect)
+        case .roundedCircular(let r): return RoundedRectangle(cornerRadius: r).path(in: rect)
+        case .selective(let r, let c): return SelectiveRoundedRectangle(radius: r, corners: c).path(in: rect)
+        }
+    }
+}
+
+// Stroke drawn inside the shape when borderWidth > 0; nothing otherwise.
+@available(iOS 15.0, *)
+@ViewBuilder
+private func borderOverlay(_ style: [String: Any], shape: ErasedShape) -> some View {
+    if let w = styleNum(style, "borderWidth"), w > 0 {
+        shape
+            .stroke(parseColor(styleString(style, key: "borderColor") ?? "#000000"), lineWidth: CGFloat(w))
+            .padding(CGFloat(w / 2))
+            .allowsHitTesting(false)
+    }
+}
+
+// Scale only when the key is present.
+@available(iOS 15.0, *)
+private func applyScale(_ style: [String: Any], _ view: AnyView) -> AnyView {
+    guard let s = styleNum(style, "scale") else { return view }
+    return AnyView(view.scaleEffect(CGFloat(s)))
+}
 
 /// Which corners use `radius` (matches RN-style per-corner radii from `getSpotCheckButtonStyles.js` side tab).
 @available(iOS 15.0, *)
@@ -889,9 +1068,6 @@ func applyOverlayContainerStyle<Content: View>(
     let borderRadiusTopRight = toDoubleOpt(style["borderRadiusTopRight"]) ?? 0
     let borderRadiusBottomLeft = toDoubleOpt(style["borderRadiusBottomLeft"]) ?? 0
     let borderRadiusBottomRight = toDoubleOpt(style["borderRadiusBottomRight"]) ?? 0
-    let padding = toDoubleOpt(style["padding"]) ?? 0
-    let paddingHorizontal = toDoubleOpt(style["paddingHorizontal"]) ?? 0
-    let paddingVertical = toDoubleOpt(style["paddingVertical"]) ?? 0
     let gap = toDoubleOpt(style["gap"]) ?? 0
     let flexDirection = style["flexDirection"] as? String ?? "column"
     let rotation = toDoubleOpt(style["rotation"]) ?? 0
@@ -910,8 +1086,8 @@ func applyOverlayContainerStyle<Content: View>(
     )
     let cornerMask = containerCornerMaskFromStyle(
         borderRadiusTopLeft: borderRadiusTopLeft,
-        borderRadiusTopRight: borderRadiusBottomLeft,
-        borderRadiusBottomLeft: borderRadiusTopRight,
+        borderRadiusTopRight: borderRadiusTopRight,
+        borderRadiusBottomLeft: borderRadiusBottomLeft,
         borderRadiusBottomRight: borderRadiusBottomRight
     )
     let perCornerMax = max(borderRadiusTopLeft, borderRadiusTopRight, borderRadiusBottomLeft, borderRadiusBottomRight)
@@ -926,9 +1102,8 @@ func applyOverlayContainerStyle<Content: View>(
     )
     .frame(width: adjustedWidth.flatMap { CGFloat($0) }, height: adjustedHeight.flatMap { CGFloat($0) })
      .offset(x: CGFloat(translateX), y: CGFloat(translateY))
-    .padding(CGFloat(padding))
-    .padding(.horizontal, CGFloat(paddingHorizontal))
-    .padding(.vertical, CGFloat(paddingVertical))
+    // Same sum as padding + paddingHorizontal + paddingVertical; per-side keys win.
+    .padding(containerPaddingInsets(style))
     .background(containerBackground(
         bgColor: bgColor,
         borderRadius: borderRadius,
@@ -938,8 +1113,28 @@ func applyOverlayContainerStyle<Content: View>(
         layoutWidth: adjustedWidth.map { CGFloat($0) },
         layoutHeight: adjustedHeight.map { CGFloat($0) }
     ))
+    .overlay(borderOverlay(style, shape: containerShape(
+        borderRadius: borderRadius,
+        perCornerRadiiSum: perCornerRadii,
+        perCornerMax: perCornerMax,
+        cornerMask: cornerMask,
+        layoutWidth: adjustedWidth.map { CGFloat($0) },
+        layoutHeight: adjustedHeight.map { CGFloat($0) }
+    )))
+    .background(backdropMaterial(blur: toDoubleOpt(style["backdropBlur"]) ?? 0))
+    // Zero when no margin keys are sent.
+    .padding(marginInsets(style))
     .opacity(opacity)
     .allowsHitTesting(opacity > 0.01)
+}
+
+// Backdrop blur behind the overlay (SwiftUI material approximates the blur radius).
+@available(iOS 15.0, *)
+@ViewBuilder
+private func backdropMaterial(blur: Double) -> some View {
+    if blur > 0 {
+        Rectangle().fill(blur >= 10 ? .regularMaterial : .ultraThinMaterial)
+    }
 }
 
 /// Mirrors Expo `justifyContent`: top → content then Spacer; bottom → Spacer then content; center → both Spacers.
@@ -979,8 +1174,6 @@ func applyContainerStyle<Content: View>(_ style: [String: Any], @ViewBuilder con
     let borderRadiusBottomLeft = toDoubleOpt(style["borderRadiusBottomLeft"]) ?? 0
     let borderRadiusBottomRight = toDoubleOpt(style["borderRadiusBottomRight"]) ?? 0
     let padding = toDoubleOpt(style["padding"]) ?? 0
-    let paddingHorizontal = toDoubleOpt(style["paddingHorizontal"]) ?? 0
-    let paddingVertical = toDoubleOpt(style["paddingVertical"]) ?? 0
     let gap = toDoubleOpt(style["gap"]) ?? 0
     let flexDirection = style["flexDirection"] as? String ?? "column"
     let rotation = toDoubleOpt(style["rotation"]) ?? 0
@@ -999,8 +1192,17 @@ func applyContainerStyle<Content: View>(_ style: [String: Any], @ViewBuilder con
     if let h = adjustedHeight, h < 0 { adjustedHeight = nil }
     let expandLayoutWidth = (width ?? 0) < 0
     let expandLayoutHeight = (height ?? 0) < 0
-    let marginHorizontal = toDoubleOpt(style["marginHorizontal"]) ?? 0
-    let marginVertical = toDoubleOpt(style["marginVertical"]) ?? 0
+    let padInsets = containerPaddingInsets(style)
+    let hasSidePadding = styleHasAny(style, sidePaddingKeys)
+    // RN padding sits inside a fixed box (floating button rings); SwiftUI pads outside, so shrink the inner box.
+    if rotation == 0, padding > 0 || hasSidePadding, let w = adjustedWidth, let h = adjustedHeight, w > 0, h > 0 {
+        // Per-side keys shrink by the real insets; otherwise today's 2 × padding.
+        let shrinkW = hasSidePadding ? Double(padInsets.leading + padInsets.trailing) : 2 * padding
+        let shrinkH = hasSidePadding ? Double(padInsets.top + padInsets.bottom) : 2 * padding
+        adjustedWidth = max(0, w - shrinkW)
+        adjustedHeight = max(0, h - shrinkH)
+    }
+    let hasFlexKeys = styleString(style, key: "justifyContent") != nil || styleString(style, key: "alignItems") != nil
 
     let perCornerRadii = (
         borderRadiusTopLeft + borderRadiusTopRight + borderRadiusBottomLeft + borderRadiusBottomRight
@@ -1012,6 +1214,14 @@ func applyContainerStyle<Content: View>(_ style: [String: Any], @ViewBuilder con
         borderRadiusBottomRight: borderRadiusBottomRight
     )
     let perCornerMax = max(borderRadiusTopLeft, borderRadiusTopRight, borderRadiusBottomLeft, borderRadiusBottomRight)
+    let borderShape = containerShape(
+        borderRadius: borderRadius,
+        perCornerRadiiSum: perCornerRadii,
+        perCornerMax: perCornerMax,
+        cornerMask: cornerMask,
+        layoutWidth: adjustedWidth.map { CGFloat($0) },
+        layoutHeight: adjustedHeight.map { CGFloat($0) }
+    )
 
     // Full-width survey column (wrapper, rows) needs leading alignment + maxWidth so HStacks match padded width.
     // Fixed small frames (e.g. miniCard close 32×32) must stay column-centered or the icon sits on the leading edge of the circle.
@@ -1021,7 +1231,19 @@ func applyContainerStyle<Content: View>(_ style: [String: Any], @ViewBuilder con
 
     return RotatedLayout(rotation: rotation, width: adjustedWidth, height: adjustedHeight, alignment: alignment) {
         Group {
-            if flexDirection == "row" {
+            if hasFlexKeys {
+                // Only when justifyContent/alignItems is sent.
+                flexStack(
+                    row: flexDirection == "row",
+                    gap: CGFloat(gap),
+                    justify: styleString(style, key: "justifyContent"),
+                    alignItems: styleString(style, key: "alignItems"),
+                    defaultH: isFullWidthColumn ? .leading : .center
+                ) {
+                    content()
+                }
+                .frame(maxWidth: isFullWidthColumn ? .infinity : nil)
+            } else if flexDirection == "row" {
                 HStack(spacing: CGFloat(gap)) {
                     content()
                 }
@@ -1039,9 +1261,8 @@ func applyContainerStyle<Content: View>(_ style: [String: Any], @ViewBuilder con
         }
     }
     .offset(x: CGFloat(translateX), y: CGFloat(translateY))
-    .padding(CGFloat(padding))
-    .padding(.horizontal, CGFloat(paddingHorizontal))
-    .padding(.vertical, CGFloat(paddingVertical))
+    // Same sum as padding + paddingHorizontal + paddingVertical; per-side keys win.
+    .padding(padInsets)
     .frame(maxWidth: expandLayoutWidth ? .infinity : nil, maxHeight: expandLayoutHeight ? .infinity : nil)
     .background(containerBackground(
         bgColor: bgColor,
@@ -1052,13 +1273,37 @@ func applyContainerStyle<Content: View>(_ style: [String: Any], @ViewBuilder con
         layoutWidth: adjustedWidth.map { CGFloat($0) },
         layoutHeight: adjustedHeight.map { CGFloat($0) }
     ))
+    .overlay(borderOverlay(style, shape: borderShape))
     // Standard SwiftUI hit-testing fix for transparent areas in buttons/custom gestures.
     .contentShape(Rectangle())
     // For elements with clear background, ensure the frame itself is hit-testable.
     .background(Color.white.opacity(0.0001))
-    .padding(.horizontal, CGFloat(marginHorizontal))
-    .padding(.vertical, CGFloat(marginVertical))
+    // marginHorizontal/Vertical as before; per-side and margin keys win.
+    .padding(marginInsets(style))
     .opacity(opacity)
+}
+
+// Same shape choice as containerBackground, for the border stroke.
+@available(iOS 15.0, *)
+private func containerShape(
+    borderRadius: Double,
+    perCornerRadiiSum: Double,
+    perCornerMax: Double,
+    cornerMask: ContainerCornerMask,
+    layoutWidth: CGFloat?,
+    layoutHeight: CGFloat?
+) -> ErasedShape {
+    let br = CGFloat(borderRadius)
+    if borderRadius > 0,
+       let w = layoutWidth, let h = layoutHeight,
+       w > 0, h > 0, abs(w - h) < 0.5, br + 0.5 >= min(w, h) / 2 {
+        return .circle
+    } else if borderRadius > 0 {
+        return .rounded(br)
+    } else if perCornerRadiiSum > 0, perCornerMax > 0, !cornerMask.isEmpty {
+        return .selective(CGFloat(perCornerMax), cornerMask)
+    }
+    return .rect
 }
 
 /// Uniform `borderRadius` (text/floating) vs per-corner keys (side tab from `getSpotCheckButtonStyles.js`).
@@ -1167,6 +1412,15 @@ private func frameStyleBackgroundFill(
 @available(iOS 15.0, *)
 extension View {
     @ViewBuilder
+    fileprivate func frameStyleCornerClip(radius: CGFloat, corners: ContainerCornerMask) -> some View {
+        if radius > 0 {
+            clipShape(SelectiveRoundedRectangle(radius: radius, corners: corners))
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder
     fileprivate func frameStyleContentClip(outerW: CGFloat?, outerH: CGFloat?, borderRadius: CGFloat, clipBehavior: String?) -> some View {
         if borderRadius > 0 {
             if let w = outerW, let h = outerH, w > 0, h > 0, abs(w - h) < 0.5, borderRadius + 0.5 >= min(w, h) / 2 {
@@ -1190,8 +1444,28 @@ func applyFrameStyle<Content: View>(_ style: [String: Any], @ViewBuilder content
     let bgColor = parseColor(style["color"] as? String ?? style["backgroundColor"] as? String)
     let borderRadius = toDoubleOpt(style["borderRadius"]) ?? 0
     let clipBehavior = style["clipBehavior"] as? String
-    let marginH = toDoubleOpt(style["marginHorizontal"]) ?? 0
+    // Per-corner radii (card/miniCard webview frame) from the backend.
+    let tl = toDoubleOpt(style["borderRadiusTopLeft"]) ?? 0
+    let tr = toDoubleOpt(style["borderRadiusTopRight"]) ?? 0
+    let bl = toDoubleOpt(style["borderRadiusBottomLeft"]) ?? 0
+    let br = toDoubleOpt(style["borderRadiusBottomRight"]) ?? 0
+    let cornerMask = containerCornerMaskFromStyle(
+        borderRadiusTopLeft: tl, borderRadiusTopRight: tr,
+        borderRadiusBottomLeft: bl, borderRadiusBottomRight: br
+    )
+    let perCornerRadius = borderRadius > 0 ? 0 : CGFloat(max(tl, tr, bl, br))
+    // New margin keys move all margins outside the background; else today's inner marginHorizontal.
+    let hasNewMargin = styleHasAny(style, newMarginKeys + ["marginVertical"])
+    let marginH = hasNewMargin ? 0 : (toDoubleOpt(style["marginHorizontal"]) ?? 0)
+    let outerMargin = hasNewMargin ? marginInsets(style) : EdgeInsets()
     let pad = CGFloat(toDoubleOpt(style["padding"]) ?? 0)
+    // Per-side/axis padding is new for Frame; zero when absent.
+    let sidePad = EdgeInsets(
+        top: CGFloat(styleNum(style, "paddingTop") ?? styleNum(style, "paddingVertical") ?? 0),
+        leading: CGFloat(styleNum(style, "paddingLeft") ?? styleNum(style, "paddingHorizontal") ?? 0),
+        bottom: CGFloat(styleNum(style, "paddingBottom") ?? styleNum(style, "paddingVertical") ?? 0),
+        trailing: CGFloat(styleNum(style, "paddingRight") ?? styleNum(style, "paddingHorizontal") ?? 0)
+    )
 
     var adjustedWidth = width
     var adjustedHeight = height
@@ -1207,7 +1481,19 @@ func applyFrameStyle<Content: View>(_ style: [String: Any], @ViewBuilder content
 
     let outerW = adjustedWidth.flatMap { $0 < 0 ? nil : CGFloat($0) }
     let outerH = adjustedHeight.flatMap { $0 < 0 ? nil : CGFloat($0) }
-    let zAlign = parseAlignment(styleString(style, key: "alignment") ?? "center")
+    let zAlign = flexZAlignment(style, base: parseAlignment(styleString(style, key: "alignment") ?? "center"))
+    // Border follows the same shape as the clip.
+    let frameBorderShape: ErasedShape = {
+        let r = CGFloat(borderRadius)
+        if r > 0 {
+            if let w = outerW, let h = outerH, w > 0, h > 0, abs(w - h) < 0.5, r + 0.5 >= min(w, h) / 2 {
+                return .circle
+            }
+            return .rounded(r)
+        }
+        if perCornerRadius > 0 { return .selective(perCornerRadius, cornerMask) }
+        return .rect
+    }()
 
     // RN `padding` on Frame insets children (floating rings). Only when outer width/height are fixed.
     let useInnerPad = pad > 0 && outerW != nil && outerH != nil && !expandW && !expandH
@@ -1217,10 +1503,12 @@ func applyFrameStyle<Content: View>(_ style: [String: Any], @ViewBuilder content
     return ZStack(alignment: zAlign) {
         content()
     }
+    .padding(sidePad)
     .frame(width: useInnerPad ? innerW : outerW, height: useInnerPad ? innerH : outerH)
     .padding(useInnerPad ? pad : 0)
     .frame(width: outerW, height: outerH)
     .frame(maxWidth: expandW ? .infinity : nil, maxHeight: expandH ? .infinity : nil)
+    .overlay(borderOverlay(style, shape: frameBorderShape))
     .padding(.horizontal, CGFloat(marginH))
     .background {
         frameStyleBackgroundFill(
@@ -1236,6 +1524,8 @@ func applyFrameStyle<Content: View>(_ style: [String: Any], @ViewBuilder content
         borderRadius: CGFloat(borderRadius),
         clipBehavior: clipBehavior
     )
+    .frameStyleCornerClip(radius: perCornerRadius, corners: cornerMask)
+    .padding(outerMargin)
     .opacity(opacity)
 }
 
@@ -1263,9 +1553,11 @@ func buildImageView(props: [String: Any], style: [String: Any]) -> some View {
     if let systemName = iconStyle["systemName"] as? String {
         let fontSize = toDoubleOpt(iconStyle["fontSize"]) ?? 15
         let color = iconStyle["color"] as? String ?? "#000000"
+        // rgb()/rgba() need parseColor; Color(hex:) keeps the old fallback for everything else.
+        let iconColor = color.lowercased().hasPrefix("rgb") ? parseColor(color) : Color(hex: color)
         Image(systemName: systemName)
             .font(.system(size: CGFloat(fontSize)))
-            .foregroundColor(Color(hex: color))
+            .foregroundColor(iconColor)
             .padding(margins)
     } else if let source = props["source"] as? [String: Any], let uri = source["uri"] as? String, !uri.isEmpty {
         let w = toDoubleOpt(iconStyle["width"]) ?? 48
@@ -1275,13 +1567,18 @@ func buildImageView(props: [String: Any], style: [String: Any]) -> some View {
         let imageBlock = AsyncImage(url: URL(string: uri)) { phase in
             switch phase {
             case .success(let image):
-                image.resizable().scaledToFill()
+                if (iconStyle["contentMode"] as? String) == "fit" {
+                    image.resizable().scaledToFit()
+                } else {
+                    image.resizable().scaledToFill()
+                }
             default:
                 Color.clear
             }
         }
         .frame(width: CGFloat(w), height: CGFloat(h))
         .clipShape(RoundedRectangle(cornerRadius: CGFloat(radius)))
+        .overlay(borderOverlay(iconStyle, shape: .roundedCircular(CGFloat(radius))))
 
         Group {
             if (iconStyle["alignSelf"] as? String)?.lowercased() == "flex-start" {
@@ -1307,6 +1604,7 @@ func buildSvgXmlView(props: [String: Any], style: [String: Any]) -> some View {
         let height = toDoubleOpt(props["height"]) ?? toDoubleOpt(style["height"]) ?? 20
         InlineSVGView(svgXML: xml)
             .frame(width: CGFloat(width), height: CGFloat(height))
+            .clipShape(RoundedRectangle(cornerRadius: CGFloat(toDoubleOpt(style["borderRadius"]) ?? 0)))
             .allowsHitTesting(false)
             .accessibilityHidden(true)
     }
@@ -1318,9 +1616,15 @@ func buildTextView(text: String, style: [String: Any]) -> some View {
     let fontSize = toDoubleOpt(style["fontSize"]) ?? 14
     let fontWeight = (style["fontWeight"] as? String) == "bold" ? Font.Weight.bold : Font.Weight.regular
     let color = style["color"] as? String ?? "#000000"
+    let family = styleString(style, key: "fontFamily") ?? ""
+    // Custom font only when installed; else today's system font.
+    let font: Font = !family.isEmpty && UIFont(name: family, size: CGFloat(fontSize)) != nil
+        ? (fontWeight == .bold ? Font.custom(family, size: CGFloat(fontSize)).weight(.bold) : Font.custom(family, size: CGFloat(fontSize)))
+        : .system(size: CGFloat(fontSize), weight: fontWeight)
+    let base = Text(text).font(font)
+    let label = (styleString(style, key: "fontStyle")?.lowercased() == "italic") ? base.italic() : base
 
-    Text(text)
-        .font(.system(size: CGFloat(fontSize), weight: fontWeight))
+    label
         .foregroundColor(Color(hex: color))
 }
 

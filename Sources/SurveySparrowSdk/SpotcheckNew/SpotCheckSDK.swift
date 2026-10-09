@@ -36,6 +36,8 @@ final class SpotCheckSDKManager {
 
 @available(iOS 15.0, *)
 final class SpotCheckSDK: ObservableObject {
+    /// Backend page script from init config; nil keeps the built-in one.
+    var remoteWebViewScript: String?
     let spotcheckStore: SpotCheckStateStore
     let functionStore: FunctionStore
     let componentStore: ComponentStore
@@ -53,24 +55,21 @@ final class SpotCheckSDK: ObservableObject {
     @Published var wrapperStyles: [String: Any] = [:]
     @Published var closeButtonStyles: [String: Any] = [:]
     @Published var spotCheckButtonStyles: [String: Any] = [:]
-    @Published var pendingInjection: String?
 
     /// `true` after fetch + `functionStore`/`componentStore` load + `initializeSpotcheckComponent` succeeds.
     private var spotcheckInitializationComplete = false
     private var spotcheckInitializationFailed = false
+    /// SwiftUI calls onAppear repeatedly; only the first call (or a retry after failure) initializes.
+    private var spotcheckInitializationStarted = false
     private let pendingTrackLock = NSLock()
     private var pendingTrackScreens: [PendingTrackScreenRequest] = []
     /// Set when `handleNavigationChange` runs; `trackScreen` is deferred until unmount + `handleNavigationChange` finish.
     private var navigationResetInProgress = false
     private var deferredTrackScreensAfterNavigation: [PendingTrackScreenRequest] = []
 
-    private let unmountAppJS = """
-    (function() {
-        window.dispatchEvent(new MessageEvent('message', {
-            data: {"type":"UNMOUNT_APP"}
-        }));
-    })();
-    """
+    private var pendingTrackEvents: [(String, [String: Any])] = []
+    /// Latest params from an initialize() made while the first is in flight; re-applied after init.
+    private var latestInitParams: [String: Any]?
 
     init() {
         self.spotcheckStore = SpotCheckStateStore()
@@ -86,6 +85,9 @@ final class SpotCheckSDK: ObservableObject {
         self.executeBridge = ExecuteBridge(spotcheckStore: spotcheckStore, functionStore: functionStore, sentry: sentry)
         self.sentry.executeBridge = self.executeBridge
         executeBridge.setListener(listenerBridge)
+        executeBridge.onWebViewInject = { [weak self] target, script in
+            self?.injectIntoWebView(target: target, script: script)
+        }
 
         setupStateObservers()
     }
@@ -102,6 +104,23 @@ final class SpotCheckSDK: ObservableObject {
         delegate: SsSpotcheckDelegate? = nil
     ) {
         listenerBridge.delegate = delegate
+
+        pendingTrackLock.lock()
+        if spotcheckInitializationStarted {
+            // Legacy: each Spotcheck used its own details; take the latest.
+            let latest: [String: Any] = [
+                "userDetails": userDetails,
+                "variables": variables,
+                "customProperties": customProperties,
+            ]
+            if !spotcheckInitializationComplete { latestInitParams = latest }
+            pendingTrackLock.unlock()
+            spotcheckStore.dispatch(["params": latest])
+            return
+        }
+        spotcheckInitializationStarted = true
+        spotcheckInitializationFailed = false
+        pendingTrackLock.unlock()
 
         let userAgent = buildUserAgent()
         let visitor = buildVisitorInfo()
@@ -127,6 +146,8 @@ final class SpotCheckSDK: ObservableObject {
                 await MainActor.run {
                     functionStore.load(from: response)
                     componentStore.load(from: response)
+                    let script = (response["config"] as? [String: Any])?["webViewScript"] as? String
+                    self.remoteWebViewScript = (script?.isEmpty == false) ? script : nil
                 }
 
                 await executeBridge.execute("initializeSpotcheckComponent", params: [
@@ -135,23 +156,49 @@ final class SpotCheckSDK: ObservableObject {
                     "userDetails": userDetails,
                     "variables": variables,
                     "customProperties": customProperties,
+                    "framework": "ios",
+                    "sdkVersion": ExecuteBridge.spotcheckSdkVersion,
+                    "device": buildDeviceFacts(),
                 ])
 
                 await MainActor.run {
-                    self.spotcheckInitializationComplete = true
+                    // initializeSpotcheckComponent used the first call's params; re-apply the latest.
+                    if let latest = self.completeInitialization() {
+                        self.spotcheckStore.dispatch(["params": latest])
+                    }
                 }
                 flushPendingTrackScreens()
+                flushPendingTrackEvents()
             } catch {
                 sentry.captureP0Error(error, "SPOTCHECK_INITIALIZATION", ["action": "initialize"])
                 await MainActor.run {
                     self.spotcheckInitializationFailed = true
                 }
+                self.allowInitializationRetry()
                 clearPendingTrackScreensAfterInitFailure()
             }
         }
     }
 
+    // Sync helpers: NSLock can't be used directly in async contexts.
+    private func completeInitialization() -> [String: Any]? {
+        pendingTrackLock.lock()
+        defer { pendingTrackLock.unlock() }
+        spotcheckInitializationComplete = true
+        let latest = latestInitParams
+        latestInitParams = nil
+        return latest
+    }
+
+    private func allowInitializationRetry() {
+        pendingTrackLock.lock()
+        defer { pendingTrackLock.unlock() }
+        spotcheckInitializationStarted = false
+        latestInitParams = nil
+    }
+
     func trackScreen(_ screen: String, variables: [String: Any] = [:], customProperties: [String: Any] = [:], userDetails: [String: Any] = [:]) {
+        sentry.addBreadcrumb("trackScreen", ["screen": screen])
         pendingTrackLock.lock()
         if spotcheckInitializationFailed {
             pendingTrackLock.unlock()
@@ -207,9 +254,22 @@ final class SpotCheckSDK: ObservableObject {
         }
     }
 
+    private func flushPendingTrackEvents() {
+        pendingTrackLock.lock()
+        let batch = pendingTrackEvents
+        pendingTrackEvents.removeAll()
+        pendingTrackLock.unlock()
+        for (screen, event) in batch {
+            Task { [weak self] in
+                await self?.executeBridge.execute("trackEvent", params: ["screen": screen, "event": event])
+            }
+        }
+    }
+
     private func clearPendingTrackScreensAfterInitFailure() {
         pendingTrackLock.lock()
         pendingTrackScreens.removeAll()
+        pendingTrackEvents.removeAll()
         deferredTrackScreensAfterNavigation.removeAll()
         navigationResetInProgress = false
         pendingTrackLock.unlock()
@@ -229,11 +289,22 @@ final class SpotCheckSDK: ObservableObject {
                 "userDetails": userDetails,
             ],
         ])
-        await Task.yield()
-        await MainActor.run { }
     }
 
     func trackEvent(_ screen: String, event: [String: Any] = [:]) {
+        sentry.addBreadcrumb("trackEvent", ["screen": screen, "event": event.keys.joined(separator: ",")])
+        pendingTrackLock.lock()
+        if spotcheckInitializationFailed {
+            pendingTrackLock.unlock()
+            return
+        }
+        if !spotcheckInitializationComplete {
+            pendingTrackEvents.append((screen, event))
+            pendingTrackLock.unlock()
+            return
+        }
+        pendingTrackLock.unlock()
+
         Task {
             await executeBridge.execute("trackEvent", params: [
                 "screen": screen,
@@ -250,13 +321,28 @@ final class SpotCheckSDK: ObservableObject {
         Task { [weak self] in
             guard let self else { return }
             await self.executeBridge.executeWithNativePrelude(
-                nativePrelude: { await self.injectUnmountApp() },
+                nativePrelude: {},
                 functionName: "handleNavigationChange"
             )
             await MainActor.run {
                 self.finishNavigationResetAndFlushDeferredTrackScreens()
             }
         }
+    }
+
+    // Swipe-back started: defer trackScreen calls until it completes or is cancelled.
+    func beginInteractiveNavigation() {
+        pendingTrackLock.lock()
+        navigationResetInProgress = true
+        pendingTrackLock.unlock()
+    }
+
+    // Swipe-back cancelled: no reset; drop the revealed screen's calls (it never became visible).
+    func cancelInteractiveNavigation() {
+        pendingTrackLock.lock()
+        navigationResetInProgress = false
+        deferredTrackScreensAfterNavigation.removeAll()
+        pendingTrackLock.unlock()
     }
 
     private func finishNavigationResetAndFlushDeferredTrackScreens() {
@@ -277,12 +363,31 @@ final class SpotCheckSDK: ObservableObject {
         }
     }
 
+    // Runner for schema `$execute` actions (one instance, so SwiftUI sees a stable value); unknown names do nothing.
+    private(set) lazy var genericActionRunner: (String, [String: Any]) -> Void = { [weak self] fn, params in
+        guard let self, !fn.isEmpty, self.functionStore.resolve(fn) != nil else { return }
+        Task { await self.executeBridge.execute(fn, params: params) }
+    }
+
+    // X tap: keeps a button spotcheck's button (legacy end()).
+    func handleCloseButtonTap() {
+        Task { [weak self] in
+            guard let self else { return }
+            await self.executeBridge.executeWithNativePrelude(
+                nativePrelude: {},
+                functionName: "closeButton.handleCloseButton"
+            )
+        }
+    }
+
+    // Public CloseSpotchecks(): full close, like navigation.
     func closeSpotCheck() {
         Task { [weak self] in
             guard let self else { return }
             await self.executeBridge.executeWithNativePrelude(
-                nativePrelude: { await self.injectUnmountApp() },
-                functionName: "closeButton.handleCloseButton"
+                nativePrelude: {},
+                functionName: "handleNavigationChange",
+                params: ["reason": "close"]
             )
         }
     }
@@ -335,123 +440,19 @@ final class SpotCheckSDK: ObservableObject {
         }
     }
 
-    /// `handleWebViewInjection.js` flips `isMounted` only after `classicWebViewRef` / `chatWebViewRef` inject; those refs are absent on iOS, which uses `WKWebView.evaluateJavaScript` instead — mirror fullscreen parity here after a successful native inject.
-    func dispatchFullscreenIsMountedAfterNativeInjection(error: Error?) {
-        guard error == nil else { return }
-        let spotCheckState = spotcheckStore.getState()["SpotCheckState"] as? [String: Any] ?? [:]
-        let spotCheckDetails = spotCheckState["spotCheckDetails"] as? [String: Any] ?? [:]
-        guard spotCheckDetails["isFullScreenMode"] as? Bool == true else { return }
-        spotcheckStore.dispatch([
-            "spotCheckDetails": [
-                "isMounted": true,
-            ],
+    func runWebViewInjectionPipeline() async {
+        await executeBridge.execute("webviewComponent.handleWebViewInjection")
+    }
+
+    func handleWebViewMessageFromNativeBridge(rawData: String) async {
+        await executeBridge.execute("webviewComponent.handleWebViewMessage", params: [
+            "event": ["nativeEvent": ["data": rawData]],
         ])
     }
 
-    func runWebViewInjectionPipeline() async {
-        await executeBridge.execute("webviewComponent.handleWebViewInjection")
-        // dispatchWrapper from JS schedules MainActor work asynchronously — yield so merged state is visible.
-        await Task.yield()
-        await MainActor.run { }
-
-        let storeState = spotcheckStore.getState()
-        let spotCheckState = storeState["SpotCheckState"] as? [String: Any] ?? [:]
-        let webViewDetails = spotCheckState["webViewDetails"] as? [String: Any] ?? [:]
-
-        let isClassicLoading = webViewDetails["isClassicLoading"] as? Bool ?? true
-        let isChatLoading = webViewDetails["isChatLoading"] as? Bool ?? true
-        let isCurrentSpotcheckChat = webViewDetails["isCurrentSpotcheckChat"] as? Bool
-        let injectionData = webViewDetails["webViewInjectionData"] as? String ?? ""
-        if injectionData.isEmpty {
-            return
-        }
-
-        await MainActor.run {
-            if isCurrentSpotcheckChat == false && !isClassicLoading {
-                if let wv = self.classicWebView {
-                    wv.evaluateJavaScript(injectionData) { [weak self] _, err in
-                        self?.dispatchFullscreenIsMountedAfterNativeInjection(error: err)
-                    }
-                } else {
-                    self.pendingInjection = injectionData
-                }
-            } else if isCurrentSpotcheckChat == true && !isChatLoading {
-                if let wv = self.chatWebView {
-                    wv.evaluateJavaScript(injectionData) { [weak self] _, err in
-                        self?.dispatchFullscreenIsMountedAfterNativeInjection(error: err)
-                    }
-                } else {
-                    self.pendingInjection = injectionData
-                }
-            } else if isClassicLoading || isChatLoading {
-                self.pendingInjection = injectionData
-            }
-        }
-    }
-
-    /// Mirrors backend `handleWebViewMessage` paths that call `injectUnmountApp` (refs are no-op on iOS; native WKWebView inject here).
-    func handleWebViewMessageFromNativeBridge(rawData: String) async {
-        let params: [String: Any] = [
-            "event": ["nativeEvent": ["data": rawData]],
-        ]
-
-        if rawData == "captureImage" {
-            await executeBridge.execute("webviewComponent.handleWebViewMessage", params: params)
-            return
-        }
-
-        guard let jsonData = rawData.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-              let messageType = json["type"] as? String
-        else {
-            await executeBridge.execute("webviewComponent.handleWebViewMessage", params: params)
-            return
-        }
-
-        let storeState = spotcheckStore.getState()
-        let spotCheckState = storeState["SpotCheckState"] as? [String: Any] ?? [:]
-        let spotCheckDetails = spotCheckState["spotCheckDetails"] as? [String: Any] ?? [:]
-
-        if messageType == "surveyCompleted" {
-            // Run backend first (listener → keyboard → bundled injectUnmountApp noop without refs → dispatch).
-            // Then native WKWebView unmount; refs-based inject is no-op on iOS (see webviewHelpers.js).
-            await executeBridge.execute("webviewComponent.handleWebViewMessage", params: params)
-            await injectUnmountApp()
-            return
-        }
-
-        if messageType == "thankYouPageSubmission" {
-            let mode = spotCheckDetails["mode"] as? String ?? ""
-            let closeButton = spotCheckDetails["closeButton"] as? [String: Any]
-            let closeEnabled = closeButton?["isEnabled"] as? Bool ?? false
-            let delayedMiniCardUnmount = (mode == "miniCard" && !closeEnabled)
-
-            await executeBridge.execute("webviewComponent.handleWebViewMessage", params: params)
-
-            if delayedMiniCardUnmount {
-                try? await Task.sleep(nanoseconds: 4_000_000_000)
-                await injectUnmountApp()
-            }
-            return
-        }
-        
-
-        await executeBridge.execute("webviewComponent.handleWebViewMessage", params: params)
-    }
-
-    func injectUnmountApp() async {
-        let storeState = spotcheckStore.getState()
-        let spotCheckState = storeState["SpotCheckState"] as? [String: Any] ?? [:]
-        let webViewDetails = spotCheckState["webViewDetails"] as? [String: Any] ?? [:]
-        let isCurrentSpotcheckChat = webViewDetails["isCurrentSpotcheckChat"] as? Bool ?? false
-
-        await MainActor.run {
-            if isCurrentSpotcheckChat {
-                self.chatWebView?.evaluateJavaScript(self.unmountAppJS)
-            } else {
-                self.classicWebView?.evaluateJavaScript(self.unmountAppJS)
-            }
-        }
+    private func injectIntoWebView(target: String, script: String) {
+        let webView = target == "chat" ? chatWebView : classicWebView
+        webView?.evaluateJavaScript(script, completionHandler: nil)
     }
 
     // MARK: - State Observers
@@ -464,18 +465,28 @@ final class SpotCheckSDK: ObservableObject {
                 self.refreshStyles()
             }
             .store(in: &cancellables)
+
+        // Rotation: recompute styles with the new screen size.
+        NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)
+            .debounce(for: .milliseconds(150), scheduler: DispatchQueue.main)
+            .sink { [weak self] _ in self?.refreshStyles() }
+            .store(in: &cancellables)
     }
 
     private var cancellables = Set<AnyCancellable>()
+    // Only the latest refresh may apply (older results can finish later).
+    private var styleRefreshSeq = 0
 
     private func refreshStyles() {
         guard functionStore.isLoaded else { return }
+        styleRefreshSeq += 1
+        let seq = styleRefreshSeq
 
         let screenHeight = UIScreen.main.bounds.height
         let screenWidth = UIScreen.main.bounds.width
 
         Task {
-            await withTaskGroup(of: (String, [String: Any]?).self) { group in
+            let next = await withTaskGroup(of: (String, [String: Any]?).self) { group in
                 group.addTask {
                     let res = await self.executeBridge.execute("wrapper.getWrapperStyles", params: [
                         "screenHeight": screenHeight,
@@ -502,12 +513,14 @@ final class SpotCheckSDK: ObservableObject {
                     else if key == "close" { nextClose = styles }
                     else if key == "button" { nextButton = styles }
                 }
+                return (nextWrapper, nextClose, nextButton)
+            }
 
-                await MainActor.run {
-                    self.wrapperStyles = nextWrapper
-                    self.closeButtonStyles = nextClose
-                    self.spotCheckButtonStyles = nextButton
-                }
+            await MainActor.run {
+                guard seq == self.styleRefreshSeq else { return }
+                self.wrapperStyles = next.0
+                self.closeButtonStyles = next.1
+                self.spotCheckButtonStyles = next.2
             }
         }
     }
