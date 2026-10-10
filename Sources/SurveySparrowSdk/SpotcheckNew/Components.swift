@@ -241,8 +241,9 @@ struct SpotCheckWebView: UIViewRepresentable {
         let webView = WKWebView(frame: .zero, configuration: config)
         objc_setAssociatedObject(webView, &Self.scriptProxyKey, proxy, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         webView.navigationDelegate = context.coordinator
-        webView.backgroundColor = .clear
-        webView.isOpaque = false
+        // Opaque like legacy: a transparent WKWebView showed the dimmed app through light survey pages.
+        webView.backgroundColor = .white
+        webView.isOpaque = true
         webView.scrollView.bounces = false
         // SwiftUI applies safe-area padding on the overlay root; avoid double insets inside WKWebView.
         webView.scrollView.contentInsetAdjustmentBehavior = .never

@@ -1710,19 +1710,30 @@ extension View {
 struct InlineSVGView: UIViewRepresentable {
     let svgXML: String
 
+    // Tracks the loaded markup so SwiftUI updates don't reload (and blank) the icon.
+    final class Coordinator {
+        var loadedXML: String?
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.isOpaque = false
         webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
         webView.scrollView.isScrollEnabled = false
         webView.scrollView.bounces = false
         webView.isUserInteractionEnabled = false
         webView.loadHTMLString(html(for: svgXML), baseURL: nil)
+        context.coordinator.loadedXML = svgXML
         return webView
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
+        guard context.coordinator.loadedXML != svgXML else { return }
+        context.coordinator.loadedXML = svgXML
         uiView.loadHTMLString(html(for: svgXML), baseURL: nil)
     }
 
