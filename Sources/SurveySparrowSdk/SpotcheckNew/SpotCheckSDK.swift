@@ -70,6 +70,10 @@ final class SpotCheckSDK: ObservableObject {
     private var pendingTrackEvents: [(String, [String: Any])] = []
     /// Latest params from an initialize() made while the first is in flight; re-applied after init.
     private var latestInitParams: [String: Any]?
+    /// Re-runs the last initialize(); a failed init (e.g. offline) is retried on the next track call.
+    private var retryInitialization: (() -> Void)?
+    private var lastInitAttempt = Date.distantPast
+    private static let initRetryGap: TimeInterval = 10
 
     init() {
         self.spotcheckStore = SpotCheckStateStore()
@@ -120,6 +124,18 @@ final class SpotCheckSDK: ObservableObject {
         }
         spotcheckInitializationStarted = true
         spotcheckInitializationFailed = false
+        lastInitAttempt = Date()
+        retryInitialization = { [weak self] in
+            self?.initialize(
+                domainName: domainName,
+                targetToken: targetToken,
+                userDetails: userDetails,
+                variables: variables,
+                customProperties: customProperties,
+                sparrowLang: sparrowLang,
+                delegate: delegate
+            )
+        }
         pendingTrackLock.unlock()
 
         let userAgent = buildUserAgent()
@@ -171,11 +187,7 @@ final class SpotCheckSDK: ObservableObject {
                 flushPendingTrackEvents()
             } catch {
                 sentry.captureP0Error(error, "SPOTCHECK_INITIALIZATION", ["action": "initialize"])
-                await MainActor.run {
-                    self.spotcheckInitializationFailed = true
-                }
-                self.allowInitializationRetry()
-                clearPendingTrackScreensAfterInitFailure()
+                self.markInitializationFailed()
             }
         }
     }
@@ -190,18 +202,41 @@ final class SpotCheckSDK: ObservableObject {
         return latest
     }
 
-    private func allowInitializationRetry() {
+    private func markInitializationFailed() {
         pendingTrackLock.lock()
         defer { pendingTrackLock.unlock() }
+        spotcheckInitializationFailed = true
         spotcheckInitializationStarted = false
         latestInitParams = nil
+        // Same lock as the flag so a track call can't queue in between and be wiped.
+        pendingTrackScreens.removeAll()
+        pendingTrackEvents.removeAll()
+        deferredTrackScreensAfterNavigation.removeAll()
+        navigationResetInProgress = false
+    }
+
+    /// Call with pendingTrackLock held: the retry to run (after unlocking) when the gap has passed.
+    private func initRetryIfDueLocked() -> (() -> Void)? {
+        guard Date().timeIntervalSince(lastInitAttempt) >= Self.initRetryGap else { return nil }
+        return retryInitialization
     }
 
     func trackScreen(_ screen: String, variables: [String: Any] = [:], customProperties: [String: Any] = [:], userDetails: [String: Any] = [:]) {
         sentry.addBreadcrumb("trackScreen", ["screen": screen])
         pendingTrackLock.lock()
         if spotcheckInitializationFailed {
+            // Keep this call only when a retry starts; it runs once that init succeeds.
+            let retry = initRetryIfDueLocked()
+            if retry != nil {
+                pendingTrackScreens.append(PendingTrackScreenRequest(
+                    screen: screen,
+                    variables: variables,
+                    customProperties: customProperties,
+                    userDetails: userDetails
+                ))
+            }
             pendingTrackLock.unlock()
+            retry?()
             return
         }
         if !spotcheckInitializationComplete {
@@ -266,15 +301,6 @@ final class SpotCheckSDK: ObservableObject {
         }
     }
 
-    private func clearPendingTrackScreensAfterInitFailure() {
-        pendingTrackLock.lock()
-        pendingTrackScreens.removeAll()
-        pendingTrackEvents.removeAll()
-        deferredTrackScreensAfterNavigation.removeAll()
-        navigationResetInProgress = false
-        pendingTrackLock.unlock()
-    }
-
     private func performTrackScreenExecute(
         screen: String,
         variables: [String: Any],
@@ -295,7 +321,11 @@ final class SpotCheckSDK: ObservableObject {
         sentry.addBreadcrumb("trackEvent", ["screen": screen, "event": event.keys.joined(separator: ",")])
         pendingTrackLock.lock()
         if spotcheckInitializationFailed {
+            // Keep this call only when a retry starts; it runs once that init succeeds.
+            let retry = initRetryIfDueLocked()
+            if retry != nil { pendingTrackEvents.append((screen, event)) }
             pendingTrackLock.unlock()
+            retry?()
             return
         }
         if !spotcheckInitializationComplete {
