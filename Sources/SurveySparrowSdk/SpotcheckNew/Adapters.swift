@@ -265,13 +265,22 @@ struct KeyboardAdapter {
 /// Raw device facts; the backend builds the User-Agent from these.
 func buildDeviceFacts() -> [String: Any] {
     let device = UIDevice.current
-    return [
+    var facts: [String: Any] = [
         "os": "ios",
         "osVersion": device.systemVersion,
         "deviceName": device.name,
         "model": device.model,
         "isTablet": device.userInterfaceIdiom == .pad,
     ]
+    // Host app release; the backend keeps the SDK version of the newest build.
+    let info = Bundle.main.infoDictionary
+    if let appVersion = info?["CFBundleShortVersionString"] as? String, !appVersion.isEmpty {
+        facts["appVersion"] = appVersion
+    }
+    if let appBuild = info?["CFBundleVersion"] as? String, !appBuild.isEmpty {
+        facts["appBuild"] = appBuild
+    }
+    return facts
 }
 
 func buildUserAgent() -> String {
