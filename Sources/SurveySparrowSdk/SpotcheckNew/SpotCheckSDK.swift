@@ -490,8 +490,12 @@ final class SpotCheckSDK: ObservableObject {
     private func setupStateObservers() {
         spotcheckStore.$state
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] state in
                 guard let self = self else { return }
+                // A close is already in the store; the queued style refresh can lag behind it (serial JS queue).
+                if Self.isClosed(state) {
+                    self.wrapperStyles = self.wrapperStyles.merging(Self.hiddenWrapperStyles) { _, hidden in hidden }
+                }
                 self.refreshStyles()
             }
             .store(in: &cancellables)
@@ -501,6 +505,19 @@ final class SpotCheckSDK: ObservableObject {
             .debounce(for: .milliseconds(150), scheduler: DispatchQueue.main)
             .sink { [weak self] _ in self?.refreshStyles() }
             .store(in: &cancellables)
+    }
+
+    private static let hiddenWrapperStyles: [String: Any] = [
+        "overlayStyle": ["width": 0, "height": 0, "opacity": 0, "positioned": true, "position": "absolute"] as [String: Any],
+        "wrapperStyle": ["width": 0, "height": 0, "opacity": 0, "clipBehavior": "hardEdge"] as [String: Any],
+        "webViewWrapperStyle": ["width": 0, "height": 0, "opacity": 0] as [String: Any],
+        "backdropBlur": 0,
+    ]
+
+    private static func isClosed(_ state: [String: Any]) -> Bool {
+        let s = state["SpotCheckState"] as? [String: Any] ?? [:]
+        let details = s["spotCheckDetails"] as? [String: Any] ?? [:]
+        return (s["showSpotCheck"] as? Bool) != true && (details["isVisible"] as? Bool) != true
     }
 
     private var cancellables = Set<AnyCancellable>()
