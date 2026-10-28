@@ -15,7 +15,7 @@ struct HomeScreen: View {
                 .padding()
             Button(
                 action: {
-                    spotCheck.TrackEvent(onScreen: "HomeScreen", event: [ "GameCompleted": ["postSentTime": "5.30pm"] ])
+         spotCheck.TrackEvent(onScreen: "HomeScreen", event: [ "GameCompleted": ["postSentTime": "5.30pm"] ])
                 }
             ){
                 Text("Click")

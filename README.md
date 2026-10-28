@@ -4,7 +4,7 @@ SurveySparrow provides various SDKs and maintaining these under different versio
 
 | SDK                                | Latest Version | Branch 
 |------------------------------------|---------------|---------------------------------|
-| SwiftUI Apps - Spotchecks & SDK Share       | [v1.2.9](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/1.2.9) | [master]() |  |
+| SwiftUI Apps - Spotchecks & SDK Share       | [v1.2.10](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/1.2.10) | [master]() |  |
 | SpotChecks for UIKit Apps         | [v3.0.5](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/3.0.5) | [spotchecks-for-uikit-app](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/spotchecks-for-uikit-app) |  |
 | SDK Share for UIKit Apps | [v0.5.3](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/0.5.3) | [framework-master](https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/framework-master) |  |
 
@@ -18,7 +18,9 @@ SurveySparrow provides various SDKs and maintaining these under different versio
 ## SpotChecks
 
 ### SpotCheck Documentation is available here
-### [SpotCheck-iOS-Docs](https://surveysparrow.gitbook.io/spotchecks/how-to-use-spotchecks/mobile-spotcheck/ios)
+### [SpotCheck-iOS-Docs](https://developers.surveysparrow.com/spotchecks/mobile-spotchecks/ios/swift-ui)
+
+**Requirements:** iOS 15.0 or newer, SwiftUI, Xcode 15 or newer (Swift Package Manager).
 
 <br>
 <br>
@@ -34,8 +36,8 @@ SurveySparrow provides various SDKs and maintaining these under different versio
 <br>
 
 > [!NOTE] 
-> ### iOS Deplyment Target
-> SwiftUI Interface    - iOS 14.0  
+> ### iOS Deployment Target
+> SwiftUI Interface    - iOS 15.0  
 > Storyboard Interface - iOS 13.0
 
 <br>
