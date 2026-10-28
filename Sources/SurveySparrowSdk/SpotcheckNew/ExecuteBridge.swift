@@ -125,6 +125,7 @@ final class ExecuteBridge: @unchecked Sendable {
         ctx.setObject(fetch, forKeyedSubscript: "fetch" as NSString)
 
         ctx.evaluateScript(Self.responsePolyfill)
+        ctx.evaluateScript(Self.markReportedHelper)
         ctx.evaluateScript(Self.urlSearchParamsPolyfill)
     }
 
@@ -194,6 +195,9 @@ final class ExecuteBridge: @unchecked Sendable {
         return ["messageType": type]
     }
 
+    // Thrown when the function already reported this failure via payload.sentry.
+    private struct ReportedByFunction: Error {}
+
     private func executeUnserialized(_ functionName: String, params: [String: Any]?) async -> Any? {
         guard functionStore.isLoaded, let functionString = functionStore.resolve(functionName) else {
             return nil
@@ -210,6 +214,8 @@ final class ExecuteBridge: @unchecked Sendable {
         let result: Any?
         do {
             result = try await runFunction(functionString, params: mergedParams, state: state, isSentry: !reportErrors)
+        } catch is ReportedByFunction {
+            result = nil
         } catch {
             if reportErrors {
                 sentry.captureP1Error(error, "GENERAL", ["action": "execute:runtime", "functionName": functionName])
@@ -255,6 +261,10 @@ final class ExecuteBridge: @unchecked Sendable {
                     finish(.success(value.isNull || value.isUndefined ? nil : value.toObject()))
                 }
                 let reject: @convention(block) (JSValue) -> Void = { error in
+                    if error.isObject, error.objectForKeyedSubscript("__ssReported")?.toBool() == true {
+                        finish(.failure(ReportedByFunction()))
+                        return
+                    }
                     finish(.failure(SpotCheckError.executionError(error.toString())))
                 }
                 promise.invokeMethod("then", withArguments: [
@@ -293,12 +303,29 @@ final class ExecuteBridge: @unchecked Sendable {
                 let message = error.objectForKeyedSubscript("message")?.toString().flatMap { $0 == "undefined" ? nil : $0 }
                     ?? error.toString() ?? "Unknown"
                 let ctx = context.toDictionary() as? [String: Any] ?? [:]
+                JSContext.current()?.objectForKeyedSubscript("__ssMarkReported")?.call(withArguments: [error])
                 if priority == "P0" {
                     self?.sentry.captureP0Error(message, source, ctx)
                 } else {
                     self?.sentry.captureP1Error(message, source, ctx)
                 }
             }
+        }
+
+        // Primitives only, few keys, short strings; NaN/Infinity dropped (breaks JSON).
+        let addBreadcrumb: @convention(block) (JSValue, JSValue) -> Void = { [weak self] message, data in
+            guard message.isString, let text = message.toString(), !text.isEmpty else { return }
+            var clean: [String: Any] = [:]
+            if data.isObject, !data.isArray, let dict = data.toDictionary() as? [String: Any] {
+                for key in dict.keys.sorted().prefix(10) {
+                    switch dict[key] {
+                    case let v as String: clean[String(key.prefix(50))] = String(v.prefix(200))
+                    case let v as NSNumber where v.doubleValue.isFinite: clean[String(key.prefix(50))] = v
+                    default: continue
+                    }
+                }
+            }
+            self?.sentry.addBreadcrumb(String(text.prefix(200)), clean)
         }
 
         let notify: (@escaping (SsSpotcheckDelegate, [String: AnyObject]) async -> Void) -> @convention(block) (JSValue) -> JSValue = { [weak self] call in
@@ -321,7 +348,11 @@ final class ExecuteBridge: @unchecked Sendable {
         return [
             "dispatchWrapper": dispatch,
             "storage": ["saveData": saveData, "loadData": loadData] as [String: Any],
-            "sentry": ["captureP0Error": capture("P0"), "captureP1Error": capture("P1")] as [String: Any],
+            "sentry": [
+                "captureP0Error": capture("P0"),
+                "captureP1Error": capture("P1"),
+                "addBreadcrumb": addBreadcrumb,
+            ] as [String: Any],
             "keyboard": [
                 "pauseDefaultKeyboardBehavior": { KeyboardAdapter.pauseDefaultKeyboardBehavior() } as @convention(block) () -> Void,
                 "resumeDefaultKeyboardBehavior": { KeyboardAdapter.resumeDefaultKeyboardBehavior() } as @convention(block) () -> Void,
@@ -388,6 +419,17 @@ final class ExecuteBridge: @unchecked Sendable {
             json: function() { return Promise.resolve(JSON.parse(body)); },
             text: function() { return Promise.resolve(body); }
         };
+    }
+    """
+
+    // Non-enumerable flag so execute() skips re-reporting; never throws.
+    private static let markReportedHelper = """
+    function __ssMarkReported(e) {
+        try {
+            if (e && (typeof e === 'object' || typeof e === 'function')) {
+                Object.defineProperty(e, '__ssReported', { value: true, enumerable: false, configurable: true });
+            }
+        } catch (_) {}
     }
     """
 
