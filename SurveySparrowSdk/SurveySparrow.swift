@@ -120,6 +120,29 @@ public class SurveySparrow: SsSurveyDelegate {
   }
   }
 
+  /// Validate a survey with the server before presenting it.
+  /// Completion runs on the main queue; active is false when the server says so or the request fails.
+  public static func validate(
+    domain: String,
+    token: String,
+    params: [String: String] = [:],
+    completion: @escaping (_ active: Bool, _ reason: String, _ widgetContactId: Int64) -> Void
+  ) {
+    var isActive = false
+    var reason = ""
+    var widgetContactId: Int64 = 0
+    let group = DispatchGroup()
+    group.enter()
+    validateSurvey(domain: domain, token: token, params: params, group: group) { result in
+      if let active = result["active"] as? Bool { isActive = active }
+      if let reasonData = result["reason"] as? String { reason = reasonData }
+      if let contactId = result["widgetContactId"] as? Int64 { widgetContactId = contactId }
+    }
+    group.notify(queue: .main) {
+      completion(isActive, reason, widgetContactId)
+    }
+  }
+
   public func clearSchedule() {
     UserDefaults.standard.removeObject(forKey: incrementMultiplierKey)
     UserDefaults.standard.removeObject(forKey: isAlreadyTakenKey)
