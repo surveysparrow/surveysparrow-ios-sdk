@@ -12,18 +12,14 @@ metadata:
   description: SurveySparrow iOS SDK enables you to collect feedback from your mobile app by embed our Classic & Chat surveys
   annotations:
     # No API definition, dependency graph or TechDocs for this repo yet: hide those tabs.
-    sparrow.io/hide: api,dependencies,docs
+    # A library has no pods or logs: hide those too.
+    sparrow.io/hide: api,dependencies,docs,observability
     github.com/project-slug: surveysparrow/surveysparrow-ios-sdk
     backstage.io/source-location: url:https://github.com/surveysparrow/surveysparrow-ios-sdk/tree/master/
   tags:
   - library
   - surveysparrow
   - swift
-  links:
-  - url: https://github.com/surveysparrow/surveysparrow-ios-sdk
-    title: GitHub repository
-    icon: github
-    type: repo
 spec:
   type: library
   lifecycle: production
