@@ -37,7 +37,7 @@ private actor ExecuteSerialGate {
 @available(iOS 15.0, *)
 final class ExecuteBridge: @unchecked Sendable {
     /// Keep in sync with the released SDK version tag.
-    static let spotcheckSdkVersion = "1.2.10-beta.1"
+    static let spotcheckSdkVersion = "1.2.10"
 
     private static let executeTimeout: TimeInterval = 15
 
