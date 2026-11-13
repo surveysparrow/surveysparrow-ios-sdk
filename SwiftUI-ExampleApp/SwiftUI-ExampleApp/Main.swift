@@ -13,8 +13,8 @@ import SurveySparrowSdk
 
 
 var spotCheck = Spotcheck(
-    domainName: "",
-    targetToken: "",
+    domainName: "kalai.in.ngrok.io",
+    targetToken: "tar-xg8WgaPkZcyVnymxWfcDJv",
     userDetails: [:],
     sparrowLang: "",
     surveyDelegate: SsDelegate()
@@ -116,20 +116,12 @@ struct CustomTextField: View {
 @available(iOS 15.0, *)
 class SsDelegate: UIViewController, SsSpotcheckDelegate {
 
-    func handleSurveyResponse(response: [String : AnyObject]) async {
-        print("Received survey response: ", response)
-    }
+    func handleSurveyResponse(response: [String : AnyObject]) async {}
 
-    func handlePartialSubmission(response: [String : AnyObject]) async {
-        print("Received partial Submission: ", response)
-    }
+    func handlePartialSubmission(response: [String : AnyObject]) async {}
 
-    func handleSurveyLoaded(response: [String : AnyObject]) async {
-        print("Survey Loaded: ", response)
-    }
+    func handleSurveyLoaded(response: [String : AnyObject]) async {}
 
-    func handleCloseButtonTap() async {
-        print("Survey closed by the User.")
-    }
+    func handleCloseButtonTap() async {}
 }
 

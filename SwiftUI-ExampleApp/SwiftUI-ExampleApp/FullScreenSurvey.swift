@@ -9,21 +9,13 @@ import SwiftUI
 import SurveySparrowSdk
 
 class SurveyDelegate: SsSurveyDelegate {
-    func handleCloseButtonTap() {
-        print("CloseButtonTap")
-    }
-    
-    func handleSurveyResponse(response: [String: AnyObject]) {
-        print("Survey Response: \(response)")
-    }
+    func handleCloseButtonTap() {}
 
-    func handleSurveyLoaded(response: [String: AnyObject]) {
-        print("Survey Loaded: \(response)")
-    }
+    func handleSurveyResponse(response: [String: AnyObject]) {}
 
-    func handleSurveyValidation(response: [String: AnyObject]) {
-        print("Survey Validation: \(response)")
-    }
+    func handleSurveyLoaded(response: [String: AnyObject]) {}
+
+    func handleSurveyValidation(response: [String: AnyObject]) {}
 }
 
 struct FullScreenSurveyView: UIViewControllerRepresentable {
@@ -62,10 +54,7 @@ struct FullScreenSurveyWithValidation {
 
     func startFullScreenSurveyWithValidation() {
            if let parentViewController = UIApplication.shared.windows.first?.rootViewController {
-               print("Success")
                SsSurveyView(properties: properties).loadFullscreenSurvey(parent: parentViewController, delegate: SurveyDelegate(), domain: domain, token: token, params: params)
-           } else {
-               print("Error: Unable to access parentViewController.")
            }
        }
 }
