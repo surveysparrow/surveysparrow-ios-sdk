@@ -8,7 +8,9 @@
 # SpotChecks
 
 ### SpotCheck Documentation is available here
-### [SpotCheck-iOS-Docs](https://surveysparrow.gitbook.io/spotchecks/how-to-use-spotchecks/mobile-spotcheck/ios)
+### [SpotCheck-iOS-UIKit-Docs](https://developers.surveysparrow.com/spotchecks/mobile-spotchecks/ios/ui-kit)
+
+**Requirements:** iOS 15.0 or newer, UIKit (Navigation Controller or Tab Bar Controller), Swift Package Manager.
 
 <br>
 <br>
