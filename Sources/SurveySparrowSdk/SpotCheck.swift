@@ -1,167 +1,117 @@
 import SwiftUI
+import WebKit
+
+// MARK: - Public API — Preserved from old architecture
+// Example app uses: Spotcheck(domainName:, targetToken:, userDetails:, sparrowLang:, surveyDelegate:)
+// Methods: .TrackScreen(screen:), .TrackEvent(onScreen:, event:), .navControllerFinder, .CloseSpotchecks()
 
 @available(iOS 15.0, *)
 public struct Spotcheck: View {
-    
-    @ObservedObject var state: SpotcheckState
-    
+    @ObservedObject private var sdk: SpotCheckSDK
+
+    private let domainName: String
+    private let targetToken: String
+    private let userDetails: [String: Any]
+    private let variables: [String: Any]
+    private let customProperties: [String: Any]
+    private let sparrowLang: String
+    private let surveyDelegate: SsSpotcheckDelegate
+    private let isUIKitApp: Bool
+
+    /// `isUIKitApp` is kept for 3.0.x apps: when true the SDK shows SpotChecks in its own overlay window.
     public init(
-                 domainName:String,
-                 targetToken: String,
-                 userDetails: [String: Any] = [:],
-                 variables: [String: Any] = [:],
-                 customProperties: [String: Any] = [:],
-                 sparrowLang: String = "",
-                 surveyDelegate: SsSpotcheckDelegate = ssSurveyDelegate(),
-                 isUIKitApp: Bool = false
+        domainName: String,
+        targetToken: String,
+        userDetails: [String: Any] = [:],
+        variables: [String: Any] = [:],
+        customProperties: [String: Any] = [:],
+        sparrowLang: String = "",
+        surveyDelegate: SsSpotcheckDelegate = ssSurveyDelegate(),
+        isUIKitApp: Bool = false
     ) {
-        self.state = SpotcheckState(
-            targetToken: targetToken,
-            domainName: domainName,
-            userDetails: userDetails,
-            variables: variables,
-            customProperties: customProperties,
-            sparrowLang: sparrowLang,
-            surveyDelegate: surveyDelegate,
-            isUIKitApp: isUIKitApp
-        )
+        self.domainName = domainName
+        self.targetToken = targetToken
+        self.userDetails = userDetails
+        self.variables = variables
+        self.customProperties = customProperties
+        self.sparrowLang = sparrowLang
+        self.surveyDelegate = surveyDelegate
+        self.isUIKitApp = isUIKitApp
+        self.sdk = SpotCheckSDKManager.shared.sdk(for: targetToken)
     }
-    
+
+    public func TrackScreen(screen: String) {
+        attachOverlayIfUIKit()
+        sdk.trackScreen(screen)
+    }
+
+    public func TrackEvent(onScreen screen: String, event: [String: Any]) {
+        attachOverlayIfUIKit()
+        sdk.trackEvent(screen, event: event)
+    }
+
+    /// 3.0.x UIKit form. Always reports false: the SDK shows the survey itself, so the app must not present it.
     public func TrackScreen(screen: String, completion: @escaping (Bool) -> Void) {
-        state.sendTrackScreenRequest(screen: screen) { valid, multiShow in
-            if multiShow {
-                if valid {
-                    print("MultiShow Passed")
-                    completion(true)
-                } else {
-                    print("TrackScreen Failed")
-                    completion(false)
-                }
-            } else {
-                if valid {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
-                        state.start()
-                        print("TrackScreen Passed. Delay: \(state.afterDelay) Seconds")
-                        completion(true)
-                    }
-                } else {
-                    print("TrackScreen Failed")
-                    completion(false)
-                }
-            }
-        }
+        TrackScreen(screen: screen)
+        completion(false)
     }
-    
+
+    /// 3.0.x UIKit form. Always reports false: the SDK shows the survey itself, so the app must not present it.
     public func TrackEvent(onScreen screen: String, event: [String: Any], completion: @escaping (Bool) -> Void) {
-        state.sendTrackEventRequest(screen: screen, event: event) { valid in
-            if valid {
-                DispatchQueue.main.asyncAfter(deadline: .now() + state.afterDelay) {
-                    state.start()
-                    print("TrackEvent Passed. Delay: \(state.afterDelay) Seconds")
-                    completion(true)
-                }
-            } else {
-                print("TrackEvent Failed")
-                completion(false)
-            }
-        }
+        TrackEvent(onScreen: screen, event: event)
+        completion(false)
     }
-    
+
+    private func attachOverlayIfUIKit() {
+        guard isUIKitApp else { return }
+        SpotCheckUIKit.shared.attachIfNeeded(self, sdk: sdk)
+    }
+
+    public func CloseSpotchecks() {
+        sdk.closeSpotCheck()
+    }
+
+    public var navControllerFinder: some View {
+        NavControllerFinder(sdk: sdk)
+            .frame(width: 0, height: 0)
+    }
+
     public var body: some View {
-        if  state.isVisible {
-            ZStack {
-                if state.currentQuestionHeight == 0 {
-                    Loader()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color.black.opacity(0.4))
-                }else {
-                    Spacer()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color.black.opacity(0.4))
-                }
-                VStack(){
-                    if state.spotcheckPosition == "bottom" {
-                        Spacer()
-                    }
-                    WebViewContainer(state: state)
-                        .frame(
-                            height:
-                                self.state.isFullScreenMode
-                            ? (UIScreen.main.bounds.height - 100)
-                            : min(
-                                (UIScreen.main.bounds.height - 100),
-                                min(
-                                    state.currentQuestionHeight,
-                                    (state.maxHeight * UIScreen.main.bounds.height)
-                                )
-                            )
-                        )
-                    if state.spotcheckPosition == "top" {
-                        Spacer()
-                    }
-                }
+        SpotCheckRootView(sdk: sdk)
+            .onAppear {
+                sdk.initialize(
+                    domainName: domainName,
+                    targetToken: targetToken,
+                    userDetails: userDetails,
+                    variables: variables,
+                    customProperties: customProperties,
+                    sparrowLang: sparrowLang,
+                    delegate: surveyDelegate
+                )
             }
-        } else {
-            EmptyView()
-        }
     }
 }
 
-@available(iOS 15.0, *)
-struct WebViewContainer: View {
-    var state: SpotcheckState
-    
-    init(state: SpotcheckState) {
-        self.state = state
-    }
-    
-    var body: some View {
-        GeometryReader { geometry in
-            WebView(delegate: state.surveyDelegate , state: state)
-                .frame(width: geometry.size.width, height: geometry.size.height)
-                .fixedSize(horizontal: true, vertical: false)
-                .clipShape(RoundedRectangle(cornerRadius: 0))
-                .shadow(radius: 20)
-                .overlay(alignment: .topTrailing) {
-                    if(state.isCloseButtonEnabled && (self.state.isFullScreenMode || state.currentQuestionHeight != 0)){
-                        Button {
-                            state.closeSpotCheck()
-                            state.end()
-                        } label: {
-                            Image(systemName: "xmark")
-                        }
-                        .buttonStyle(
-                            CustomButtonStyle(
-                                iconColor: (
-                                    state.closeButtonStyle["ctaButton"] != nil
-                                    && state.closeButtonStyle["ctaButton"]!.isNotHex()
-                                ) ? "#000000" : state.closeButtonStyle["ctaButton"] ?? "#000000"
-                            )
-                        )
-                    }
-                }
-        }
-    }
+// MARK: - Default Delegate (no-op)
+
+@available(iOS 13.0, *)
+public class ssSurveyDelegate: SsSpotcheckDelegate {
+    public init() {}
+    public func handleSurveyResponse(response: [String: AnyObject]) async {}
+    public func handleSurveyLoaded(response: [String: AnyObject]) async {}
+    public func handlePartialSubmission(response: [String: AnyObject]) async {}
+    public func handleCloseButtonTap() async {}
 }
 
-@available(iOS 13.4, *)
-struct CustomButtonStyle: ButtonStyle {
-    var iconColor: String
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size: 15))
-            .padding(24)
-            .foregroundColor(Color(hex: iconColor))
-            .contentShape(Rectangle())
-    }
-}
+// MARK: - Color Extension
 
 @available(iOS 13.0, *)
 extension Color {
     init(hex: String) {
-        let scanner = Scanner(string: hex)
-        scanner.currentIndex = hex.hasPrefix("#") ? hex.index(after: hex.startIndex) : hex.startIndex
+        // #RGB expands to #RRGGBB.
+        var digits = hex.hasPrefix("#") ? String(hex.dropFirst()) : hex
+        if digits.count == 3 { digits = digits.map { "\($0)\($0)" }.joined() }
+        let scanner = Scanner(string: digits)
         var rgb: UInt64 = 0
         scanner.scanHexInt64(&rgb)
         let r = Double((rgb >> 16) & 0xFF) / 255.0
@@ -171,14 +121,109 @@ extension Color {
     }
 }
 
-extension String {
-    func isNotHex() -> Bool {
-        let hexPattern = "^#(?:[0-9a-fA-F]{3}){1,2}$"
-        let regex = try? NSRegularExpression(pattern: hexPattern, options: .caseInsensitive)
-        let matches = regex?.matches(in: self, options: [], range: NSRange(location: 0, length: self.count))
-        return matches?.count == 0
+// MARK: - Navigation Controller Listener
+
+@available(iOS 15.0, *)
+private struct NavControllerFinder: UIViewControllerRepresentable {
+    let sdk: SpotCheckSDK
+
+    func makeUIViewController(context: Context) -> NavigationControllerSniffer {
+        let vc = NavigationControllerSniffer()
+        vc.sdk = sdk
+        return vc
+    }
+
+    func updateUIViewController(_ uiViewController: NavigationControllerSniffer, context: Context) {}
+}
+
+@available(iOS 15.0, *)
+final class NavigationControllerSniffer: UIViewController {
+    weak var sdk: SpotCheckSDK?
+
+    override func didMove(toParent parent: UIViewController?) {
+        super.didMove(toParent: parent)
+        guard let nav = parent?.navigationController else { return }
+        SsNavigationListener.attach(to: nav, sdk: sdk)
     }
 }
+
+/// Listens for pushes/pops without replacing the host app's own navigation delegate (calls are forwarded to it).
+@available(iOS 15.0, *)
+final class SsNavigationListener: NSObject, UINavigationControllerDelegate {
+    private static var associationKey = 0
+    private weak var sdk: SpotCheckSDK?
+    private weak var hostDelegate: UINavigationControllerDelegate?
+
+    static func attach(to nav: UINavigationController, sdk: SpotCheckSDK?) {
+        if let existing = nav.delegate as? SsNavigationListener {
+            existing.sdk = sdk
+            return
+        }
+        let listener = SsNavigationListener()
+        listener.sdk = sdk
+        listener.hostDelegate = nav.delegate
+        // `delegate` is weak; the navigation controller keeps the listener alive.
+        objc_setAssociatedObject(nav, &associationKey, listener, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        nav.delegate = listener
+        if let host = listener.hostDelegate {
+            // UIKit caches responds(to:) at assignment; re-assign when the host delegate goes away.
+            let watcher = DeallocWatcher { [weak nav, weak listener] in
+                guard let nav, let listener, nav.delegate === listener else { return }
+                let reassign = {
+                    nav.delegate = nil
+                    nav.delegate = listener
+                }
+                if Thread.isMainThread { reassign() } else { DispatchQueue.main.async(execute: reassign) }
+            }
+            objc_setAssociatedObject(host, &DeallocWatcher.key, watcher, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+
+    func navigationController(
+        _ navigationController: UINavigationController,
+        willShow viewController: UIViewController,
+        animated: Bool
+    ) {
+        hostDelegate?.navigationController?(navigationController, willShow: viewController, animated: animated)
+        // Interactive swipe-back: close only if the swipe completes (a cancelled swipe stays on the screen).
+        if let coordinator = navigationController.transitionCoordinator, coordinator.isInteractive {
+            // Hold the revealed screen's trackScreen until the reset has run.
+            let sdk = self.sdk
+            sdk?.beginInteractiveNavigation()
+            coordinator.notifyWhenInteractionChanges { context in
+                if context.isCancelled {
+                    sdk?.cancelInteractiveNavigation()
+                } else {
+                    sdk?.handleNavigationChange()
+                }
+            }
+            return
+        }
+        sdk?.handleNavigationChange()
+    }
+
+    override func responds(to aSelector: Selector!) -> Bool {
+        super.responds(to: aSelector) || (hostDelegate?.responds(to: aSelector) ?? false)
+    }
+
+    override func forwardingTarget(for aSelector: Selector!) -> Any? {
+        hostDelegate?.responds(to: aSelector) == true ? hostDelegate : super.forwardingTarget(for: aSelector)
+    }
+}
+
+/// Runs a callback when its owner object is deallocated.
+private final class DeallocWatcher: NSObject {
+    static var key = 0
+    private let onDealloc: () -> Void
+
+    init(_ onDealloc: @escaping () -> Void) {
+        self.onDealloc = onDealloc
+    }
+
+    deinit { onDealloc() }
+}
+
+// MARK: - Loader View
 
 @available(iOS 13.0, *)
 struct Loader: View {
@@ -189,33 +234,15 @@ struct Loader: View {
             Circle()
                 .stroke(style: StrokeStyle(lineWidth: 6.0, lineCap: .round, lineJoin: .round))
                 .opacity(0.3)
-                .foregroundColor(Color.black)
-            
+                .foregroundColor(.black)
             Circle()
                 .trim(from: 0.0, to: 0.7)
                 .stroke(lineWidth: 6.0)
-                .foregroundColor(Color.white)
+                .foregroundColor(.white)
                 .rotationEffect(Angle(degrees: isAnimating ? 360 : 0))
-                .animation(Animation.linear(duration: 1.5).repeatForever(autoreverses: false))
-                .onAppear {
-                    self.isAnimating = true
-                }
+                .animation(Animation.linear(duration: 1.5).repeatForever(autoreverses: false), value: isAnimating)
+                .onAppear { isAnimating = true }
         }
-        .frame(width: 60.0, height: 60.0)
+        .frame(width: 60, height: 60)
     }
-}
-
-@available(iOS 13.0, *)
-public class ssSurveyDelegate: SsSpotcheckDelegate {
-
-    public init() {}
-
-    public func handleSurveyResponse(response: [String : AnyObject]) async{}
-
-    public func handleSurveyLoaded(response: [String : AnyObject]) async{}
-    
-    public func handlePartialSubmission(response: [String : AnyObject]) async {}
-
-    public func handleCloseButtonTap() async{}
-    
 }
