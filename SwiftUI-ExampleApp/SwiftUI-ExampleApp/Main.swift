@@ -13,8 +13,8 @@ import SurveySparrowSdk
 
 
 var spotCheck = Spotcheck(
-    domainName: "kalai.in.ngrok.io",
-    targetToken: "tar-xg8WgaPkZcyVnymxWfcDJv",
+    domainName: "",
+    targetToken: "",
     userDetails: [:],
     sparrowLang: "",
     surveyDelegate: SsDelegate()
