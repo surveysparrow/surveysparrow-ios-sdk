@@ -4,10 +4,6 @@ import PackageDescription
 let package = Package(
     name: "SurveySparrowSdk",
     
-    platforms: [
-        .iOS(.v15)
-    ],
-    
     products: [
         .library(
             name: "SurveySparrowSdk",

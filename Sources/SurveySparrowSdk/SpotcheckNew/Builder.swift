@@ -17,6 +17,7 @@ private struct SpotcheckActionRunnerKey: EnvironmentKey {
     static let defaultValue: ((String, [String: Any]) -> Void)? = nil
 }
 
+@available(iOS 15.0, *)
 extension EnvironmentValues {
     var spotcheckActionRunner: ((String, [String: Any]) -> Void)? {
         get { self[SpotcheckActionRunnerKey.self] }
@@ -256,6 +257,7 @@ func renderNode(_ node: [String: Any], context: BuilderContext, key: String) -> 
 }
 
 /// Uniform tap feedback on every platform: dim while pressed.
+@available(iOS 15.0, *)
 private struct PressedOpacityButtonStyle: ButtonStyle {
     let pressedOpacity: Double
     func makeBody(configuration: Configuration) -> some View {
@@ -264,6 +266,7 @@ private struct PressedOpacityButtonStyle: ButtonStyle {
 }
 
 /// Optional shadow (shadowRadius, shadowColor, shadowOffsetX/Y); applied outside any clip.
+@available(iOS 15.0, *)
 private func applyShadow(_ style: [String: Any], _ view: AnyView) -> AnyView {
     guard let radius = toDoubleOpt(style["shadowRadius"]), radius > 0 else { return view }
     let color = (style["shadowColor"] as? String).map { parseColor($0) } ?? Color.black.opacity(0.33)
@@ -685,6 +688,7 @@ private let sidePaddingKeys = ["paddingTop", "paddingBottom", "paddingLeft", "pa
 private let newMarginKeys = ["margin", "marginTop", "marginBottom", "marginLeft", "marginRight"]
 
 // Container padding: per-side wins, else today's additive padding + axis value.
+@available(iOS 15.0, *)
 private func containerPaddingInsets(_ style: [String: Any]) -> EdgeInsets {
     let p = styleNum(style, "padding") ?? 0
     let ph = styleNum(style, "paddingHorizontal") ?? 0
@@ -698,6 +702,7 @@ private func containerPaddingInsets(_ style: [String: Any]) -> EdgeInsets {
 }
 
 // RN margin: per-side, then axis, then margin; zero when absent.
+@available(iOS 15.0, *)
 private func marginInsets(_ style: [String: Any]) -> EdgeInsets {
     let m = styleNum(style, "margin")
     let mh = styleNum(style, "marginHorizontal") ?? m ?? 0
@@ -711,6 +716,7 @@ private func marginInsets(_ style: [String: Any]) -> EdgeInsets {
 }
 
 // RN alignItems/justifyContent token → horizontal alignment.
+@available(iOS 15.0, *)
 private func flexHAlign(_ token: String?) -> HorizontalAlignment? {
     switch token?.lowercased() {
     case "flex-start", "start": return .leading
@@ -721,6 +727,7 @@ private func flexHAlign(_ token: String?) -> HorizontalAlignment? {
 }
 
 // RN alignItems/justifyContent token → vertical alignment.
+@available(iOS 15.0, *)
 private func flexVAlign(_ token: String?) -> VerticalAlignment? {
     switch token?.lowercased() {
     case "flex-start", "start": return .top
@@ -731,6 +738,7 @@ private func flexVAlign(_ token: String?) -> VerticalAlignment? {
 }
 
 // ZStack/Frame alignment: column justifyContent → vertical, alignItems → horizontal; base when absent.
+@available(iOS 15.0, *)
 private func flexZAlignment(_ style: [String: Any], base: Alignment) -> Alignment {
     let h = flexHAlign(styleString(style, key: "alignItems"))
     let v = flexVAlign(styleString(style, key: "justifyContent"))
@@ -1530,6 +1538,7 @@ func applyFrameStyle<Content: View>(_ style: [String: Any], @ViewBuilder content
 }
 
 /// RN `marginVertical` / `marginTop` / `marginBottom` on Image — SwiftUI uses padding on the outer view.
+@available(iOS 15.0, *)
 private func imageMarginEdgeInsets(_ style: [String: Any]) -> EdgeInsets {
     let mv = toDoubleOpt(style["marginVertical"]) ?? 0
     let mt = toDoubleOpt(style["marginTop"]) ?? mv
