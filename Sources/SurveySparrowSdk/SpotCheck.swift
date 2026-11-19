@@ -36,8 +36,14 @@ public struct Spotcheck: View {
         self.sdk = SpotCheckSDKManager.shared.sdk(for: targetToken)
     }
 
-    public func TrackScreen(screen: String) {
-        sdk.trackScreen(screen)
+    /// Values passed here are merged into the init values and kept for later calls.
+    public func TrackScreen(
+        screen: String,
+        userDetails: [String: Any] = [:],
+        variables: [String: Any] = [:],
+        customProperties: [String: Any] = [:]
+    ) {
+        sdk.trackScreen(screen, variables: variables, customProperties: customProperties, userDetails: userDetails)
     }
 
     public func TrackEvent(onScreen screen: String, event: [String: Any]) {
