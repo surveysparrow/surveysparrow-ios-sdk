@@ -38,9 +38,15 @@ public final class SpotCheckUIKit {
         host(view, sdk: SpotCheckSDKManager.shared.sdk(for: targetToken), in: windowScene)
     }
 
-    public func trackScreen(_ screen: String) {
+    /// Values passed here are merged into the init values and kept for later calls.
+    public func trackScreen(
+        _ screen: String,
+        userDetails: [String: Any] = [:],
+        variables: [String: Any] = [:],
+        customProperties: [String: Any] = [:]
+    ) {
         observeVisibleNavigation()
-        spotcheck?.TrackScreen(screen: screen)
+        spotcheck?.TrackScreen(screen: screen, userDetails: userDetails, variables: variables, customProperties: customProperties)
     }
 
     public func trackEvent(onScreen screen: String, event: [String: Any]) {
